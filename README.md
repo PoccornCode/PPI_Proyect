@@ -1,7 +1,7 @@
-# Sistema de Subastas en Línea - PPI - Ciclo 2-2026
+# Sistema de Subastas en Línea - PPI | Ciclo II-2026
 
 ## Integrantes
-- Ricardo Alexander Villalta López
+- Ricardo Alexander Villalta López (VL24006)
 - Nathaly Saraí Flores Hernández (FH24011)
 - Jhonatan Santos Perdomo Martínez (PM24024)
 - Adán Edenilson Hernández Acosta (HA25004)
