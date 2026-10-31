@@ -51,25 +51,6 @@
     cursor: default
 }
 
-.btn-primary-ppi {
-    color: #000;
-    background-color: #5e7325;
-    border-color: #5e7325
-}
-
-.btn-primary-ppi:hover {
-    color: #000;
-    background-color: #3d91ff;
-    border-color: #328aff
-}
-
-.btn-check:focus+.btn-primary-ppi,
-.btn-primary-ppi:focus {
-    color: #000;
-    background-color: #3d91ff;
-    border-color: #328aff;
-    box-shadow: 0 0 0 .25rem rgba(23, 106, 217, .5)
-}
 
 :root {
     --bs-blue: #0d6efd;
@@ -2303,10 +2284,10 @@ progress {
     font-size: 1rem;
     font-weight: 400;
     line-height: 1.5;
-    color: #747d88;
-    background-color: #fff;
+    color: #a7a59d;
+    background-color: #080708;
     background-clip: padding-box;
-    border: 1px solid #ced4da;
+    border:2px solid #191c17;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -2333,11 +2314,11 @@ progress {
 }
 
 .form-control:focus {
-    color: #747d88;
-    background-color: #fff;
-    border-color: #8dbeff;
+    color: #c9c9c9;
+    background-color: #191c17;
+    border-color: #658807;
     outline: 0;
-    box-shadow: 0 0 0 .25rem rgba(27, 125, 255, .25)
+    box-shadow: 0 0 0 .25rem rgba(25, 28, 23, .8)
 }
 
 .form-control::-webkit-date-and-time-value {
@@ -3219,10 +3200,10 @@ fieldset:disabled .btn {
 
 .btn-check:focus+.btn-primary,
 .btn-primary:focus {
-    color: #000;
+    color: #fff;
     background-color: #4c5c1e;
     border-color: #4c5c1e;
-    box-shadow: 0 0 0 .1rem rgba(23, 106, 217, .5)
+    box-shadow: 0 0 0 .1rem #658807;
 }
 
 .btn-check:checked+.btn-primary,
@@ -3230,9 +3211,9 @@ fieldset:disabled .btn {
 .btn-primary:active,
 .btn-primary.active,
 .show>.btn-primary.dropdown-toggle {
-    color: #000;
-    background-color: #4997ff;
-    border-color: #328aff
+    color: #fff;
+   background-color: #658807;
+    border-color: #4c5c1e
 }
 
 .btn-check:checked+.btn-primary:focus,
@@ -3240,14 +3221,14 @@ fieldset:disabled .btn {
 .btn-primary:active:focus,
 .btn-primary.active:focus,
 .show>.btn-primary.dropdown-toggle:focus {
-    box-shadow: 0 0 0 .25rem rgba(23, 106, 217, .5)
+    box-shadow: 0 0 0 .1rem #658807;
 }
 
 .btn-primary:disabled,
 .btn-primary.disabled {
-    color: #000;
-    background-color: #1b7dff;
-    border-color: #1b7dff
+    color: #fff;
+   background-color: #658807;
+    border-color: #4c5c1e
 }
 
 .btn-secondary {
@@ -3264,10 +3245,10 @@ fieldset:disabled .btn {
 
 .btn-check:focus+.btn-secondary,
 .btn-secondary:focus {
-    color: #000;
-    background-color: #89919a;
-    border-color: #828a94;
-    box-shadow: 0 0 0 .25rem rgba(99, 106, 116, .5)
+    color: #c9c9c9;
+    background-color: #080708;
+    border:3px solid #191c17;
+    box-shadow: 0 0 0 .25rem #658807;
 }
 
 .btn-check:checked+.btn-secondary,
@@ -3275,9 +3256,9 @@ fieldset:disabled .btn {
 .btn-secondary:active,
 .btn-secondary.active,
 .show>.btn-secondary.dropdown-toggle {
-    color: #000;
-    background-color: #9097a0;
-    border-color: #828a94
+    color: #c9c9c9;
+    background-color: #080708;
+    border:3px solid #191c17;
 }
 
 .btn-check:checked+.btn-secondary:focus,
@@ -3285,14 +3266,14 @@ fieldset:disabled .btn {
 .btn-secondary:active:focus,
 .btn-secondary.active:focus,
 .show>.btn-secondary.dropdown-toggle:focus {
-    box-shadow: 0 0 0 .25rem rgba(99, 106, 116, .5)
+     box-shadow: 0 0 0 .25rem #658807;
 }
 
 .btn-secondary:disabled,
 .btn-secondary.disabled {
-    color: #000;
-    background-color: #747d88;
-    border-color: #747d88
+    color: #c9c9c9;
+    background-color: #080708;
+    border:3px solid #191c17;
 }
 
 .btn-success {
@@ -4943,9 +4924,8 @@ fieldset:disabled .btn {
     flex-direction: column;
     min-width: 0;
     word-wrap: break-word;
-    background-color: #fff;
     background-clip: border-box;
-    border: 1px solid rgba(0, 0, 0, .125);
+    border: 1px solid rgba(25, 28, 23, 1);
     border-radius: 10px
 }
 
@@ -7299,7 +7279,7 @@ fieldset:disabled .btn {
 }
 
 .shadow {
-    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important
+    box-shadow: 0 .2rem .4rem rgba(25, 28, 23, 1) !important
 }
 
 .shadow-sm {
