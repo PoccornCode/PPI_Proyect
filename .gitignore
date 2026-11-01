@@ -2,3 +2,5 @@
 .idea/
 *.log
 nbproject/
+env.php
+config/env.php
