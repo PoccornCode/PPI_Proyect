@@ -91,18 +91,36 @@
     }
 }
 
+main{
+    flex: 1;
+  background-image: url("../img/tileHexa.png");
+  background-repeat: repeat;      /* se repite en X e Y (es el valor por defecto) */
+  background-size: 200px 200px;   /* tamaño de cada "baldosa" */
+  background-color: #080708;   
+     /* color de respaldo mientras carga */
+}
+html,body{
+    margin: 0;
+    min-height: 100%;
+}
 body {
     margin: 0;
     font-family: "Open Sans", sans-serif;
     font-size: 1rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     font-weight: 400;
+    min-height: 100vh;
     line-height: 1.5;
     color: #080708;
     background-color: #f5e9e2;;
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0)
 }
+footer{
 
+}
 hr {
     margin: 1rem 0;
     color: inherit;
