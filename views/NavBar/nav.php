@@ -17,10 +17,10 @@ if ($host === 'localhost') {
             <nav class="navbar bg-dark-ppi navbar-expand-xl row">
                 
                 <div class="row col-7 col-xl-3 py-1 mt-3 mb-1">
-                    <div class="col-6">
+                    <div class="col-5">
                         <p class="text-main-ppi display-5" style="line-height: 0;">Gavel</p>
                     </div>
-                    <div class="col-6">
+                    <div class="col-4">
                         <p class="text-third-ppi display-6 mb-2" style="line-height: 0;">.net</p>
                     </div>
                 </div>

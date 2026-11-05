@@ -1,13 +1,49 @@
 <footer>
-    <div class="container-fluid bg-dark-ppi" style="border-top: 3px solid #191c17;">
-        <div class="container py-5">
-            <div class="pb-4 mb-4">
+    <div class="container-fluid bg-dark-ppi-2 footer-ppi" style="border-top: 3px solid #658807;">
+        <div class="container py-4 row">
 
+            <div class="pb-2 mb-1 col-12 col-lg-6">
+                <div class="row py-2 mt-3 mb-1">
+                    <div class="col-lg-3 col-4">
+                        <p class="text-main-ppi" style="line-height: 0;
+                        font-size:40px">Gavel</p>
+                    </div>
+                    <div class="col-lg-3 col-4">
+                        <p class="text-third-ppi mb-2" style="line-height: 0;
+                        font-size:30px;">.net</p>
+                    </div>
+                    <div class="col-lg-7">
+                    </div>
+                </div>
+                <div>
+                    <p class="text-main-ppi" style="font-size:13px">
+                        Sistema de subastas en linea. Publica, puja y gana con ofertas transparentes
+                    </p>
+                </div>
             </div>
+
+            <div class=" mb-1 col-12 col-lg-3">
+                <div>
+                    <p class="text-main-ppi fw-bold">
+                        Explorar
+                    </p>
+                </div>
+                <div>
+                    <a href="404.html" class="nav-item link-ppi px-1">Subastas</a>
+                </div>
+                <div>
+                    <a href="404.html" class="nav-item link-ppi px-1">Categorias</a>
+                </div>
+                <div>
+                    <a href="404.html" class="nav-item link-ppi px-1">Como funciona</a>
+                </div>
+            </div>
+
+
         </div>
     </div>
 </footer>
-    
+
 
 
 <!-- <div class="container-fluid bg-dark footer py-5">
