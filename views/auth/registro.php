@@ -103,6 +103,8 @@ $pagina = "registro";
         </div>
     </div>
 
+    <?php include "../Footer/footer.php"; ?>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../../assets/js/registro.js?v=2"></script>

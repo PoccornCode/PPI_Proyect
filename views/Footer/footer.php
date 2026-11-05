@@ -1,10 +1,10 @@
 <footer>
-    <div class="container-fluid bg-dark-ppi-2 footer-ppi" style="border-top: 3px solid #658807;">
+    <div class="container-fluid bg-dark-ppi-2 footer-ppi align-items-center" style="border-top: 3px solid #658807;">
         <div class="container py-4 row">
 
             <div class="pb-2 mb-1 col-12 col-lg-6">
                 <div class="row py-2 mt-3 mb-1">
-                    <div class="col-lg-3 col-4">
+                    <div class="col-lg-2 col-4">
                         <p class="text-main-ppi" style="line-height: 0;
                         font-size:40px">Gavel</p>
                     </div>
@@ -16,7 +16,7 @@
                     </div>
                 </div>
                 <div>
-                    <p class="text-main-ppi" style="font-size:13px">
+                    <p class="text-main-ppi">
                         Sistema de subastas en linea. Publica, puja y gana con ofertas transparentes
                     </p>
                 </div>
@@ -38,8 +38,32 @@
                     <a href="404.html" class="nav-item link-ppi px-1">Como funciona</a>
                 </div>
             </div>
+            <div class=" mb-1 col-12 col-lg-3">
+                <div>
+                    <p class="text-main-ppi fw-bold">
+                        Tu cuenta
+                    </p>
+                </div>
+                <div>
+                    <a href="404.html" class="nav-item link-ppi px-1">Registrarse</a>
+                </div>
+                <div>
+                    <a href="404.html" class="nav-item link-ppi px-1">Iniciar sesion</a>
+                </div>
+                <div>
+                    <a href="404.html" class="nav-item link-ppi px-1">Contacto</a>
+                </div>
+            </div>
 
 
+        </div>
+    </div>
+    <div class=" row container-fluid bg-dark-ppi-2" style="border-top: 1px solid #383f2f;">
+        <div class="col-3"></div>
+        <div class="col-6">
+            <p class="text-main-ppi py-3"style="text-align:center;">
+                Proyecto PPI - Ciclo II-2026
+            </p>
         </div>
     </div>
 </footer>
