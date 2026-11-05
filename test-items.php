@@ -43,7 +43,7 @@
 
     <!-- Navbar start -->
     <?php
-    include "forms/NavBar/nav.php";
+    include "views/NavBar/nav.php";
     ?>
     <!-- Navbar End -->
 
@@ -1672,7 +1672,7 @@
 
 
 
-    <?php include "forms/Footer/footer.php"; ?>
+    <?php include "views/Footer/footer.php"; ?>
 
     <!-- Back to Top -->
     <a href="#" class="btn btn-primary border-2 border-white rounded-circle back-to-top"><i

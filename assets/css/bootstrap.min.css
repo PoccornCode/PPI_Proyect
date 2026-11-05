@@ -10,10 +10,13 @@
     background-color: #080708;
 }
 .text-main-ppi{
-    color: #c9c9c9
+    color: #c9c9c9;
 }
 .text-second-ppi{
-    color: #a7a59d
+    color: #a7a59d;
+}
+.text-third-ppi{
+    color: #62803f;
 }
 
 .nav-ppi{
