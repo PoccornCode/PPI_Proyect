@@ -17,6 +17,10 @@ $pagina = "registro";
 
 <body class="bg-dark-ppi">
 
+    <?php
+    include "../NavBar/nav.php";
+    ?>
+
     <div class="container-fluid py-5">
         <div class="container py-4">
             <div class="row justify-content-center">
