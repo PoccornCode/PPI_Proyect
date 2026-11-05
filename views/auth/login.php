@@ -4,7 +4,6 @@ session_start();
 $titulo = "Iniciar Sesión";
 $pagina = "login";
 
-// Si ya hay sesión activa, redirige al inicio
 if (!empty($_SESSION['id_usuario'])) {
     header("Location: ../../index.php");
     exit;
@@ -19,17 +18,15 @@ if (!empty($_SESSION['id_usuario'])) {
     <title><?= $titulo ?></title>
     <link href="../../assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
-
-     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <link href="../../assets/css/style.css" rel="stylesheet">
+    <link href="../../assets/css/main.css" rel="stylesheet">
     <link href="../../assets/css/forms.css?v=2" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
 
-    <?php
-    include "../NavBar/nav.php";
-    ?>
+    <?php include "../NavBar/nav.php"; ?>
 
     <div class="container-fluid py-5">
         <div class="container py-4">

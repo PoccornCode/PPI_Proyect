@@ -11,10 +11,10 @@ $pagina = "registro";
     <title><?= $titulo ?></title>
     <link href="../../assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
-
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <link href="../../assets/css/style.css" rel="stylesheet">
     <link href="../../assets/css/forms.css?v=2" rel="stylesheet">
+    <link href="../../assets/css/main.css" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -30,10 +30,6 @@ $pagina = "registro";
                     <div class="card shadow p-4 p-md-5">
                         <h3 class="mb-2 text-center text-main-ppi fw-bold">Crear una cuenta</h3>
                         <p class="mb-4 text-center text-second-ppi fs-6">Completa tus datos para registrarte</p>
-
-                        <?php if (!empty($error)) { ?>
-                            <div class="alert alert-danger" role="alert"><?= $error ?></div>
-                        <?php } ?>
 
                         <form id="formRegistro" name="formRegistro" method="POST" action="../../controllers/registro_controller.php" autocomplete="off">
                             <div class="row g-3">

@@ -8,6 +8,7 @@ require_once __DIR__ . '/../../config/conexion.php';
 $titulo = "Registrar Subasta";
 $pagina = "registro-subasta";
 
+//Agregar a dao o controller despues
 $categorias = [];
 $catQuery = $conexion->query("SELECT id_categoria, nombre FROM sb_categoria ORDER BY nombre ASC");
 if ($catQuery) {
@@ -84,7 +85,6 @@ if ($catQuery) {
             border-bottom-left-radius: 10px;
         }
 
-        /* Zona de carga de fotos sobria */
         .upload-dropzone {
             border: 2px dashed #23271f;
             background: #080708;
@@ -135,9 +135,9 @@ if ($catQuery) {
     <?php include __DIR__ . "/../NavBar/nav.php"; ?>
 
     <main class="py-5">
-        <div class="container py-2">
+        <div class="container-fluid px-4 px-lg-5 py-2">
             <div class="row justify-content-center">
-                <div class="col-lg-9 col-xl-8">
+                <div class="col-lg-9 col-xl-7">
 
                     <div class="d-flex justify-content-between align-items-end mb-4">
                         <div>
@@ -164,6 +164,7 @@ if ($catQuery) {
                                     <label for="id_categoria" class="form-label text-main-ppi fw-bold small">Categoría</label>
                                     <select class="form-select select-gavel" id="id_categoria" name="id_categoria" required>
                                         <option value="" disabled selected>Selecciona una categoría...</option>
+                                        //Agregas a dao o controller despues
                                         <?php if (!empty($categorias)): ?>
                                             <?php foreach ($categorias as $cat): ?>
                                                 <option value="<?= $cat['id_categoria'] ?>"><?= htmlspecialchars($cat['nombre']) ?></option>
@@ -208,10 +209,7 @@ if ($catQuery) {
                         </div>
 
                         <div class="card card-gavel p-4 mb-4 shadow">
-                            <h5 class="section-title">
-                                <span class="step-num">03.</span> Parámetros de la Subasta
-                            </h5>
-
+                            <h5 class="section-title">Parámetros de la Subasta</h5>
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label for="precio_inicial" class="form-label text-main-ppi fw-bold small">Precio Inicial ($ USD)</label>
