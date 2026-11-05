@@ -20,7 +20,7 @@ if ($host === 'localhost') {
                         <p class="text-main-ppi display-5" style="line-height: 0;">Gavel</p>
                     </div>
                     <div class="col-5">
-                        <p class="text-second-ppi display-6 mb-2" style="line-height: 0;">.net</p>
+                        <p class="text-third-ppi display-6 mb-2" style="line-height: 0;">.net</p>
                     </div>
                 </div>
                 <button class="navbar-toggler py-2 px-3 col-6" type="button" data-bs-toggle="collapse"
