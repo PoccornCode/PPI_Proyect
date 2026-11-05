@@ -27,15 +27,15 @@ if ($host === 'localhost') {
 
                 <button class="navbar-toggler py-2 px-2 col-2 m-3" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarCollapse">
-                    <span class="fa fa-bars text-main-ppi p-1">
-                        <i class="bi bi-arrow-bar-down fs-2"></i>
+                    <span class="text-main-ppi p-1">
+                        <i class="fa fa-bars fs-2"></i>
                     </span>
                 </button>
 
                 <div class="collapse navbar-collapse nbg-dark-ppi py-1 col-2" id="navbarCollapse">
 
                     <div class="navbar-nav mx-auto">
-                        <a href="<?php echo $base_url; ?>404.html" class="nav-item link-ppi">Inicio</a>
+                        <a href="<?php echo $base_url; ?>index.php" class="nav-item link-ppi">Inicio</a>
                         <a href="404.html" class="nav-item link-ppi">Subastas</a>
                         <a href="404.html" class="nav-item link-ppi active">Categorias<a>
                                 <a href="404.html" class="nav-item link-ppi active">Como funciona<a>

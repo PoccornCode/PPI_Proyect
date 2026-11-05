@@ -71,6 +71,10 @@ $urlSubasta = 'views/subasta.php?id=';
 <body class="bg-dark-ppi">
 
     <!--HEADER CALIDAD ADAN-->
+    <?php
+    include "views/NavBar/nav.php";
+    ?>
+
 
     <main class="container py-4">
 
