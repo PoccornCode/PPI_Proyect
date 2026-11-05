@@ -37,6 +37,7 @@ if ($catQuery) {
     <!-- Customized Bootstrap & Project Stylesheets -->
     <link href="../../assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="../../assets/css/style.css" rel="stylesheet">
+    <link href="../../assets/css/main.css" rel="stylesheet">
     <link href="../../assets/css/forms.css?v=2" rel="stylesheet">
 
     <style>

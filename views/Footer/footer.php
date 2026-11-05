@@ -1,13 +1,65 @@
 <footer>
-    <div class="container-fluid bg-dark-ppi" style="border-top: 3px solid #191c17;">
-        <div class="container py-5">
-            <div class="pb-4 mb-4">
+    <div class="container-fluid bg-dark-ppi-2 footer-ppi align-items-center" style="border-top: 3px solid #658807;">
+        <div class="container py-4 row">
 
+            <div class="pb-2 mb-1 col-12 col-lg-6">
+                <div class="py-2 mt-2 mb-2 d-flex align-items-baseline gap-1 gavel-brand">
+                    <span class="text-main-ppi fw-bold" style="font-size:2.2rem; line-height:1; font-family:'Raleway',sans-serif;">Gavel</span>
+                    <span class="text-third-ppi fw-bold" style="font-size:1.7rem; line-height:1; font-family:'Raleway',sans-serif;">.net</span>
+                </div>
+                <div>
+                    <p class="text-main-ppi">
+                        Sistema de subastas en linea. Publica, puja y gana con ofertas transparentes
+                    </p>
+                </div>
             </div>
+
+            <div class=" mb-1 col-12 col-lg-3">
+                <div>
+                    <p class="text-main-ppi fw-bold">
+                        Explorar
+                    </p>
+                </div>
+                <div>
+                    <a href="404.html" class="nav-item link-ppi px-1">Subastas</a>
+                </div>
+                <div>
+                    <a href="404.html" class="nav-item link-ppi px-1">Categorias</a>
+                </div>
+                <div>
+                    <a href="404.html" class="nav-item link-ppi px-1">Como funciona</a>
+                </div>
+            </div>
+            <div class=" mb-1 col-12 col-lg-3">
+                <div>
+                    <p class="text-main-ppi fw-bold">
+                        Tu cuenta
+                    </p>
+                </div>
+                <div>
+                    <a href="404.html" class="nav-item link-ppi px-1">Registrarse</a>
+                </div>
+                <div>
+                    <a href="404.html" class="nav-item link-ppi px-1">Iniciar sesion</a>
+                </div>
+                <div>
+                    <a href="404.html" class="nav-item link-ppi px-1">Contacto</a>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+    <div class=" row container-fluid bg-dark-ppi-2" style="border-top: 1px solid #383f2f;">
+        <div class="col-3"></div>
+        <div class="col-6">
+            <p class="text-main-ppi py-3"style="text-align:center;">
+                Proyecto PPI - Ciclo II-2026
+            </p>
         </div>
     </div>
 </footer>
-    
+
 
 
 <!-- <div class="container-fluid bg-dark footer py-5">

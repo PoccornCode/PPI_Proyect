@@ -1,4 +1,28 @@
-﻿/* ===================== HERO ===================== */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@100;600;700;800&display=swap');
+
+/* ===================== LOGO / BRAND ===================== */
+.gavel-brand {
+    font-family: 'Raleway', sans-serif !important;
+    text-decoration: none !important;
+}
+
+.gavel-brand .brand-name {
+    font-family: 'Raleway', sans-serif !important;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #c9c9c9;
+}
+
+.gavel-brand .brand-tld {
+    font-family: 'Raleway', sans-serif !important;
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #62803f;
+}
+
+/* ===================== HERO ===================== */
 .hero-ppi {
     position: relative;
     padding: 130px 0 110px;
