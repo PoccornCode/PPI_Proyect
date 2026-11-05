@@ -102,11 +102,7 @@
 
 main{
     flex: 1;
-  background-image: url("../img/tileHexa.png");
-  background-repeat: repeat;      /* se repite en X e Y (es el valor por defecto) */
-  background-size: 200px 200px;   /* tamaño de cada "baldosa" */
-  background-color: #080708;   
-     /* color de respaldo mientras carga */
+    background-color: #080708;
 }
 html,body{
     margin: 0;
