@@ -19,7 +19,7 @@ $pagina = "registro";
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <link href="../../assets/css/style.css" rel="stylesheet">
-    <link href="../../assets/css/forms.css?v=2" rel="stylesheet">
+    <link href="../../assets/css/forms.css?v=3" rel="stylesheet">
     <link href="../../assets/css/main.css" rel="stylesheet">
 </head>
 

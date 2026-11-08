@@ -8,6 +8,8 @@ const SwalPPI = Swal.mixin({
     buttonsStyling: false
 });
 
+const REGEX_PASSWORD = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#.\-_])[A-Za-z\d@$!%*?&#.\-_]{8,}$/;
+
 function validarCampo(campo) {
     if (!campo) return true;
     const valor = campo.value.trim();
@@ -170,12 +172,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            if (contrasenia.value.length < 8) {
+            if (!REGEX_PASSWORD.test(contrasenia.value)) {
                 contrasenia.classList.add("is-invalid");
                 SwalPPI.fire({
                     icon: "warning",
-                    title: "Contraseña corta",
-                    text: "La contraseña debe tener un mínimo de 8 caracteres."
+                    title: "Contraseña débil",
+                    text: "La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un símbolo (@$!%*?&#.-_)."
                 });
                 contrasenia.focus();
                 return;
