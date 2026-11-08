@@ -5,6 +5,8 @@ if (!file_exists(__DIR__ . '/env.php')) {
 
 require_once __DIR__ . '/env.php';
 
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
 $conexion = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
 if ($conexion->connect_error) {
