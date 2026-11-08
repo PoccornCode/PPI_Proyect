@@ -42,14 +42,10 @@ if (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false
 
                         <div class="row col-xl-4 col-12">
                             <div class="col-6">
-                                <a href="<?php echo $base_url; ?>views/auth/registro.php">
-                                    <button type="button" class="btn btn-primary rounded w-100 m-2">Registrarse</button>
-                                </a>
+                                <a href="<?php echo $base_url; ?>views/auth/registro.php" class="btn btn-primary rounded w-100 m-2">Registrarse</a>
                             </div>
                             <div class="col-6">
-                                <a href="<?php echo $base_url; ?>views/auth/login.php">
-                                    <button type="button" class="btn btn-secondary rounded w-100 m-2">Iniciar Sesion</button>
-                                </a>
+                                <a href="<?php echo $base_url; ?>views/auth/login.php" class="btn btn-secondary rounded w-100 m-2">Iniciar Sesion</a>
                             </div>
                         </div>
                     </div>

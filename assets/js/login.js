@@ -1,12 +1,48 @@
-const SwalPPI = Swal.mixin({
-    customClass: {
-        popup: "swal-ppi-popup",
-        title: "swal-ppi-title",
-        htmlContainer: "swal-ppi-html",
-        confirmButton: "btn swal-ppi-confirm-btn"
-    },
-    buttonsStyling: false
-});
+let modalInstance = null;
+let callbackModal = null;
+
+function mostrarModal(tipo, titulo, mensaje, onCerrar = null) {
+    const modalEl = document.getElementById("modalPPI");
+    const tituloEl = document.getElementById("modalPPITitulo");
+    const cuerpoEl = document.getElementById("modalPPICuerpo");
+    const btnAccion = document.getElementById("btnModalPPIAccion");
+
+    if (!modalEl || !tituloEl || !cuerpoEl || !btnAccion) return;
+
+    callbackModal = onCerrar;
+
+    let icon = "";
+    btnAccion.className = "btn btn-ppi-modal btn-sm";
+
+    if (tipo === "success") {
+        icon = '<i class="bi bi-check-circle-fill text-success fs-5"></i>';
+        btnAccion.textContent = "Continuar";
+    } else if (tipo === "danger" || tipo === "error") {
+        icon = '<i class="bi bi-x-circle-fill text-danger fs-5"></i>';
+        btnAccion.className = "btn btn-ppi-modal btn-danger btn-sm";
+        btnAccion.textContent = "Entendido";
+    } else {
+        icon = '<i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i>';
+        btnAccion.className = "btn btn-ppi-modal btn-warning btn-sm";
+        btnAccion.textContent = "Entendido";
+    }
+
+    tituloEl.innerHTML = `${icon} <span>${titulo}</span>`;
+    cuerpoEl.innerHTML = `<p class="mb-0 text-second-ppi">${mensaje}</p>`;
+
+    if (!modalInstance) {
+        modalInstance = new bootstrap.Modal(modalEl);
+        modalEl.addEventListener("hidden.bs.modal", () => {
+            if (typeof callbackModal === "function") {
+                const cb = callbackModal;
+                callbackModal = null;
+                cb();
+            }
+        });
+    }
+
+    modalInstance.show();
+}
 
 function validarCampo(campo) {
     if (!campo) return true;
@@ -72,11 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             if (!todosValidos) {
-                SwalPPI.fire({
-                    icon: "warning",
-                    title: "Campos incompletos",
-                    text: "Por favor ingresa tu usuario y contraseña."
-                });
+                mostrarModal("warning", "Campos incompletos", "Por favor ingresa tu usuario y contraseña.");
                 return;
             }
 
@@ -89,14 +121,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     btnLogin.textContent = "Procesando...";
                 }
 
-                SwalPPI.fire({
-                    title: "Espere...",
-                    text: "Verificando credenciales",
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    didOpen: () => Swal.showLoading()
-                });
-
                 const respuesta = await fetch(formulario.action, {
                     method: "POST",
                     body: datos
@@ -107,36 +131,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 const resultado = await respuesta.json();
-                SwalPPI.close();
 
                 if (resultado.estado) {
-                    SwalPPI.fire({
-                        position: "center",
-                        icon: "success",
-                        title: "¡Bienvenido!",
-                        text: resultado.mensaje || "Inicio de sesión exitoso.",
-                        showConfirmButton: false,
-                        timer: 1500
-                    }).then(() => {
+                    mostrarModal("success", "¡Bienvenido!", resultado.mensaje || "Inicio de sesión exitoso.", () => {
                         window.location.href = resultado.redirect || "../../index.php";
                     });
                 } else {
                     contrasenia.value = "";
-                    SwalPPI.fire({
-                        position: "center",
-                        icon: "error",
-                        title: "Error",
-                        text: resultado.mensaje || "No se pudo iniciar sesión.",
-                        showConfirmButton: true
-                    });
+                    contrasenia.classList.remove("is-valid");
+                    mostrarModal("danger", "Error", resultado.mensaje || "No se pudo iniciar sesión.");
                 }
             } catch (error) {
-                SwalPPI.close();
-                SwalPPI.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: error.message || "Error al procesar la solicitud con el servidor."
-                });
+                mostrarModal("danger", "Error", error.message || "Error al procesar la solicitud con el servidor.");
             } finally {
                 if (btnLogin) {
                     btnLogin.disabled = false;
