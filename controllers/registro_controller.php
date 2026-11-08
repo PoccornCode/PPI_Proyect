@@ -23,10 +23,11 @@ if ($opcion === "guardar") {
         exit;
     }
 
-    if (strlen($contrasenia) < 8) {
+    $regexContrasenia = '/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#.\-_])[A-Za-z\d@$!%*?&#.\-_]{8,}$/';
+    if (!preg_match($regexContrasenia, $contrasenia)) {
         echo json_encode([
             "estado" => false,
-            "mensaje" => "La contraseña debe tener un mínimo de 8 caracteres."
+            "mensaje" => "La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un símbolo (@$!%*?&#.-_)."
         ]);
         exit;
     }
