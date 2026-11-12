@@ -20,7 +20,7 @@ $pagina = "contacto";
     <link href="../../assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="../../assets/css/style.css" rel="stylesheet">
     <link href="../../assets/css/main.css" rel="stylesheet">
-    <link href="../../assets/css/forms.css" rel="stylesheet">
+    <link href="../../assets/css/forms.css?v=17" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
