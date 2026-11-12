@@ -61,7 +61,7 @@ $urlSubasta = 'views/subasta.php?id=';
 
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
-    <link href="assets/css/main.css" rel="stylesheet">
+    <link href="assets/css/main.css?v=7" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -72,18 +72,27 @@ $urlSubasta = 'views/subasta.php?id=';
 
         <section class="hero-ppi" aria-labelledby="hero-titulo">
             <div class="container-fluid px-4 px-lg-5">
-                <div class="row align-items-center">
-                    <div class="col-lg-8 col-xl-7">
-                        <p class="hero-label mb-3">Subastas en línea · El Salvador</p>
-                        <h1 id="hero-titulo" class="hero-titulo text-main-ppi mb-3">
-                            Compra, vende<br>y <span class="text-third-ppi">puja</span> en línea.
+                <div class="row justify-content-center">
+                    <div class="col-12 text-center">
+                        <p class="hero-label mb-4 d-inline-block">Subastas en línea · El Salvador</p>
+                        <h1 id="hero-titulo" class="hero-titulo text-main-ppi mb-4">
+                            Compra, vende y <span class="text-third-ppi">puja</span> en línea.
                         </h1>
-                        <p class="text-second-ppi mb-4" style="max-width:540px; font-size:1.15rem; line-height:1.6;">
-                            Encuentra artículos únicos o publica lo que ya no necesitas. Miles de subastas activas esperan tu oferta.
+                        <p class="text-second-ppi mb-5 mx-auto" style="max-width:620px; font-size:1.15rem; line-height:1.7;">
+                            Encuentra artículos únicos o publica lo que ya no necesitas.
+                            Miles de subastas activas esperan tu oferta.
                         </p>
-                        <div class="d-flex flex-wrap gap-3">
+                        <div class="d-flex flex-wrap justify-content-center gap-3 mb-5">
                             <a href="views/catalogo.php" class="btn btn-primary px-5 py-3 fw-bold">Explorar subastas</a>
                             <a href="views/subastas/registro-producto.php" class="btn btn-secondary px-5 py-3 fw-bold">Publicar artículo</a>
+                        </div>
+                        <!-- Categorías rápidas -->
+                        <div class="d-flex flex-wrap justify-content-center gap-2">
+                            <?php foreach ($categorias as $cat): ?>
+                            <a href="views/catalogo.php?categoria=<?= e($cat['nombre']) ?>" class="hero-cat-pill">
+                                <i class="fa <?= e($cat['icono']) ?>"></i> <?= e($cat['nombre']) ?>
+                            </a>
+                            <?php endforeach; ?>
                         </div>
                     </div>
                 </div>
@@ -168,30 +177,8 @@ $urlSubasta = 'views/subasta.php?id=';
             </div>
         </section>
 
-        <!-- ===================== CATEGORÍAS ===================== -->
-        <section class="py-5" aria-labelledby="titulo-categorias">
-            <div class="container-fluid px-4 px-lg-5">
-                <div class="d-flex justify-content-between align-items-baseline mb-4 flex-wrap gap-2">
-                    <div>
-                        <h2 id="titulo-categorias" class="fw-bold text-main-ppi mb-1">Explora por categoría</h2>
-                        <p class="text-second-ppi mb-0">Encuentra lo que buscas y puja desde cualquier lugar.</p>
-                    </div>
-                </div>
-                <div class="row row-cols-3 row-cols-md-6 g-4 text-center">
-                    <?php foreach ($categorias as $cat) { ?>
-                        <div class="col">
-                            <a href="views/catalogo.php?categoria=<?= urlencode($cat['nombre']) ?>" class="d-block text-decoration-none">
-                                <span class="circulo-categoria"><i class="fas <?= e($cat['icono']) ?> fa-2x" aria-hidden="true"></i></span>
-                                <span class="d-block mt-3 fw-bold text-main-ppi small"><?= e($cat['nombre']) ?></span>
-                            </a>
-                        </div>
-                    <?php } ?>
-                </div>
-            </div>
-        </section>
-
         <!-- ===================== NUEVAS SUBASTAS ===================== -->
-        <section class="py-4" aria-labelledby="titulo-nuevas">
+        <section class="py-5" aria-labelledby="titulo-nuevas">
             <div class="container-fluid px-4 px-lg-5">
                 <div class="d-flex justify-content-between align-items-baseline mb-4 flex-wrap gap-2">
                     <h2 id="titulo-nuevas" class="fw-bold text-main-ppi mb-0">Nuevas subastas</h2>
