@@ -17,6 +17,18 @@
     background-image: none !important;
 }
 
+.form-control.is-valid,
+.form-select.is-valid {
+    border-color: #5e7325 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%235e7325' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e") !important;
+}
+
+.form-control.is-valid:focus,
+.form-select.is-valid:focus {
+    border-color: #6d852c !important;
+    box-shadow: 0 0 0 0.25rem rgba(94, 115, 37, 0.25) !important;
+}
+
 .btn-toggle-eye {
     position: absolute;
     right: 12px;
@@ -40,6 +52,52 @@
     color: #a0a6ad;
     outline: none;
     box-shadow: none;
+}
+
+.modal-content-ppi {
+    background-color: #0f110e;
+    border: 1px solid #23271f;
+    color: #c9c9c9;
+    border-radius: 14px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.85);
+    padding: 0.5rem;
+}
+
+.modal-header-ppi {
+    border-bottom: none;
+    padding-bottom: 0.25rem;
+}
+
+.modal-footer-ppi {
+    border-top: none;
+    padding-top: 0;
+}
+
+.btn-ppi-modal {
+    background-color: #5e7325;
+    border-color: #5e7325;
+    color: #ffffff;
+    font-weight: 600;
+    padding: 0.45rem 1.4rem;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-ppi-modal:hover,
+.btn-ppi-modal:focus {
+    background-color: #6d852c;
+    border-color: #6d852c;
+    color: #ffffff;
+}
+
+.btn-ppi-modal.btn-danger {
+    background-color: #a83232;
+    border-color: #a83232;
+}
+
+.btn-ppi-modal.btn-warning {
+    background-color: #c48b27;
+    border-color: #c48b27;
 }
 
 .swal2-container {

@@ -1,12 +1,50 @@
-const SwalPPI = Swal.mixin({
-    customClass: {
-        popup: "swal-ppi-popup",
-        title: "swal-ppi-title",
-        htmlContainer: "swal-ppi-html",
-        confirmButton: "btn swal-ppi-confirm-btn"
-    },
-    buttonsStyling: false
-});
+const REGEX_PASSWORD = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#.\-_])[A-Za-z\d@$!%*?&#.\-_]{8,}$/;
+
+let modalInstance = null;
+let callbackModal = null;
+
+function mostrarModal(tipo, titulo, mensaje, onCerrar = null) {
+    const modalEl = document.getElementById("modalPPI");
+    const tituloEl = document.getElementById("modalPPITitulo");
+    const cuerpoEl = document.getElementById("modalPPICuerpo");
+    const btnAccion = document.getElementById("btnModalPPIAccion");
+
+    if (!modalEl || !tituloEl || !cuerpoEl || !btnAccion) return;
+
+    callbackModal = onCerrar;
+
+    let icon = "";
+    btnAccion.className = "btn btn-ppi-modal btn-sm";
+
+    if (tipo === "success") {
+        icon = '<i class="bi bi-check-circle-fill text-success fs-5"></i>';
+        btnAccion.textContent = "Continuar";
+    } else if (tipo === "danger" || tipo === "error") {
+        icon = '<i class="bi bi-x-circle-fill text-danger fs-5"></i>';
+        btnAccion.className = "btn btn-ppi-modal btn-danger btn-sm";
+        btnAccion.textContent = "Entendido";
+    } else {
+        icon = '<i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i>';
+        btnAccion.className = "btn btn-ppi-modal btn-warning btn-sm";
+        btnAccion.textContent = "Entendido";
+    }
+
+    tituloEl.innerHTML = `${icon} <span>${titulo}</span>`;
+    cuerpoEl.innerHTML = `<p class="mb-0 text-second-ppi">${mensaje}</p>`;
+
+    if (!modalInstance) {
+        modalInstance = new bootstrap.Modal(modalEl);
+        modalEl.addEventListener("hidden.bs.modal", () => {
+            if (typeof callbackModal === "function") {
+                const cb = callbackModal;
+                callbackModal = null;
+                cb();
+            }
+        });
+    }
+
+    modalInstance.show();
+}
 
 function validarCampo(campo) {
     if (!campo) return true;
@@ -82,16 +120,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (res.estado) {
                         username.classList.add("is-invalid");
                         username.classList.remove("is-valid");
-                        SwalPPI.fire({
-                            position: "center",
-                            icon: "warning",
-                            title: "Usuario no disponible",
-                            text: res.mensaje,
-                            showConfirmButton: true
-                        });
+                        mostrarModal("warning", "Usuario no disponible", res.mensaje || "Este nombre de usuario ya está en uso");
                     }
                 } catch (e) {
-                    console.error("Error al validar username", e);
+                    console.error(e);
                 }
             }
         });
@@ -114,16 +146,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (res.estado) {
                         correo.classList.add("is-invalid");
                         correo.classList.remove("is-valid");
-                        SwalPPI.fire({
-                            position: "center",
-                            icon: "warning",
-                            title: "Correo no disponible",
-                            text: res.mensaje,
-                            showConfirmButton: true
-                        });
+                        mostrarModal("warning", "Correo no disponible", res.mensaje || "Este correo electrónico ya está registrado");
                     }
                 } catch (e) {
-                    console.error("Error al validar correo", e);
+                    console.error(e);
                 }
             }
         });
@@ -162,32 +188,20 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             if (!todosValidos) {
-                SwalPPI.fire({
-                    icon: "warning",
-                    title: "Campos incompletos",
-                    text: "Por favor completa todos los campos obligatorios."
-                });
+                mostrarModal("warning", "Campos incompletos", "Por favor completa todos los campos obligatorios.");
                 return;
             }
 
-            if (contrasenia.value.length < 8) {
+            if (!REGEX_PASSWORD.test(contrasenia.value)) {
                 contrasenia.classList.add("is-invalid");
-                SwalPPI.fire({
-                    icon: "warning",
-                    title: "Contraseña corta",
-                    text: "La contraseña debe tener un mínimo de 8 caracteres."
-                });
+                mostrarModal("warning", "Contraseña débil", "La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un símbolo (@$!%*?&#.-_).");
                 contrasenia.focus();
                 return;
             }
 
             if (contrasenia.value !== confirmarContrasenia.value) {
                 confirmarContrasenia.classList.add("is-invalid");
-                SwalPPI.fire({
-                    icon: "warning",
-                    title: "Contraseñas no coinciden",
-                    text: "Las contraseñas ingresadas no son iguales. Por favor verifica."
-                });
+                mostrarModal("warning", "Contraseñas no coinciden", "Las contraseñas ingresadas no son iguales. Por favor verifica.");
                 confirmarContrasenia.focus();
                 return;
             }
@@ -201,14 +215,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     btnRegistrar.textContent = "Procesando...";
                 }
 
-                SwalPPI.fire({
-                    title: "Espere...",
-                    text: "Registrando usuario",
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    didOpen: () => Swal.showLoading()
-                });
-
                 const respuesta = await fetch(formulario.action, {
                     method: "POST",
                     body: datos
@@ -219,35 +225,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 const resultado = await respuesta.json();
-                SwalPPI.close();
 
                 if (resultado.estado) {
-                    SwalPPI.fire({
-                        position: "center",
-                        icon: "success",
-                        title: "¡Registro exitoso!",
-                        text: resultado.mensaje || "Tu cuenta ha sido creada exitosamente.",
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then(() => {
+                    mostrarModal("success", "¡Registro exitoso!", resultado.mensaje || "Tu cuenta ha sido creada exitosamente.", () => {
                         window.location.href = "login.php";
                     });
                 } else {
-                    SwalPPI.fire({
-                        position: "center",
-                        icon: "error",
-                        title: "Error",
-                        text: resultado.mensaje || "No se pudo completar el registro.",
-                        showConfirmButton: true
-                    });
+                    mostrarModal("danger", "Error", resultado.mensaje || "No se pudo completar el registro.");
                 }
             } catch (error) {
-                SwalPPI.close();
-                SwalPPI.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: error.message || "Error al procesar la solicitud con el servidor."
-                });
+                mostrarModal("danger", "Error", error.message || "Error al procesar la solicitud con el servidor.");
             } finally {
                 if (btnRegistrar) {
                     btnRegistrar.disabled = false;

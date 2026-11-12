@@ -1,12 +1,48 @@
-const SwalPPI = Swal.mixin({
-    customClass: {
-        popup: "swal-ppi-popup",
-        title: "swal-ppi-title",
-        htmlContainer: "swal-ppi-html",
-        confirmButton: "btn swal-ppi-confirm-btn"
-    },
-    buttonsStyling: false
-});
+let modalInstance = null;
+let callbackModal = null;
+
+function mostrarModal(tipo, titulo, mensaje, onCerrar = null) {
+    const modalEl = document.getElementById("modalPPI");
+    const tituloEl = document.getElementById("modalPPITitulo");
+    const cuerpoEl = document.getElementById("modalPPICuerpo");
+    const btnAccion = document.getElementById("btnModalPPIAccion");
+
+    if (!modalEl || !tituloEl || !cuerpoEl || !btnAccion) return;
+
+    callbackModal = onCerrar;
+
+    let icon = "";
+    btnAccion.className = "btn btn-ppi-modal btn-sm";
+
+    if (tipo === "success") {
+        icon = '<i class="bi bi-check-circle-fill text-success fs-5"></i>';
+        btnAccion.textContent = "Continuar";
+    } else if (tipo === "danger" || tipo === "error") {
+        icon = '<i class="bi bi-x-circle-fill text-danger fs-5"></i>';
+        btnAccion.className = "btn btn-ppi-modal btn-danger btn-sm";
+        btnAccion.textContent = "Entendido";
+    } else {
+        icon = '<i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i>';
+        btnAccion.className = "btn btn-ppi-modal btn-warning btn-sm";
+        btnAccion.textContent = "Entendido";
+    }
+
+    tituloEl.innerHTML = `${icon} <span>${titulo}</span>`;
+    cuerpoEl.innerHTML = `<p class="mb-0 text-second-ppi">${mensaje}</p>`;
+
+    if (!modalInstance) {
+        modalInstance = new bootstrap.Modal(modalEl);
+        modalEl.addEventListener("hidden.bs.modal", () => {
+            if (typeof callbackModal === "function") {
+                const cb = callbackModal;
+                callbackModal = null;
+                cb();
+            }
+        });
+    }
+
+    modalInstance.show();
+}
 
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('formRegistroSubasta');
@@ -69,11 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const dropzone = document.getElementById('dropzoneImagenes');
                 if (dropzone) dropzone.style.borderColor = '#dc3545';
 
-                SwalPPI.fire({
-                    icon: 'warning',
-                    title: 'Imágenes requeridas',
-                    text: 'Debes subir al menos una fotografía del artículo para la subasta.'
-                });
+                mostrarModal('warning', 'Imágenes requeridas', 'Debes subir al menos una fotografía del artículo para la subasta.');
                 return;
             }
 
@@ -82,22 +114,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (isNaN(precioInicial) || precioInicial <= 0) {
                 marcarInvalido(inputPrecioInicial);
-                SwalPPI.fire({
-                    icon: 'warning',
-                    title: 'Precio inicial inválido',
-                    text: 'El precio inicial debe ser un monto mayor a $0.00 USD.'
-                });
+                mostrarModal('warning', 'Precio inicial inválido', 'El precio inicial debe ser un monto mayor a $0.00 USD.');
                 inputPrecioInicial.focus();
                 return;
             }
 
             if (isNaN(incremento) || incremento <= 0) {
                 marcarInvalido(inputIncremento);
-                SwalPPI.fire({
-                    icon: 'warning',
-                    title: 'Incremento mínimo inválido',
-                    text: 'El incremento mínimo de puja debe ser un valor positivo mayor a $0.00 USD.'
-                });
+                mostrarModal('warning', 'Incremento mínimo inválido', 'El incremento mínimo de puja debe ser un valor positivo mayor a $0.00 USD.');
                 inputIncremento.focus();
                 return;
             }
@@ -108,43 +132,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (isNaN(fechaInicio.getTime())) {
                 marcarInvalido(inputFechaInicial);
-                SwalPPI.fire({
-                    icon: 'warning',
-                    title: 'Fecha de inicio requerida',
-                    text: 'Por favor define una fecha y hora de inicio válida.'
-                });
+                mostrarModal('warning', 'Fecha de inicio requerida', 'Por favor define una fecha y hora de inicio válida.');
                 inputFechaInicial.focus();
                 return;
             }
 
             if (isNaN(fechaFin.getTime())) {
                 marcarInvalido(inputFechaFinal);
-                SwalPPI.fire({
-                    icon: 'warning',
-                    title: 'Fecha de cierre requerida',
-                    text: 'Por favor define una fecha y hora de cierre válida.'
-                });
+                mostrarModal('warning', 'Fecha de cierre requerida', 'Por favor define una fecha y hora de cierre válida.');
                 inputFechaFinal.focus();
                 return;
             }
 
             if (fechaFin <= fechaInicio) {
                 marcarInvalido(inputFechaFinal);
-                SwalPPI.fire({
-                    icon: 'warning',
-                    title: 'Rango de fechas inválido',
-                    text: 'La fecha y hora de cierre debe ser posterior a la fecha de inicio.'
-                });
+                mostrarModal('warning', 'Rango de fechas inválido', 'La fecha y hora de cierre debe ser posterior a la fecha de inicio.');
                 inputFechaFinal.focus();
                 return;
             }
 
             if (hayErrores && primerError) {
-                SwalPPI.fire({
-                    icon: 'warning',
-                    title: 'Campos incompletos',
-                    text: 'Por favor completa todos los campos requeridos marcados en el formulario.'
-                });
+                mostrarModal('warning', 'Campos incompletos', 'Por favor completa todos los campos requeridos marcados en el formulario.');
                 primerError.focus();
                 return;
             }
