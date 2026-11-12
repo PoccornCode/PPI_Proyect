@@ -1,6 +1,6 @@
 <?php
 
-function guardarProducto($conexion, $nombre, $descripcion, $condicion, $id_categoria, $id_usuario, $rutas) {
+function insertarProducto($conexion, $nombre, $descripcion, $condicion, $id_categoria, $id_usuario, $rutas) {
     
     try {
         $conexion->begin_transaction();
@@ -20,7 +20,7 @@ function guardarProducto($conexion, $nombre, $descripcion, $condicion, $id_categ
         $id_producto= $conexion->insert_id;
         $stmt->close();
 
-        guardarImagenes($conexion, $id_producto, $rutas);
+        insertarImagenes($conexion, $id_producto, $rutas);
         $conexion->commit();
         return ['estado' => true, 'mensaje' => 'Producto guardado exitosamente'];
     } catch (Throwable $e) {
@@ -36,7 +36,7 @@ function guardarProducto($conexion, $nombre, $descripcion, $condicion, $id_categ
     } 
 }
 
-function guardarImagenes($conexion, $id_producto, $rutas){
+function insertarImagenes($conexion, $id_producto, $rutas){
     $sql= "INSERT INTO sb_imagen_producto (id_producto, principal, ruta) 
     VALUES (?, ?, ?)";
     $stmtImg=$conexion->prepare($sql);

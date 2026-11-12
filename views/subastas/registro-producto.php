@@ -5,8 +5,8 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/../../config/conexion.php';
 
-$titulo = "Registrar Subasta";
-$pagina = "registro-subasta";
+$titulo = "Registrar Producto";
+$pagina = "registro-producto";
 
 //Agregar a dao o controller despues
 $categorias = [];
@@ -142,8 +142,8 @@ if ($catQuery) {
 
                     <div class="d-flex justify-content-between align-items-end mb-4">
                         <div>
-                            <h3 class="text-main-ppi fw-bold mb-1">Registrar Subasta</h3>
-                            <p class="text-second-ppi small mb-0">Completa la información del producto y los términos de la puja.</p>
+                            <h3 class="text-main-ppi fw-bold mb-1">Registrar Producto</h3>
+                            <p class="text-second-ppi small mb-0">Completa la información del producto.</p>
                         </div>
                         <a href="../../index.php" class="btn btn-secondary btn-sm px-3">
                             Volver al inicio
@@ -209,43 +209,10 @@ if ($catQuery) {
                             <div id="imagePreviewContainer" class="d-flex flex-wrap gap-2 mt-3"></div>
                         </div>
 
-                        <div class="card card-gavel p-4 mb-4 shadow">
-                            <h5 class="section-title">Parámetros de la Subasta</h5>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label for="precio_inicial" class="form-label text-main-ppi fw-bold small">Precio Inicial ($ USD)</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text addon-gavel">$</span>
-                                        <input type="number" step="0.01" min="1" class="form-control" id="precio_inicial" name="precio_inicial" placeholder="0.00" required>
-                                    </div>
-                                    <span class="text-second-ppi small">Monto inicial con el que comenzarán las ofertas.</span>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label for="incremento_minimo" class="form-label text-main-ppi fw-bold small">Incremento Mínimo ($ USD)</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text addon-gavel">$</span>
-                                        <input type="number" step="0.01" min="0.50" class="form-control" id="incremento_minimo" name="incremento_minimo" placeholder="5.00" required>
-                                    </div>
-                                    <span class="text-second-ppi small">Diferencia mínima entre cada puja consecutiva.</span>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label for="fecha_inicial" class="form-label text-main-ppi fw-bold small">Fecha y Hora de Apertura</label>
-                                    <input type="datetime-local" class="form-control" id="fecha_inicial" name="fecha_inicial" required>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label for="fecha_final" class="form-label text-main-ppi fw-bold small">Fecha y Hora de Cierre</label>
-                                    <input type="datetime-local" class="form-control" id="fecha_final" name="fecha_final" required>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- ACCIONES -->
                         <div class="d-flex justify-content-end gap-3 pb-4">
                             <a href="../../index.php" class="btn btn-secondary px-4 py-2">Cancelar</a>
-                            <button type="submit" class="btn btn-primary px-5 py-2 fw-bold">Guardar y Publicar Subasta</button>
+                            <button type="submit" class="btn btn-primary px-5 py-2 fw-bold">Guardar Producto</button>
                         </div>
 
                     </form>
