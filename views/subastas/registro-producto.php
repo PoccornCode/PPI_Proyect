@@ -150,7 +150,7 @@ if ($catQuery) {
                         </a>
                     </div>
 
-                    <form id="formRegistroSubasta" action="../../controllers/crear_producto.php" method="POST" enctype="multipart/form-data" autocomplete="off">
+                    <form id="formRegistroSubasta" action="../../controllers/ControllerProducto.php" method="POST" enctype="multipart/form-data" autocomplete="off">
 
                         <div class="card card-gavel p-4 mb-4 shadow">
                             <h5 class="section-title">Información del Producto</h5>
@@ -244,7 +244,7 @@ if ($catQuery) {
     <?php include __DIR__ . "/../Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../../assets/js/registro-subasta.js?v=2"></script>
+    <script src="../../assets/js/registro-producto.js?v=2"></script>
 </body>
 
 </html>

@@ -83,7 +83,7 @@ $urlSubasta = 'views/subasta.php?id=';
                         </p>
                         <div class="d-flex flex-wrap gap-3">
                             <a href="views/catalogo.php" class="btn btn-primary px-5 py-3 fw-bold">Explorar subastas</a>
-                            <a href="views/subastas/registro-subasta.php" class="btn btn-secondary px-5 py-3 fw-bold">Publicar artículo</a>
+                            <a href="views/subastas/registro-producto.php" class="btn btn-secondary px-5 py-3 fw-bold">Publicar artículo</a>
                         </div>
                     </div>
                 </div>
