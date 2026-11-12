@@ -37,7 +37,7 @@ if (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false
                         <a href="<?php echo $base_url; ?>views/catalogo.php" class="nav-item link-ppi">Categorias</a>
                         <a href="<?php echo $base_url; ?>404.php" class="nav-item link-ppi">Como funciona</a>
                         <a href="<?php echo $base_url; ?>views/contacto/contacto.php" class="nav-item link-ppi">Contacto</a>
-                        <a href="<?php echo $base_url; ?>views/subastas/registro-subasta.php" class="nav-item link-ppi fw-bold" style="color:#94aa34;">+ Subastar</a>
+                        <a href="<?php echo $base_url; ?>views/subastas/registro-producto.php" class="nav-item link-ppi fw-bold" style="color:#94aa34;">+ Subastar</a>
                     </div>
 
                         <div class="row col-xl-4 col-12">

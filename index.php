@@ -226,7 +226,7 @@ $urlSubasta = 'views/subasta.php?id=';
                         <h2 id="titulo-vender" class="fw-bold text-main-ppi mb-1">¿Tienes algo que vender?</h2>
                         <p class="mb-0 text-second-ppi">Crea tu subasta, publica tu artículo y deja que los postores hagan el resto.</p>
                     </div>
-                    <a href="views/subastas/registro-subasta.php" class="btn btn-primary py-3 px-5 fw-bold">Publicar subasta</a>
+                    <a href="views/subastas/registro-producto.php" class="btn btn-primary py-3 px-5 fw-bold">Publicar subasta</a>
                 </div>
             </div>
         </section>
