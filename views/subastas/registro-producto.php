@@ -212,7 +212,7 @@ if ($catQuery) {
                         <!-- ACCIONES -->
                         <div class="d-flex justify-content-end gap-3 pb-4">
                             <a href="../../index.php" class="btn btn-secondary px-4 py-2">Cancelar</a>
-                            <button type="submit" class="btn btn-primary px-5 py-2 fw-bold">Guardar Producto</button>
+                            <button type="submit" id="btnGuardar" class="btn btn-primary px-5 py-2 fw-bold">Guardar Producto</button>
                         </div>
 
                     </form>

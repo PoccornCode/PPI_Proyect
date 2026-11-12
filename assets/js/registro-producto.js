@@ -1,6 +1,11 @@
 let modalInstance = null;
 let callbackModal = null;
 
+let form, btnGuardar, textoBotonOriginal;
+let inputNombre, selectCategoria, selectCondicion, textareaDescripcion;
+let inputImagenes, inputPrecioInicial, inputIncremento, inputFechaInicial, inputFechaFinal;
+let camposValidables = [];
+
 function mostrarModal(tipo, titulo, mensaje, onCerrar = null) {
     const modalEl = document.getElementById("modalPPI");
     const tituloEl = document.getElementById("modalPPITitulo");
@@ -43,124 +48,6 @@ function mostrarModal(tipo, titulo, mensaje, onCerrar = null) {
 
     modalInstance.show();
 }
-
-document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('formRegistroSubasta');
-    const inputNombre = document.getElementById('nombre');
-    const selectCategoria = document.getElementById('id_categoria');
-    const selectCondicion = document.getElementById('condicion');
-    const textareaDescripcion = document.getElementById('descripcion');
-    const inputImagenes = document.getElementById('imagenes');
-    const inputPrecioInicial = document.getElementById('precio_inicial');
-    const inputIncremento = document.getElementById('incremento_minimo');
-    const inputFechaInicial = document.getElementById('fecha_inicial');
-    const inputFechaFinal = document.getElementById('fecha_final');
-
-    inicializarFechasPorDefecto(inputFechaInicial, inputFechaFinal);
-    inicializarDropzone(inputImagenes);
-
-    const camposValidables = [
-        inputNombre,
-        selectCategoria,
-        selectCondicion,
-        textareaDescripcion,
-        inputPrecioInicial,
-        inputIncremento,
-        inputFechaInicial,
-        inputFechaFinal
-    ];
-
-    camposValidables.forEach(campo => {
-        if (!campo) return;
-        campo.addEventListener('blur', () => validarCampoIndividual(campo));
-        campo.addEventListener('input', () => {
-            if (campo.classList.contains('is-invalid')) {
-                validarCampoIndividual(campo);
-            }
-        });
-        campo.addEventListener('change', () => {
-            if (campo.classList.contains('is-invalid')) {
-                validarCampoIndividual(campo);
-            }
-        });
-    });
-
-
-    if (form) {
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            let hayErrores = false;
-            let primerError = null;
-
-            camposValidables.forEach(campo => {
-                const esValido = validarCampoIndividual(campo);
-                if (!esValido) {
-                    hayErrores = true;
-                    if (!primerError) primerError = campo;
-                }
-            });
-
-            if (!inputImagenes || !inputImagenes.files || inputImagenes.files.length === 0) {
-                const dropzone = document.getElementById('dropzoneImagenes');
-                if (dropzone) dropzone.style.borderColor = '#dc3545';
-
-                mostrarModal('warning', 'Imágenes requeridas', 'Debes subir al menos una fotografía del artículo para la subasta.');
-                return;
-            }
-
-            const precioInicial = parseFloat(inputPrecioInicial.value);
-            const incremento = parseFloat(inputIncremento.value);
-
-            if (isNaN(precioInicial) || precioInicial <= 0) {
-                marcarInvalido(inputPrecioInicial);
-                mostrarModal('warning', 'Precio inicial inválido', 'El precio inicial debe ser un monto mayor a $0.00 USD.');
-                inputPrecioInicial.focus();
-                return;
-            }
-
-            if (isNaN(incremento) || incremento <= 0) {
-                marcarInvalido(inputIncremento);
-                mostrarModal('warning', 'Incremento mínimo inválido', 'El incremento mínimo de puja debe ser un valor positivo mayor a $0.00 USD.');
-                inputIncremento.focus();
-                return;
-            }
-
-            const fechaInicio = new Date(inputFechaInicial.value);
-            const fechaFin = new Date(inputFechaFinal.value);
-            const fechaActual = new Date();
-
-            if (isNaN(fechaInicio.getTime())) {
-                marcarInvalido(inputFechaInicial);
-                mostrarModal('warning', 'Fecha de inicio requerida', 'Por favor define una fecha y hora de inicio válida.');
-                inputFechaInicial.focus();
-                return;
-            }
-
-            if (isNaN(fechaFin.getTime())) {
-                marcarInvalido(inputFechaFinal);
-                mostrarModal('warning', 'Fecha de cierre requerida', 'Por favor define una fecha y hora de cierre válida.');
-                inputFechaFinal.focus();
-                return;
-            }
-
-            if (fechaFin <= fechaInicio) {
-                marcarInvalido(inputFechaFinal);
-                mostrarModal('warning', 'Rango de fechas inválido', 'La fecha y hora de cierre debe ser posterior a la fecha de inicio.');
-                inputFechaFinal.focus();
-                return;
-            }
-
-            if (hayErrores && primerError) {
-                mostrarModal('warning', 'Campos incompletos', 'Por favor completa todos los campos requeridos marcados en el formulario.');
-                primerError.focus();
-                return;
-            }
-
-            form.submit();
-        });
-    }
-});
 
 function validarCampoIndividual(campo) {
     if (!campo) return true;
@@ -244,3 +131,120 @@ function inicializarDropzone(inputImagenes) {
         });
     });
 }
+
+function limpiarFormulario() {
+    form.reset();
+    camposValidables.forEach(campo => campo.classList.remove('is-valid', 'is-invalid'));
+    document.getElementById('imagePreviewContainer').innerHTML = '';
+    inicializarFechasPorDefecto(inputFechaInicial, inputFechaFinal);
+}
+
+function validarFormulario() {
+    const validos = camposValidables.map(campo => validarCampoIndividual(campo));
+    if (validos.includes(false)) {
+        mostrarModal("warning", "Campos incompletos", "Completa los campos requeridos marcados en el formulario.");
+        return false;
+    }
+
+    if (inputImagenes.files.length === 0) {
+        document.getElementById("dropzoneImagenes").style.borderColor = "#dc3545";
+        mostrarModal("warning", "Imágenes requeridas", "Debes subir al menos una fotografía del artículo.");
+        return false;
+    }
+
+    const precio = parseFloat(inputPrecioInicial.value);
+    if (isNaN(precio) || precio <= 0) {
+        marcarInvalido(inputPrecioInicial);
+        mostrarModal("warning", "Precio inicial inválido", "El precio inicial debe ser mayor a $0.00 USD.");
+        return false;
+    }
+
+    const incremento = parseFloat(inputIncremento.value);
+    if (isNaN(incremento) || incremento <= 0) {
+        marcarInvalido(inputIncremento);
+        mostrarModal("warning", "Incremento mínimo inválido", "El incremento debe ser mayor a $0.00 USD.");
+        return false;
+    }
+
+    const fechaInicio = new Date(inputFechaInicial.value);
+    const fechaFin = new Date(inputFechaFinal.value);
+    if (isNaN(fechaInicio.getTime()) || isNaN(fechaFin.getTime()) || fechaFin <= fechaInicio) {
+        marcarInvalido(inputFechaFinal);
+        mostrarModal("warning", "Rango de fechas inválido", "La fecha de cierre debe ser posterior a la de apertura.");
+        return false;
+    }
+
+    return true;
+} 
+
+document.addEventListener("DOMContentLoaded", function () {
+    form = document.getElementById("formRegistroSubasta");
+    btnGuardar = document.getElementById("btnGuardar");
+    textoBotonOriginal = btnGuardar.textContent.trim();
+
+    inputNombre = document.getElementById("nombre");
+    selectCategoria = document.getElementById("id_categoria");
+    selectCondicion = document.getElementById("condicion");
+    textareaDescripcion = document.getElementById("descripcion");
+    inputImagenes = document.getElementById("imagenes");
+    inputPrecioInicial = document.getElementById("precio_inicial");
+    inputIncremento = document.getElementById("incremento_minimo");
+    inputFechaInicial = document.getElementById("fecha_inicial");
+    inputFechaFinal = document.getElementById("fecha_final");
+
+    camposValidables = [
+        inputNombre,
+        selectCategoria,
+        selectCondicion,
+        textareaDescripcion,
+        inputPrecioInicial,
+        inputIncremento,
+        inputFechaInicial,
+        inputFechaFinal
+    ];
+
+    inicializarFechasPorDefecto(inputFechaInicial, inputFechaFinal);
+    inicializarDropzone(inputImagenes);
+
+    camposValidables.forEach(campo => {
+        campo.addEventListener("blur", () => validarCampoIndividual(campo));
+        campo.addEventListener("input", () => {
+            if (campo.classList.contains("is-invalid")) validarCampoIndividual(campo);
+        });
+        campo.addEventListener("change", () => {
+            if (campo.classList.contains("is-invalid")) validarCampoIndividual(campo);
+        });
+    });
+
+    form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        if (btnGuardar.textContent.trim() !== textoBotonOriginal) return;
+        if (!validarFormulario()) return;
+
+        try {
+            const datos = new FormData(form);
+            datos.append("opcion", "guardar");
+
+            btnGuardar.disabled = true;
+            btnGuardar.textContent = "Procesando...";
+
+            const respuesta = await fetch(form.action, { method: "POST", body: datos });
+            if (!respuesta.ok) throw new Error("Error HTTP: " + respuesta.status);
+
+            const resultado = await respuesta.json();
+
+            if (resultado.estado) {
+                mostrarModal("success", "Subasta publicada", resultado.mensaje, limpiarFormulario);
+            } else {
+                mostrarModal("error", "No se pudo guardar", resultado.mensaje);
+            }
+        } catch (error) {
+            console.error(error);
+            mostrarModal("error", "Error de conexión", "No se pudo completar la operación. Intenta de nuevo.");
+        } finally {
+            btnGuardar.disabled = false;
+            btnGuardar.textContent = textoBotonOriginal;
+        }
+    });
+});
