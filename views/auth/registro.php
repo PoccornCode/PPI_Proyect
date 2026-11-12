@@ -19,7 +19,7 @@ $pagina = "registro";
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <link href="../../assets/css/style.css" rel="stylesheet">
-    <link href="../../assets/css/forms.css?v=2" rel="stylesheet">
+    <link href="../../assets/css/forms.css?v=8" rel="stylesheet">
     <link href="../../assets/css/main.css" rel="stylesheet">
 </head>
 
@@ -105,11 +105,29 @@ $pagina = "registro";
         </div>
     </div>
 
+    <div class="modal fade" id="modalPPI" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-ppi">
+                <div class="modal-header modal-header-ppi">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2" id="modalPPITitulo">
+                        Aviso
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body py-4" id="modalPPICuerpo">
+                    Mensaje
+                </div>
+                <div class="modal-footer modal-footer-ppi">
+                    <button type="button" class="btn btn-ppi-modal btn-sm" id="btnModalPPIAccion" data-bs-dismiss="modal">Entendido</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <?php include "../Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="../../assets/js/registro.js?v=2"></script>
+    <script src="../../assets/js/registro.js?v=7"></script>
 </body>
 
 </html>
