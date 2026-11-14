@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__DIR__, 2) . '/config/env.php';
 $titulo = "Contacto";
 $pagina = "contacto";
 ?>
@@ -17,10 +18,10 @@ $pagina = "contacto";
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
-    <link href="../../assets/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../../assets/css/style.css" rel="stylesheet">
-    <link href="../../assets/css/main.css" rel="stylesheet">
-    <link href="../../assets/css/forms.css?v=17" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/main.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/forms.css?v=17" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">

@@ -2,6 +2,8 @@
 $titulo = "Inicio";
 $pagina = "inicio";
 
+require_once __DIR__ . '/config/env.php';
+
 if (!function_exists('e')) {
     function e($texto)
     {

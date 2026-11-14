@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__DIR__, 2) . '/config/env.php';
 $titulo = "Crear Cuenta";
 $pagina = "registro";
 ?>
@@ -15,12 +16,12 @@ $pagina = "registro";
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@100;600;700;800&display=swap" rel="stylesheet">
 
-    <link href="../../assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
-    <link href="../../assets/css/style.css" rel="stylesheet">
-    <link href="../../assets/css/forms.css?v=20" rel="stylesheet">
-    <link href="../../assets/css/main.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/forms.css?v=20" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/main.css" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -56,7 +57,7 @@ $pagina = "registro";
                         <h3 class="mb-2 text-center text-main-ppi fw-bold">Crear una cuenta</h3>
                         <p class="mb-4 text-center text-second-ppi fs-6">Completa tus datos para registrarte</p>
 
-                        <form id="formRegistro" name="formRegistro" method="POST" action="../../controllers/registro_controller.php" autocomplete="off">
+                        <form id="formRegistro" name="formRegistro" method="POST" action="<?= BASE_URL ?>controllers/registro_controller.php" autocomplete="off">
                             <div class="row g-3">
 
                                 <div class="col-md-6">
@@ -117,7 +118,7 @@ $pagina = "registro";
                         </form>
 
                         <p class="mt-4 mb-2 text-center text-second-ppi">¿Ya tienes cuenta? <a href="login.php" class="link-ppi link-coral-hover fw-bold d-inline p-0">Inicia sesión aquí</a></p>
-                        <p class="mb-0 text-center"><a href="../../index.php" class="auth-back-link"><i class="bi bi-arrow-left"></i>Volver al inicio</a></p>
+                        <p class="mb-0 text-center"><a href="<?= BASE_URL ?>index.php" class="auth-back-link"><i class="bi bi-arrow-left"></i>Volver al inicio</a></p>
                     </div>
                 </div>
             </div>
@@ -146,7 +147,7 @@ $pagina = "registro";
     <?php include "../Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../../assets/js/registro.js?v=7"></script>
+    <script src="<?= BASE_URL ?>assets/js/registro.js?v=7"></script>
 </body>
 
 </html>

@@ -3,6 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+require_once __DIR__ . '/../../config/env.php';
 require_once __DIR__ . '/../../config/conexion.php';
 
 $titulo = "Registrar Producto";
@@ -35,10 +36,10 @@ if ($catQuery) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
     <!-- Customized Bootstrap & Project Stylesheets -->
-    <link href="../../assets/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../../assets/css/style.css" rel="stylesheet">
-    <link href="../../assets/css/main.css" rel="stylesheet">
-    <link href="../../assets/css/forms.css?v=8" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/main.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/forms.css?v=8" rel="stylesheet">
 
     <style>
         body.bg-dark-ppi {
@@ -145,12 +146,12 @@ if ($catQuery) {
                             <h3 class="text-main-ppi fw-bold mb-1">Registrar Producto</h3>
                             <p class="text-second-ppi small mb-0">Completa la información del producto.</p>
                         </div>
-                        <a href="../../index.php" class="btn btn-secondary btn-sm px-3">
+                        <a href="<?= BASE_URL ?>index.php" class="btn btn-secondary btn-sm px-3">
                             Volver al inicio
                         </a>
                     </div>
 
-                    <form id="formRegistroSubasta" action="../../controllers/ControllerProducto.php" method="POST" enctype="multipart/form-data" autocomplete="off">
+                    <form id="formRegistroSubasta" action="<?= BASE_URL ?>controllers/ControllerProducto.php" method="POST" enctype="multipart/form-data" autocomplete="off">
 
                         <div class="card card-gavel p-4 mb-4 shadow">
                             <h5 class="section-title">Información del Producto</h5>
@@ -211,7 +212,7 @@ if ($catQuery) {
 
                         <!-- ACCIONES -->
                         <div class="d-flex justify-content-end gap-3 pb-4">
-                            <a href="../../index.php" class="btn btn-secondary px-4 py-2">Cancelar</a>
+                            <a href="<?= BASE_URL ?>index.php" class="btn btn-secondary px-4 py-2">Cancelar</a>
                             <button type="submit" id="btnGuardar" class="btn btn-primary px-5 py-2 fw-bold">Guardar Producto</button>
                         </div>
 
@@ -244,7 +245,7 @@ if ($catQuery) {
     <?php include __DIR__ . "/../Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../../assets/js/registro-producto.js?v=2"></script>
+    <script src="<?= BASE_URL ?>assets/js/registro-producto.js?v=2"></script>
 </body>
 
 </html>
