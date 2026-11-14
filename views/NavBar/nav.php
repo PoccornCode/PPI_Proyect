@@ -119,19 +119,10 @@ $url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url 
                 </div>
                 <div class="modal-footer modal-footer-ppi d-flex justify-content-end gap-2">
                     <button type="button" class="btn btn-outline-secondary btn-sm px-3 py-2 fw-semibold" data-bs-dismiss="modal">Cancelar</button>
-                    <a href="<?php echo $base_url; ?>controllers/logout.php" class="btn btn-danger btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2">
+                    <a href="<?php echo $base_url; ?>controllers/logout.php" class="btn btn-danger-salmon btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2">
                         <i class="fas fa-sign-out-alt"></i> Sí, cerrar sesión
                     </a>
                 </div>
-            </div>
-            <div class="modal-body py-3">
-                <p class="mb-0 text-second-ppi">¿Estás seguro de que deseas salir de tu cuenta de <strong>Gavel.net</strong>?</p>
-            </div>
-            <div class="modal-footer modal-footer-ppi d-flex justify-content-end gap-2">
-                <button type="button" class="btn btn-outline-secondary btn-sm px-3 py-2 fw-semibold" data-bs-dismiss="modal">Cancelar</button>
-                <a href="<?php echo $base_url; ?>controllers/logout.php" class="btn btn-danger-salmon btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2">
-                    <i class="fas fa-sign-out-alt"></i> Sí, cerrar sesión
-                </a>
             </div>
         </div>
     </div>
