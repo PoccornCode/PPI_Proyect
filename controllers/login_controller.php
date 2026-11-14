@@ -8,6 +8,7 @@ require_once __DIR__ . '/../dao/LoginDAO.php';
 $opcion = $_POST['opcion'] ?? '';
 $username = trim($_POST['username'] ?? '');
 $contrasenia = $_POST['contrasenia'] ?? '';
+$redirect_param = trim($_POST['redirect'] ?? '');
 
 $dao = new LoginDAO();
 
@@ -34,6 +35,13 @@ if ($opcion === "login") {
 
         // Redirige a la raíz del proyecto (auto-detectada)
         $redirect = BASE_URL . "index.php";
+        if (!empty($redirect_param)) {
+            if (strpos($redirect_param, 'http://') === false && strpos($redirect_param, 'https://') === false) {
+                $redirect = (strpos($redirect_param, BASE_URL) === 0) ? $redirect_param : BASE_URL . ltrim($redirect_param, '/');
+            } elseif (strpos($redirect_param, BASE_URL) === 0) {
+                $redirect = $redirect_param;
+            }
+        }
 
         echo json_encode([
             "estado" => true,

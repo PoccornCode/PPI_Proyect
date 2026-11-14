@@ -163,7 +163,10 @@ document.addEventListener("DOMContentLoaded", function () {
             const resultado = await respuesta.json();
 
             if (resultado.estado) {
-                mostrarModal("success", "Producto registrado", resultado.mensaje, limpiarFormulario);
+                mostrarToast('success', '¡Producto registrado!', 'Redirigiendo a tu lista de productos...', 2000);
+                setTimeout(() => {
+                    window.location.href = typeof RUTA_MIS_PRODUCTOS !== 'undefined' ? RUTA_MIS_PRODUCTOS : 'mis-productos.php';
+                }, 1200);
             } else {
                 mostrarModal("error", "No se pudo guardar", resultado.mensaje);
             }

@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (btnLogin) {
                     btnLogin.disabled = true;
-                    btnLogin.textContent = "Procesando...";
+                    btnLogin.textContent = "Iniciando sesión...";
                 }
 
                 const respuesta = await fetch(formulario.action, {
@@ -133,13 +133,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 const resultado = await respuesta.json();
 
                 if (resultado.estado) {
-                    mostrarModal("success", "¡Bienvenido!", resultado.mensaje || "Inicio de sesión exitoso.", () => {
-                        window.location.href = resultado.redirect || "../../index.php";
-                    });
+                    window.location.href = resultado.redirect || "../../index.php";
                 } else {
                     contrasenia.value = "";
                     contrasenia.classList.remove("is-valid");
-                    mostrarModal("danger", "Error", resultado.mensaje || "No se pudo iniciar sesión.");
+                    mostrarModal("danger", "Error", resultado.mensaje || "Usuario o contraseña incorrectos.");
                 }
             } catch (error) {
                 mostrarModal("danger", "Error", error.message || "Error al procesar la solicitud con el servidor.");

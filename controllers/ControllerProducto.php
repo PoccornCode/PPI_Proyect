@@ -72,6 +72,14 @@ if($opcion==="guardar"){
     $resultado= insertarProducto($conexion, $nombre, $descripcion, 
     $condicion, $id_categoria, $id_usuario, $rutas);
 
+    if ($resultado['estado']) {
+        $_SESSION['flash_toast'] = [
+            'tipo' => 'success',
+            'titulo' => '¡Producto registrado con éxito!',
+            'mensaje' => 'Tu producto ya está en tu lista de productos listo para asignarle una subasta.'
+        ];
+    }
+
     echo json_encode($resultado);
 }
 

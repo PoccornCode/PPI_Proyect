@@ -42,7 +42,7 @@ $url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url 
                         <a href="<?php echo $base_url; ?>views/catalogo.php" class="nav-link link-ppi">Categorías</a>
                     </li>
                     <li class="nav-item">
-                        <a href="<?php echo $base_url; ?>404.php" class="nav-link link-ppi">Cómo funciona</a>
+                        <a href="<?php echo $base_url; ?>views/como-funciona.php" class="nav-link link-ppi">Cómo funciona</a>
                     </li>
                     <li class="nav-item">
                         <a href="<?php echo $base_url; ?>views/contacto/contacto.php" class="nav-link link-ppi">Contacto</a>
@@ -51,7 +51,7 @@ $url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url 
 
                 <div class="d-flex flex-column flex-xl-row align-items-stretch align-items-xl-center gap-2 pt-3 pt-xl-0 border-top-mobile">
                     <a href="<?php echo $base_url; ?>views/subastas/registro-producto.php" class="btn btn-outline-publish btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center justify-content-center">
-                        <i class="fas fa-plus me-1 small"></i>Publicar artículo
+                        <i class="fas fa-plus me-1 small"></i>Publicar producto
                     </a>
                     <?php if ($usuario_logueado): ?>
                         <div class="dropdown">
@@ -71,8 +71,8 @@ $url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url 
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item d-flex align-items-center gap-2" href="<?php echo $base_url; ?>views/subastas/registro-producto.php">
-                                        <i class="fas fa-box-open"></i> Mis Artículos
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="<?php echo $base_url; ?>views/subastas/mis-productos.php">
+                                        <i class="fas fa-box-open"></i> Mis Productos
                                     </a>
                                 </li>
                                 <li>
