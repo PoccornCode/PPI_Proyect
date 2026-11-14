@@ -133,7 +133,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 const resultado = await respuesta.json();
 
                 if (resultado.estado) {
-                    // Redirección inmediata a home o destino sin modal de espera
                     window.location.href = resultado.redirect || "../../index.php";
                 } else {
                     contrasenia.value = "";
