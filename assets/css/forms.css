@@ -111,48 +111,55 @@ textarea.form-control.is-invalid:focus {
 
 .btn-ppi-modal {
     background-color: #5e7325;
-    border-color: #5e7325;
+    border: 1px solid #6b822d;
     color: #ffffff;
     font-weight: 600;
     font-size: 0.92rem;
     padding: 0.55rem 1.6rem;
     border-radius: 8px;
-    transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    box-shadow: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .btn-ppi-modal:hover,
 .btn-ppi-modal:focus {
-    background-color: #6d852c;
-    border-color: #6d852c;
+    background-color: #526520;
+    border-color: #5e7325;
     color: #ffffff;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(94, 115, 37, 0.35);
+    transform: none;
+    box-shadow: none;
 }
 
 .btn-ppi-modal.btn-danger {
-    background-color: #dc2626;
-    border-color: #dc2626;
+    background-color: #b85046;
+    border: 1px solid #c75b51;
+    color: #ffffff;
+    box-shadow: none;
 }
 
 .btn-ppi-modal.btn-danger:hover,
 .btn-ppi-modal.btn-danger:focus {
-    background-color: #ef4444;
-    border-color: #ef4444;
-    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+    background-color: #a6453c;
+    border-color: #b85046;
+    color: #ffffff;
+    transform: none;
+    box-shadow: none;
 }
 
 .btn-ppi-modal.btn-warning {
-    background-color: #d97706;
-    border-color: #d97706;
+    background-color: #b46b0a;
+    border: 1px solid #c4760d;
     color: #ffffff;
+    box-shadow: none;
 }
 
 .btn-ppi-modal.btn-warning:hover,
 .btn-ppi-modal.btn-warning:focus {
-    background-color: #f59e0b;
-    border-color: #f59e0b;
+    background-color: #9c5c08;
+    border-color: #b46b0a;
     color: #ffffff;
-    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+    transform: none;
+    box-shadow: none;
 }
 
 .swal2-container {

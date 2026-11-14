@@ -21,7 +21,7 @@ function mostrarModal(tipo, titulo, mensaje, onCerrar = null) {
         icon = '<i class="fas fa-check-circle fs-5" style="color: #658807;"></i>';
         btnAccion.textContent = "Continuar";
     } else if (tipo === "error") {
-        icon = '<i class="fas fa-times-circle text-danger fs-5"></i>';
+        icon = '<i class="fas fa-times-circle fs-5" style="color: #d8685d;"></i>';
         btnAccion.className = "btn btn-ppi-modal btn-danger btn-sm";
         btnAccion.textContent = "Entendido";
     } else {

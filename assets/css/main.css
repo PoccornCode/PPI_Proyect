@@ -184,6 +184,100 @@ html {
     color: #ffffff !important;
 }
 
+/* MODALES GLOBALES PPI */
+.modal-dialog {
+    max-width: 440px;
+    margin: 1.75rem auto;
+}
+
+.modal-content-ppi {
+    background-color: #0f120d !important;
+    border: 1px solid #28311e !important;
+    color: #c9c9c9 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.9), 0 0 1px rgba(101, 136, 7, 0.4) !important;
+    padding: 0.5rem !important;
+}
+
+.modal-header-ppi {
+    border-bottom: none !important;
+    padding: 1rem 1.25rem 0.35rem 1.25rem !important;
+}
+
+.modal-header-ppi .modal-title {
+    font-size: 1.2rem !important;
+    font-weight: 700 !important;
+    color: #f0f0f0 !important;
+}
+
+.modal-content-ppi .modal-body {
+    padding: 0.5rem 1.25rem 1rem 1.25rem !important;
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+    color: #b5b3aa !important;
+}
+
+.modal-footer-ppi {
+    border-top: none !important;
+    padding: 0 1.25rem 1rem 1.25rem !important;
+}
+
+.btn-ppi-modal {
+    background-color: #5e7325 !important;
+    border: 1px solid #6b822d !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    font-size: 0.92rem !important;
+    padding: 0.55rem 1.6rem !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    transition: background-color 0.15s ease, border-color 0.15s ease !important;
+}
+
+.btn-ppi-modal:hover,
+.btn-ppi-modal:focus {
+    background-color: #526520 !important;
+    border-color: #5e7325 !important;
+    color: #ffffff !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.btn-ppi-modal.btn-danger,
+.btn-danger-salmon {
+    background-color: #b85046 !important;
+    border: 1px solid #c75b51 !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+.btn-ppi-modal.btn-danger:hover,
+.btn-ppi-modal.btn-danger:focus,
+.btn-danger-salmon:hover,
+.btn-danger-salmon:focus {
+    background-color: #a6453c !important;
+    border-color: #b85046 !important;
+    color: #ffffff !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.btn-ppi-modal.btn-warning {
+    background-color: #b46b0a !important;
+    border: 1px solid #c4760d !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+.btn-ppi-modal.btn-warning:hover,
+.btn-ppi-modal.btn-warning:focus {
+    background-color: #9c5c08 !important;
+    border-color: #b46b0a !important;
+    color: #ffffff !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
 .hero-ppi {
     position: relative;
     padding: 110px 0 95px;

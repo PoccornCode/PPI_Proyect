@@ -13,12 +13,12 @@ $url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Raleway:wght@600;700;800&display=swap" rel="stylesheet">
-<link href="<?php echo $base_url; ?>assets/css/main.css?v=26" rel="stylesheet">
+<link href="<?php echo $base_url; ?>assets/css/main.css?v=30" rel="stylesheet">
 
 <header class="sticky-top navbar-ppi-wrapper" style="background-color: #0c0f0a !important; border-bottom: 2px solid #658807 !important; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7) !important;">
     <nav class="navbar navbar-expand-xl navbar-dark py-2 py-lg-3" style="background-color: transparent !important;">
         <div class="container-fluid px-3 px-lg-5">
-            
+
             <a href="<?php echo $base_url; ?>index.php" class="navbar-brand d-flex align-items-baseline gap-1 gavel-brand py-0 me-3 me-xl-4">
                 <span class="brand-name text-main-ppi fw-bold" style="font-size: 1.85rem; line-height: 1; font-family: 'Raleway', sans-serif;">Gavel</span>
                 <span class="brand-tld text-third-ppi fw-bold" style="font-size: 1.45rem; line-height: 1; font-family: 'Raleway', sans-serif;">.net</span>
@@ -75,7 +75,9 @@ $url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url 
                                         <i class="fas fa-box-open"></i> Mis Artículos
                                     </a>
                                 </li>
-                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
                                 <li>
                                     <a class="dropdown-item item-logout d-flex align-items-center gap-2" href="#" data-bs-toggle="modal" data-bs-target="#modalConfirmLogout">
                                         <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
@@ -102,28 +104,35 @@ $url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url 
 </header>
 
 <?php if ($usuario_logueado): ?>
-<!-- Modal Confirmación Cerrar Sesión -->
-<div class="modal fade" id="modalConfirmLogout" tabindex="-1" aria-labelledby="modalConfirmLogoutLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
-        <div class="modal-content modal-content-ppi">
-            <div class="modal-header modal-header-ppi d-flex align-items-center justify-content-between">
-                <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2 m-0" id="modalConfirmLogoutLabel">
-                    <i class="fas fa-sign-out-alt text-warning fs-5"></i>
-                    <span>Cerrar Sesión</span>
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+    <div class="modal fade" id="modalConfirmLogout" tabindex="-1" aria-labelledby="modalConfirmLogoutLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+            <div class="modal-content modal-content-ppi">
+                <div class="modal-header modal-header-ppi d-flex align-items-center justify-content-between">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2 m-0" id="modalConfirmLogoutLabel">
+                        <i class="fas fa-sign-out-alt text-warning fs-5"></i>
+                        <span>Cerrar Sesión</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body py-3">
+                    <p class="mb-0 text-second-ppi">¿Estás seguro de que deseas salir de tu cuenta de <strong>Gavel.net</strong>?</p>
+                </div>
+                <div class="modal-footer modal-footer-ppi d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-secondary btn-sm px-3 py-2 fw-semibold" data-bs-dismiss="modal">Cancelar</button>
+                    <a href="<?php echo $base_url; ?>controllers/logout.php" class="btn btn-danger btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2">
+                        <i class="fas fa-sign-out-alt"></i> Sí, cerrar sesión
+                    </a>
+                </div>
             </div>
             <div class="modal-body py-3">
                 <p class="mb-0 text-second-ppi">¿Estás seguro de que deseas salir de tu cuenta de <strong>Gavel.net</strong>?</p>
             </div>
             <div class="modal-footer modal-footer-ppi d-flex justify-content-end gap-2">
                 <button type="button" class="btn btn-outline-secondary btn-sm px-3 py-2 fw-semibold" data-bs-dismiss="modal">Cancelar</button>
-                <a href="<?php echo $base_url; ?>controllers/logout.php" class="btn btn-danger btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2">
+                <a href="<?php echo $base_url; ?>controllers/logout.php" class="btn btn-danger-salmon btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2">
                     <i class="fas fa-sign-out-alt"></i> Sí, cerrar sesión
                 </a>
             </div>
         </div>
     </div>
-</div>
 <?php endif; ?>
-
