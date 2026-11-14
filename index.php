@@ -13,12 +13,12 @@ if (!function_exists('e')) {
 
 // Datos de ejemplo — reemplazar con consultas reales cuando existan
 $categorias = [
-    ['nombre' => 'Arte',           'icono' => 'fa-palette', 'imagen' => 'assets/img/features-life-style.jpg', 'total' => '24 lotes'],
-    ['nombre' => 'Tecnología',     'icono' => 'fa-laptop',  'imagen' => 'assets/img/features-technology.jpg', 'total' => '42 lotes'],
-    ['nombre' => 'Coleccionables', 'icono' => 'fa-star',    'imagen' => 'assets/img/features-background.jpg', 'total' => '31 lotes'],
-    ['nombre' => 'Hogar',          'icono' => 'fa-home',    'imagen' => 'assets/img/lifestyle-2.jpg',          'total' => '19 lotes'],
-    ['nombre' => 'Vehículos',      'icono' => 'fa-car',     'imagen' => 'assets/img/features-sports-1.jpg',   'total' => '15 lotes'],
-    ['nombre' => 'Joyería',        'icono' => 'fa-gem',     'imagen' => 'assets/img/features-fashion.jpg',    'total' => '28 lotes'],
+    ['nombre' => 'Arte',           'icono' => 'fa-palette', 'imagen' => 'assets/img/features-life-style.jpg'],
+    ['nombre' => 'Tecnología',     'icono' => 'fa-laptop',  'imagen' => 'assets/img/features-technology.jpg'],
+    ['nombre' => 'Coleccionables', 'icono' => 'fa-star',    'imagen' => 'assets/img/features-background.jpg'],
+    ['nombre' => 'Hogar',          'icono' => 'fa-home',    'imagen' => 'assets/img/lifestyle-2.jpg'],
+    ['nombre' => 'Vehículos',      'icono' => 'fa-car',     'imagen' => 'assets/img/features-sports-1.jpg'],
+    ['nombre' => 'Joyería',        'icono' => 'fa-gem',     'imagen' => 'assets/img/features-fashion.jpg'],
 ];
 
 $destacada = [
@@ -224,7 +224,6 @@ $urlSubasta = 'views/subasta.php?id=';
                                 <div class="cat-img-wrapper position-relative">
                                     <img src="<?= e($cat['imagen']) ?>" class="cat-card-img w-100" alt="<?= e($cat['nombre']) ?>">
                                     <div class="cat-card-overlay d-flex flex-column justify-content-end p-3">
-                                        <span class="cat-badge-salmon mb-1 align-self-start"><?= e($cat['total']) ?></span>
                                         <h3 class="fs-6 fw-bold text-white mb-0"><?= e($cat['nombre']) ?></h3>
                                     </div>
                                 </div>
