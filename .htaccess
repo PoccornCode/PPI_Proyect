@@ -1,4 +1,4 @@
 RewriteEngine On
 
-ErrorDocument 404 /PPI_Proyect/404.php
-ErrorDocument 500 /PPI_Proyect/500.php
+ErrorDocument 404 404.php
+ErrorDocument 500 500.php
