@@ -1,11 +1,9 @@
 <?php
-$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
-$host = $_SERVER['HTTP_HOST'];
-if (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false) {
-    $base_url = $protocol . $host . '/PPI_Proyect/';
-} else {
-    $base_url = $protocol . $host . '/';
+// Usar BASE_URL de env.php (auto-detecta el subdirectorio en cualquier entorno)
+if (!defined('BASE_URL')) {
+    require_once dirname(__DIR__, 2) . '/config/env.php';
 }
+$base_url = BASE_URL;
 ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

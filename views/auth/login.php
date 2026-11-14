@@ -1,11 +1,12 @@
 <?php
 session_start();
+require_once dirname(__DIR__, 2) . '/config/env.php';
 
 $titulo = "Iniciar Sesión";
 $pagina = "login";
 
 if (!empty($_SESSION['id_usuario'])) {
-    header("Location: ../../index.php");
+    header("Location: " . BASE_URL . "index.php");
     exit;
 }
 ?>
@@ -22,12 +23,12 @@ if (!empty($_SESSION['id_usuario'])) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@100;600;700;800&display=swap" rel="stylesheet">
 
-    <link href="../../assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
-    <link href="../../assets/css/style.css" rel="stylesheet">
-    <link href="../../assets/css/main.css" rel="stylesheet">
-    <link href="../../assets/css/forms.css?v=20" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/main.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/forms.css?v=20" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -61,7 +62,7 @@ if (!empty($_SESSION['id_usuario'])) {
                         <h3 class="mb-2 text-center text-main-ppi fw-bold">Iniciar sesión</h3>
                         <p class="mb-4 text-center text-second-ppi fs-6">Ingresa tus credenciales para continuar</p>
 
-                        <form id="formLogin" name="formLogin" method="POST" action="../../controllers/login_controller.php" autocomplete="off">
+                        <form id="formLogin" name="formLogin" method="POST" action="<?= BASE_URL ?>controllers/login_controller.php" autocomplete="off">
                             <div class="row g-3">
 
                                 <div class="col-12">
@@ -87,7 +88,7 @@ if (!empty($_SESSION['id_usuario'])) {
                         </form>
 
                         <p class="mt-4 mb-2 text-center text-second-ppi">¿No tienes cuenta? <a href="registro.php" class="link-ppi link-coral-hover fw-bold d-inline p-0">Regístrate aquí</a></p>
-                        <p class="mb-0 text-center"><a href="../../index.php" class="auth-back-link"><i class="bi bi-arrow-left"></i>Volver al inicio</a></p>
+                        <p class="mb-0 text-center"><a href="<?= BASE_URL ?>index.php" class="auth-back-link"><i class="bi bi-arrow-left"></i>Volver al inicio</a></p>
                     </div>
                 </div>
             </div>
@@ -116,7 +117,7 @@ if (!empty($_SESSION['id_usuario'])) {
     <?php include "../Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../../assets/js/login.js?v=2"></script>
+    <script src="<?= BASE_URL ?>assets/js/login.js?v=2"></script>
 </body>
 
 </html>
