@@ -23,7 +23,7 @@ if ($opcion === "guardar") {
         exit;
     }
 
-    $regexContrasenia = '/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#.\-_])[A-Za-z\d@$!%*?&#.\-_]{8,}$/';
+    $regexContrasenia = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9\s]).{8,}$/';
     if (!preg_match($regexContrasenia, $contrasenia)) {
         echo json_encode([
             "estado" => false,

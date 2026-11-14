@@ -13,12 +13,12 @@ if (!function_exists('e')) {
 
 // Datos de ejemplo — reemplazar con consultas reales cuando existan
 $categorias = [
-    ['nombre' => 'Arte',           'icono' => 'fa-palette'],
-    ['nombre' => 'Tecnología',     'icono' => 'fa-laptop'],
-    ['nombre' => 'Coleccionables', 'icono' => 'fa-star'],
-    ['nombre' => 'Hogar',          'icono' => 'fa-home'],
-    ['nombre' => 'Vehículos',      'icono' => 'fa-car'],
-    ['nombre' => 'Joyería',        'icono' => 'fa-gem'],
+    ['nombre' => 'Arte',           'icono' => 'fa-palette', 'imagen' => 'assets/img/features-life-style.jpg'],
+    ['nombre' => 'Tecnología',     'icono' => 'fa-laptop',  'imagen' => 'assets/img/features-technology.jpg'],
+    ['nombre' => 'Coleccionables', 'icono' => 'fa-star',    'imagen' => 'assets/img/features-background.jpg'],
+    ['nombre' => 'Hogar',          'icono' => 'fa-home',    'imagen' => 'assets/img/lifestyle-2.jpg'],
+    ['nombre' => 'Vehículos',      'icono' => 'fa-car',     'imagen' => 'assets/img/features-sports-1.jpg'],
+    ['nombre' => 'Joyería',        'icono' => 'fa-gem',     'imagen' => 'assets/img/features-fashion.jpg'],
 ];
 
 $destacada = [
@@ -63,7 +63,7 @@ $urlSubasta = 'views/subasta.php?id=';
 
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
-    <link href="assets/css/main.css?v=7" rel="stylesheet">
+    <link href="assets/css/main.css?v=12" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -179,8 +179,7 @@ $urlSubasta = 'views/subasta.php?id=';
             </div>
         </section>
 
-        <!-- ===================== NUEVAS SUBASTAS ===================== -->
-        <section class="py-5" aria-labelledby="titulo-nuevas">
+        <section class="pt-4 pb-5" aria-labelledby="titulo-nuevas">
             <div class="container-fluid px-4 px-lg-5">
                 <div class="d-flex justify-content-between align-items-baseline mb-4 flex-wrap gap-2">
                     <h2 id="titulo-nuevas" class="fw-bold text-main-ppi mb-0">Nuevas subastas</h2>
@@ -207,22 +206,35 @@ $urlSubasta = 'views/subasta.php?id=';
             </div>
         </section>
 
-        <!-- ===================== BANNER VENDEDOR ===================== -->
-        <section class="py-5" aria-labelledby="titulo-vender">
+        <section class="pt-5 pb-6" aria-labelledby="titulo-categorias" style="border-top: 1px solid #191c17; padding-bottom: 5rem !important;">
             <div class="container-fluid px-4 px-lg-5">
-                <div class="banner-ppi p-4 p-md-5 d-flex flex-wrap align-items-center justify-content-between gap-4">
+                <div class="d-flex justify-content-between align-items-baseline mb-4 flex-wrap gap-2">
                     <div>
-                        <h2 id="titulo-vender" class="fw-bold text-main-ppi mb-1">¿Tienes algo que vender?</h2>
-                        <p class="mb-0 text-second-ppi">Crea tu subasta, publica tu artículo y deja que los postores hagan el resto.</p>
+                        <span class="hero-label d-inline-block mb-1">Explorar por rubro</span>
+                        <h2 id="titulo-categorias" class="fw-bold text-main-ppi mb-0">Categorías populares</h2>
                     </div>
-                    <a href="views/subastas/registro-producto.php" class="btn btn-primary py-3 px-5 fw-bold">Publicar subasta</a>
+                    <a href="views/catalogo.php" class="link-ppi d-inline p-0 fw-bold small">Ver todas las categorías &rarr;</a>
+                </div>
+
+                <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-6 g-3 g-lg-4">
+                    <?php foreach ($categorias as $cat) { ?>
+                        <div class="col">
+                            <a href="views/catalogo.php?categoria=<?= urlencode($cat['nombre']) ?>" class="card h-100 overflow-hidden text-decoration-none cat-card-ppi border-0 position-relative">
+                                <div class="cat-img-wrapper position-relative">
+                                    <img src="<?= e($cat['imagen']) ?>" class="cat-card-img w-100" alt="<?= e($cat['nombre']) ?>">
+                                    <div class="cat-card-overlay d-flex flex-column justify-content-end p-3">
+                                        <h3 class="fs-6 fw-bold text-white mb-0"><?= e($cat['nombre']) ?></h3>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    <?php } ?>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- FOOTER CALIDAD ADAN -->
     <?php include "views/Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>

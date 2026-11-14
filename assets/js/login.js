@@ -15,14 +15,14 @@ function mostrarModal(tipo, titulo, mensaje, onCerrar = null) {
     btnAccion.className = "btn btn-ppi-modal btn-sm";
 
     if (tipo === "success") {
-        icon = '<i class="bi bi-check-circle-fill text-success fs-5"></i>';
+        icon = '<i class="fas fa-check-circle fs-5" style="color: #658807;"></i>';
         btnAccion.textContent = "Continuar";
     } else if (tipo === "danger" || tipo === "error") {
-        icon = '<i class="bi bi-x-circle-fill text-danger fs-5"></i>';
+        icon = '<i class="fas fa-times-circle fs-5" style="color: #d8685d;"></i>';
         btnAccion.className = "btn btn-ppi-modal btn-danger btn-sm";
         btnAccion.textContent = "Entendido";
     } else {
-        icon = '<i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i>';
+        icon = '<i class="fas fa-exclamation-triangle text-warning fs-5"></i>';
         btnAccion.className = "btn btn-ppi-modal btn-warning btn-sm";
         btnAccion.textContent = "Entendido";
     }
