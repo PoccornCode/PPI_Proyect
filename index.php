@@ -13,12 +13,12 @@ if (!function_exists('e')) {
 
 // Datos de ejemplo — reemplazar con consultas reales cuando existan
 $categorias = [
-    ['nombre' => 'Arte',           'icono' => 'fa-palette'],
-    ['nombre' => 'Tecnología',     'icono' => 'fa-laptop'],
-    ['nombre' => 'Coleccionables', 'icono' => 'fa-star'],
-    ['nombre' => 'Hogar',          'icono' => 'fa-home'],
-    ['nombre' => 'Vehículos',      'icono' => 'fa-car'],
-    ['nombre' => 'Joyería',        'icono' => 'fa-gem'],
+    ['nombre' => 'Arte',           'icono' => 'fa-palette', 'imagen' => 'assets/img/features-life-style.jpg', 'total' => '24 lotes'],
+    ['nombre' => 'Tecnología',     'icono' => 'fa-laptop',  'imagen' => 'assets/img/features-technology.jpg', 'total' => '42 lotes'],
+    ['nombre' => 'Coleccionables', 'icono' => 'fa-star',    'imagen' => 'assets/img/features-background.jpg', 'total' => '31 lotes'],
+    ['nombre' => 'Hogar',          'icono' => 'fa-home',    'imagen' => 'assets/img/lifestyle-2.jpg',          'total' => '19 lotes'],
+    ['nombre' => 'Vehículos',      'icono' => 'fa-car',     'imagen' => 'assets/img/features-sports-1.jpg',   'total' => '15 lotes'],
+    ['nombre' => 'Joyería',        'icono' => 'fa-gem',     'imagen' => 'assets/img/features-fashion.jpg',    'total' => '28 lotes'],
 ];
 
 $destacada = [
@@ -63,7 +63,7 @@ $urlSubasta = 'views/subasta.php?id=';
 
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
-    <link href="assets/css/main.css?v=8" rel="stylesheet">
+    <link href="assets/css/main.css?v=9" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -220,12 +220,14 @@ $urlSubasta = 'views/subasta.php?id=';
                 <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-6 g-3 g-lg-4">
                     <?php foreach ($categorias as $cat) { ?>
                         <div class="col">
-                            <a href="views/catalogo.php?categoria=<?= urlencode($cat['nombre']) ?>" class="card h-100 p-4 text-center text-decoration-none cat-card-ppi">
-                                <div class="cat-icon-circle mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle">
-                                    <i class="fas <?= e($cat['icono']) ?> fs-4 text-third-ppi"></i>
+                            <a href="views/catalogo.php?categoria=<?= urlencode($cat['nombre']) ?>" class="card h-100 overflow-hidden text-decoration-none cat-card-ppi border-0 position-relative">
+                                <div class="cat-img-wrapper position-relative">
+                                    <img src="<?= e($cat['imagen']) ?>" class="cat-card-img w-100" alt="<?= e($cat['nombre']) ?>">
+                                    <div class="cat-card-overlay d-flex flex-column justify-content-end p-3">
+                                        <span class="cat-badge-salmon mb-1 align-self-start"><?= e($cat['total']) ?></span>
+                                        <h3 class="fs-6 fw-bold text-white mb-0"><?= e($cat['nombre']) ?></h3>
+                                    </div>
                                 </div>
-                                <h3 class="fs-6 fw-bold text-main-ppi mb-1"><?= e($cat['nombre']) ?></h3>
-                                <span class="small text-second-ppi">Ver lotes</span>
                             </a>
                         </div>
                     <?php } ?>
