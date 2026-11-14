@@ -245,7 +245,11 @@ if ($catQuery) {
     <?php include __DIR__ . "/../Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/registro-producto.js?v=2"></script>
+    <script>
+        const RUTA_MIS_PRODUCTOS = "<?= BASE_URL ?>views/subastas/mis-productos.php";
+    </script>
+    <script src="<?= BASE_URL ?>assets/js/toast-ppi.js?v=2"></script>
+    <script src="<?= BASE_URL ?>assets/js/registro-producto.js?v=4"></script>
 </body>
 
 </html>

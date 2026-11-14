@@ -22,11 +22,10 @@ function insertarProducto($conexion, $nombre, $descripcion, $condicion, $id_cate
 
         insertarImagenes($conexion, $id_producto, $rutas);
         $conexion->commit();
-        return ['estado' => true, 'mensaje' => 'Producto guardado exitosamente'];
+        return ['estado' => true, 'mensaje' => 'Producto guardado exitosamente', 'id_producto' => $id_producto];
     } catch (Throwable $e) {
         $conexion->rollback();
 
-        // Segun, esto borra los archivos en la carpeta, pues si hay rollback ya nadie va a ocupar esas img haciendo bulto
         foreach ($rutas as $ruta) {
             @unlink(__DIR__ . '/../uploads/productos/' . $ruta);
         }
@@ -60,4 +59,28 @@ function insertarImagenes($conexion, $id_producto, $rutas){
         }
     }
     $stmtImg->close();
+}
+
+function obtenerProductosPorUsuario($conexion, $id_usuario) {
+    $sql = "SELECT p.id_producto, p.nombre, p.descripcion, p.condicion, p.estado,
+                   c.nombre AS categoria,
+                   img.ruta AS imagen_principal,
+                   s.id_subasta, s.estado AS estado_subasta, s.precio_inicial, s.fecha_inicial, s.fecha_final
+            FROM sb_producto p
+            LEFT JOIN sb_categoria c ON p.id_categoria = c.id_categoria
+            LEFT JOIN sb_imagen_producto img ON p.id_producto = img.id_producto AND img.principal = 1
+            LEFT JOIN sb_subasta s ON p.id_producto = s.id_producto
+            WHERE p.id_usuario = ?
+            ORDER BY p.id_producto DESC";
+
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param("i", $id_usuario);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $productos = [];
+    while ($row = $resultado->fetch_assoc()) {
+        $productos[] = $row;
+    }
+    $stmt->close();
+    return $productos;
 }
