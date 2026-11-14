@@ -33,10 +33,9 @@ if ($opcion === "login") {
         $_SESSION['username'] = $u['username'];
         $_SESSION['id_rol'] = $u['id_rol'];
 
-        // Determinar redirección segura (si tiene parámetro de retorno o directo a home)
+        // Redirige a la raíz del proyecto (auto-detectada)
         $redirect = BASE_URL . "index.php";
         if (!empty($redirect_param)) {
-            // Validar que sea una ruta relativa o interna dentro del dominio
             if (strpos($redirect_param, 'http://') === false && strpos($redirect_param, 'https://') === false) {
                 $redirect = (strpos($redirect_param, BASE_URL) === 0) ? $redirect_param : BASE_URL . ltrim($redirect_param, '/');
             } elseif (strpos($redirect_param, BASE_URL) === 0) {

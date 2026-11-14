@@ -38,7 +38,7 @@ if (!empty($_SESSION['id_usuario'])) {
     <div class="container-fluid auth-page-wrapper py-5">
         <div class="container auth-container-sm py-3 py-lg-4">
             <div class="row align-items-center justify-content-center g-4 g-lg-5">
-                
+
                 <div class="col-lg-6 auth-showcase pe-lg-3">
                     <span class="auth-eyebrow">Acceso a tu cuenta</span>
                     <h1 class="auth-hero-title">¡Bienvenido de <span class="text-accent-ppi">nuevo!</span></h1>
