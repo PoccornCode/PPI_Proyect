@@ -1,4 +1,4 @@
-const REGEX_PASSWORD = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#.\-_])[A-Za-z\d@$!%*?&#.\-_]{8,}$/;
+const REGEX_PASSWORD = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9\s]).{8,}$/;
 
 let modalInstance = null;
 let callbackModal = null;
@@ -17,14 +17,14 @@ function mostrarModal(tipo, titulo, mensaje, onCerrar = null) {
     btnAccion.className = "btn btn-ppi-modal btn-sm";
 
     if (tipo === "success") {
-        icon = '<i class="bi bi-check-circle-fill text-success fs-5"></i>';
+        icon = '<i class="fas fa-check-circle fs-5" style="color: #658807;"></i>';
         btnAccion.textContent = "Continuar";
     } else if (tipo === "danger" || tipo === "error") {
-        icon = '<i class="bi bi-x-circle-fill text-danger fs-5"></i>';
+        icon = '<i class="fas fa-times-circle text-danger fs-5"></i>';
         btnAccion.className = "btn btn-ppi-modal btn-danger btn-sm";
         btnAccion.textContent = "Entendido";
     } else {
-        icon = '<i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i>';
+        icon = '<i class="fas fa-exclamation-triangle text-warning fs-5"></i>';
         btnAccion.className = "btn btn-ppi-modal btn-warning btn-sm";
         btnAccion.textContent = "Entendido";
     }
@@ -194,7 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!REGEX_PASSWORD.test(contrasenia.value)) {
                 contrasenia.classList.add("is-invalid");
-                mostrarModal("warning", "Contraseña débil", "La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un símbolo (@$!%*?&#.-_).");
+                mostrarModal("warning", "Contraseña débil", "La contraseña debe tener al menos 8 caracteres, incluir mayúscula, minúscula, número y algún símbolo (como ., :, -, _, @, $, etc.).");
                 contrasenia.focus();
                 return;
             }

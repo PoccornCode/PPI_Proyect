@@ -20,8 +20,8 @@ $pagina = "registro";
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/forms.css?v=22" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/main.css?v=12" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/forms.css?v=23" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/main.css?v=26" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -62,38 +62,38 @@ $pagina = "registro";
 
                                 <div class="col-md-6">
                                     <label for="nombre" class="form-label text-main-ppi fw-bold">Nombre <span class="req-star">*</span></label>
-                                    <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingresa tu nombre" required>
+                                    <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingresa tu nombre" autocomplete="off" required>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label for="apellido" class="form-label text-main-ppi fw-bold">Apellido <span class="req-star">*</span></label>
-                                    <input type="text" class="form-control" id="apellido" name="apellido" placeholder="Ingresa tu apellido" required>
+                                    <input type="text" class="form-control" id="apellido" name="apellido" placeholder="Ingresa tu apellido" autocomplete="off" required>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label for="correo" class="form-label text-main-ppi fw-bold">Correo Electrónico <span class="req-star">*</span></label>
-                                    <input type="email" class="form-control" id="correo" name="correo" placeholder="correo@ejemplo.com" maxlength="100" required>
+                                    <input type="email" class="form-control" id="correo" name="correo" placeholder="correo@ejemplo.com" maxlength="100" autocomplete="off" required>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label for="telefono" class="form-label text-main-ppi fw-bold">Teléfono <span class="req-star">*</span></label>
-                                    <input type="tel" class="form-control" id="telefono" name="telefono" placeholder="Ej. 7000-0000" maxlength="30" required>
+                                    <input type="tel" class="form-control" id="telefono" name="telefono" placeholder="Ej. 7000-0000" maxlength="30" autocomplete="off" required>
                                 </div>
 
                                 <div class="col-12">
                                     <label for="ubicacion" class="form-label text-main-ppi fw-bold">Ubicación <span class="req-star">*</span></label>
-                                    <input type="text" class="form-control" id="ubicacion" name="ubicacion" placeholder="Ciudad, Departamento" required>
+                                    <input type="text" class="form-control" id="ubicacion" name="ubicacion" placeholder="Ciudad, Departamento" autocomplete="off" required>
                                 </div>
 
                                 <div class="col-12">
                                     <label for="username" class="form-label text-main-ppi fw-bold">Nombre de usuario <span class="req-star">*</span></label>
-                                    <input type="text" class="form-control" id="username" name="username" placeholder="Elige un usuario único" maxlength="50" required>
+                                    <input type="text" class="form-control" id="username" name="username" placeholder="Elige un usuario único" maxlength="50" autocomplete="off" required>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label for="contrasenia" class="form-label text-main-ppi fw-bold">Contraseña <span class="req-star">*</span></label>
                                     <div class="password-field-wrapper">
-                                        <input type="password" class="form-control" id="contrasenia" name="contrasenia" placeholder="Ingresa tu contraseña" minlength="8" required>
+                                        <input type="password" class="form-control" id="contrasenia" name="contrasenia" placeholder="Ingresa tu contraseña" minlength="8" autocomplete="new-password" required>
                                         <button type="button" class="btn-toggle-eye" data-target="contrasenia" tabindex="-1" aria-label="Mostrar u ocultar contraseña">
                                             <i class="bi bi-eye"></i>
                                         </button>
@@ -103,7 +103,7 @@ $pagina = "registro";
                                 <div class="col-md-6">
                                     <label for="confirmar_contrasenia" class="form-label text-main-ppi fw-bold">Confirmar Contraseña <span class="req-star">*</span></label>
                                     <div class="password-field-wrapper">
-                                        <input type="password" class="form-control" id="confirmar_contrasenia" name="confirmar_contrasenia" placeholder="Repite tu contraseña" minlength="8" required>
+                                        <input type="password" class="form-control" id="confirmar_contrasenia" name="confirmar_contrasenia" placeholder="Repite tu contraseña" minlength="8" autocomplete="new-password" required>
                                         <button type="button" class="btn-toggle-eye" data-target="confirmar_contrasenia" tabindex="-1" aria-label="Mostrar u ocultar contraseña">
                                             <i class="bi bi-eye"></i>
                                         </button>
@@ -147,7 +147,7 @@ $pagina = "registro";
     <?php include "../Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/registro.js?v=7"></script>
+    <script src="<?= BASE_URL ?>assets/js/registro.js?v=9"></script>
 </body>
 
 </html>

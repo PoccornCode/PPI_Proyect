@@ -46,9 +46,9 @@ $pagina = "perfil";
                         <h1 class="h3 fw-bold text-main-ppi mb-1"><?= htmlspecialchars($_SESSION['nombre'] ?? 'Usuario') ?> <?= htmlspecialchars($_SESSION['apellido'] ?? '') ?></h1>
                         <p class="text-second-ppi mb-0 small">@<?= htmlspecialchars($_SESSION['username'] ?? 'usuario') ?></p>
                     <div class="ms-auto">
-                        <a href="<?= BASE_URL ?>controllers/logout.php" class="btn btn-outline-danger btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-outline-danger btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalConfirmLogout">
                             <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                        </a>
+                        </button>
                     </div>
                 </div>
                 <p class="text-second-ppi">Esta sección de perfil está en desarrollo.</p>

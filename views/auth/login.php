@@ -27,8 +27,8 @@ if (!empty($_SESSION['id_usuario'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/main.css?v=12" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/forms.css?v=22" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/main.css?v=26" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/forms.css?v=23" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -117,7 +117,7 @@ if (!empty($_SESSION['id_usuario'])) {
     <?php include "../Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/login.js?v=2"></script>
+    <script src="<?= BASE_URL ?>assets/js/login.js?v=4"></script>
 </body>
 
 </html>

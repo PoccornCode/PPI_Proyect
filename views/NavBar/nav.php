@@ -77,7 +77,7 @@ $url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url 
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <a class="dropdown-item item-logout d-flex align-items-center gap-2" href="<?php echo $base_url; ?>controllers/logout.php">
+                                    <a class="dropdown-item item-logout d-flex align-items-center gap-2" href="#" data-bs-toggle="modal" data-bs-target="#modalConfirmLogout">
                                         <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                                     </a>
                                 </li>
@@ -100,4 +100,30 @@ $url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url 
         </div>
     </nav>
 </header>
+
+<?php if ($usuario_logueado): ?>
+<!-- Modal Confirmación Cerrar Sesión -->
+<div class="modal fade" id="modalConfirmLogout" tabindex="-1" aria-labelledby="modalConfirmLogoutLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+        <div class="modal-content modal-content-ppi">
+            <div class="modal-header modal-header-ppi d-flex align-items-center justify-content-between">
+                <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2 m-0" id="modalConfirmLogoutLabel">
+                    <i class="fas fa-sign-out-alt text-warning fs-5"></i>
+                    <span>Cerrar Sesión</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body py-3">
+                <p class="mb-0 text-second-ppi">¿Estás seguro de que deseas salir de tu cuenta de <strong>Gavel.net</strong>?</p>
+            </div>
+            <div class="modal-footer modal-footer-ppi d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm px-3 py-2 fw-semibold" data-bs-dismiss="modal">Cancelar</button>
+                <a href="<?php echo $base_url; ?>controllers/logout.php" class="btn btn-danger btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2">
+                    <i class="fas fa-sign-out-alt"></i> Sí, cerrar sesión
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 
