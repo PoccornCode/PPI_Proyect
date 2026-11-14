@@ -63,6 +63,8 @@ if (!empty($_SESSION['id_usuario'])) {
                         <p class="mb-4 text-center text-second-ppi fs-6">Ingresa tus credenciales para continuar</p>
 
                         <form id="formLogin" name="formLogin" method="POST" action="<?= BASE_URL ?>controllers/login_controller.php" autocomplete="off">
+                            <input type="hidden" name="redirect" id="redirect" value="<?= htmlspecialchars($_GET['redirect'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+
                             <div class="row g-3">
 
                                 <div class="col-12">
@@ -117,7 +119,7 @@ if (!empty($_SESSION['id_usuario'])) {
     <?php include "../Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/login.js?v=4"></script>
+    <script src="<?= BASE_URL ?>assets/js/login.js?v=6"></script>
 </body>
 
 </html>
