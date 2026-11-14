@@ -59,7 +59,7 @@ html {
     scrollbar-gutter: stable;
 }
 
-/* ===================== BOTÓN PERFIL / USUARIO ===================== */
+/* BOTÓN PERFIL / USUARIO */
 .btn-nav-profile {
     width: 42px !important;
     height: 42px !important;
@@ -104,7 +104,86 @@ html {
 }
 
 
-/* ===================== HERO ===================== */
+/*MENÚ DE PERFIL */
+.menu-perfil-ppi {
+    background-color: #0f120d !important;
+    border: 1px solid #28311e !important;
+    border-radius: 12px !important;
+    min-width: 220px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85), 0 0 1px rgba(101, 136, 7, 0.4) !important;
+    padding: 0.5rem 0 !important;
+}
+
+.menu-perfil-header {
+    padding: 0.65rem 1rem !important;
+    border-bottom: 1px solid #1c2217 !important;
+    background-color: #0b0d09 !important;
+    border-top-left-radius: 11px;
+    border-top-right-radius: 11px;
+}
+
+.menu-perfil-name {
+    color: #e5e5e5 !important;
+    font-weight: 700;
+    font-size: 0.92rem;
+}
+
+.menu-perfil-user {
+    color: #8c8a82 !important;
+    font-size: 0.8rem;
+}
+
+.menu-perfil-ppi .dropdown-item {
+    color: #c9c9c9 !important;
+    font-size: 0.88rem !important;
+    font-weight: 500 !important;
+    padding: 0.55rem 1rem !important;
+    background-color: transparent !important;
+    transition: background-color 0.2s ease, color 0.2s ease, padding-left 0.2s ease;
+}
+
+.menu-perfil-ppi .dropdown-item:hover,
+.menu-perfil-ppi .dropdown-item:focus {
+    color: #ffffff !important;
+    background-color: #1a2214 !important;
+    padding-left: 1.2rem !important;
+}
+
+.menu-perfil-ppi .dropdown-item i {
+    color: #94aa34 !important;
+    width: 20px;
+    text-align: center;
+    transition: color 0.2s ease;
+}
+
+.menu-perfil-ppi .dropdown-item:hover i {
+    color: #c8d87a !important;
+}
+
+.menu-perfil-ppi .dropdown-divider {
+    border-top: 1px solid #1c2217 !important;
+    opacity: 1 !important;
+    margin: 0.35rem 0 !important;
+}
+
+.menu-perfil-ppi .dropdown-item.item-logout {
+    color: #f87171 !important;
+}
+
+.menu-perfil-ppi .dropdown-item.item-logout i {
+    color: #ef4444 !important;
+}
+
+.menu-perfil-ppi .dropdown-item.item-logout:hover,
+.menu-perfil-ppi .dropdown-item.item-logout:focus {
+    color: #ffffff !important;
+    background-color: rgba(220, 38, 38, 0.18) !important;
+}
+
+.menu-perfil-ppi .dropdown-item.item-logout:hover i {
+    color: #ffffff !important;
+}
+
 .hero-ppi {
     position: relative;
     padding: 110px 0 95px;

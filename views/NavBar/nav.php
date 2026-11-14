@@ -13,7 +13,7 @@ $url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Raleway:wght@600;700;800&display=swap" rel="stylesheet">
-<link href="<?php echo $base_url; ?>assets/css/main.css?v=25" rel="stylesheet">
+<link href="<?php echo $base_url; ?>assets/css/main.css?v=26" rel="stylesheet">
 
 <header class="sticky-top navbar-ppi-wrapper" style="background-color: #0c0f0a !important; border-bottom: 2px solid #658807 !important; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7) !important;">
     <nav class="navbar navbar-expand-xl navbar-dark py-2 py-lg-3" style="background-color: transparent !important;">
@@ -53,17 +53,47 @@ $url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url 
                     <a href="<?php echo $base_url; ?>views/subastas/registro-producto.php" class="btn btn-outline-publish btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center justify-content-center">
                         <i class="fas fa-plus me-1 small"></i>Publicar artículo
                     </a>
-                    <?php if (!$usuario_logueado): ?>
+                    <?php if ($usuario_logueado): ?>
+                        <div class="dropdown">
+                            <button class="btn-nav-profile d-inline-flex align-items-center justify-content-center border-0" type="button" id="dropdownPerfil" data-bs-toggle="dropdown" aria-expanded="false" title="Mi Cuenta">
+                                <i class="fas fa-user-circle"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end menu-perfil-ppi" aria-labelledby="dropdownPerfil">
+                                <li class="menu-perfil-header">
+                                    <div class="menu-perfil-name text-truncate">
+                                        <?= htmlspecialchars($_SESSION['nombre'] ?? 'Usuario') ?> <?= htmlspecialchars($_SESSION['apellido'] ?? '') ?>
+                                    </div>
+                                    <div class="menu-perfil-user text-truncate">@<?= htmlspecialchars($_SESSION['username'] ?? 'usuario') ?></div>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="<?php echo $base_url; ?>views/perfil.php">
+                                        <i class="fas fa-user"></i> Mi Perfil
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="<?php echo $base_url; ?>views/subastas/registro-producto.php">
+                                        <i class="fas fa-box-open"></i> Mis Artículos
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item item-logout d-flex align-items-center gap-2" href="<?php echo $base_url; ?>controllers/logout.php">
+                                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    <?php else: ?>
                         <a href="<?php echo $base_url; ?>views/auth/login.php" class="btn btn-secondary btn-sm px-3 py-2 fw-semibold">
                             Iniciar Sesión
                         </a>
                         <a href="<?php echo $base_url; ?>views/auth/registro.php" class="btn btn-primary btn-sm px-3 py-2 fw-semibold">
                             Registrarse
                         </a>
+                        <a href="<?php echo $url_perfil; ?>" class="btn-nav-profile d-inline-flex align-items-center justify-content-center" title="Iniciar sesión">
+                            <i class="fas fa-user-circle"></i>
+                        </a>
                     <?php endif; ?>
-                    <a href="<?php echo $url_perfil; ?>" class="btn-nav-profile d-inline-flex align-items-center justify-content-center" title="<?php echo $usuario_logueado ? 'Mi Perfil' : 'Iniciar sesión'; ?>">
-                        <i class="fas fa-user-circle"></i>
-                    </a>
                 </div>
             </div>
 
