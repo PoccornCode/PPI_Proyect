@@ -1,5 +1,4 @@
 <?php
-// Usar BASE_URL de env.php (auto-detecta el subdirectorio en cualquier entorno)
 if (!defined('BASE_URL')) {
     require_once dirname(__DIR__, 2) . '/config/env.php';
 }
@@ -7,48 +6,55 @@ $base_url = BASE_URL;
 ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Raleway:wght@600;700;800&display=swap" rel="stylesheet">
 
-<div class="container-fluid sticky-top px-0 nav-ppi-1">
-    <div class="container-fluid bg-dark-ppi">
+<header class="sticky-top navbar-ppi-wrapper">
+    <nav class="navbar navbar-expand-xl navbar-dark bg-dark-ppi py-2 py-lg-3">
+        <div class="container px-3 px-lg-4">
+            
+            <a href="<?php echo $base_url; ?>index.php" class="navbar-brand d-flex align-items-baseline gap-1 gavel-brand py-0 me-3 me-xl-4">
+                <span class="brand-name text-main-ppi fw-bold" style="font-size: 1.85rem; line-height: 1; font-family: 'Raleway', sans-serif;">Gavel</span>
+                <span class="brand-tld text-third-ppi fw-bold" style="font-size: 1.45rem; line-height: 1; font-family: 'Raleway', sans-serif;">.net</span>
+            </a>
 
-        <div class="container px-0">
+            <button class="navbar-toggler border-0 p-2 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="text-main-ppi">
+                    <i class="fas fa-bars fs-4"></i>
+                </span>
+            </button>
 
-            <nav class="navbar bg-dark-ppi navbar-expand-xl row">
-                <a href="<?php echo $base_url; ?>index.php" class="col-7 col-xl-3 py-2 gavel-brand d-flex align-items-baseline gap-1">
-                    <span class="brand-name text-main-ppi fw-bold" style="font-size:2rem; line-height:1; font-family:'Raleway',sans-serif;">Gavel</span>
-                    <span class="brand-tld text-third-ppi fw-bold" style="font-size:1.6rem; line-height:1; font-family:'Raleway',sans-serif;">.net</span>
-                </a>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav mx-auto mb-2 mb-xl-0 align-items-xl-center gap-xl-1">
+                    <li class="nav-item">
+                        <a href="<?php echo $base_url; ?>index.php" class="nav-link link-ppi">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?php echo $base_url; ?>views/catalogo.php" class="nav-link link-ppi">Subastas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?php echo $base_url; ?>views/catalogo.php" class="nav-link link-ppi">Categorías</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?php echo $base_url; ?>404.php" class="nav-link link-ppi">Cómo funciona</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?php echo $base_url; ?>views/contacto/contacto.php" class="nav-link link-ppi">Contacto</a>
+                    </li>
+                </ul>
 
-                <button class="navbar-toggler py-2 px-2 col-2 m-3" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarCollapse">
-                    <span class="text-main-ppi p-1">
-                        <i class="fas fa-bars fs-2"></i>
-                    </span>
-                </button>
+                <div class="d-flex flex-column flex-xl-row align-items-stretch align-items-xl-center gap-2 pt-3 pt-xl-0 border-top-mobile">
+                    <a href="<?php echo $base_url; ?>views/subastas/registro-producto.php" class="btn btn-outline-publish btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center justify-content-center">
+                        <i class="fas fa-plus me-1 small"></i>Publicar artículo
+                    </a>
+                    <a href="<?php echo $base_url; ?>views/auth/login.php" class="btn btn-secondary btn-sm px-3 py-2 fw-semibold">
+                        Iniciar Sesión
+                    </a>
+                    <a href="<?php echo $base_url; ?>views/auth/registro.php" class="btn btn-primary btn-sm px-3 py-2 fw-semibold">
+                        Registrarse
+                    </a>
+                </div>
+            </div>
 
-                <div class="collapse navbar-collapse nbg-dark-ppi py-1 col-2" id="navbarCollapse">
-
-                    <div class="navbar-nav mx-auto">
-                        <a href="<?php echo $base_url; ?>index.php" class="nav-item link-ppi">Inicio</a>
-                        <a href="<?php echo $base_url; ?>views/catalogo.php" class="nav-item link-ppi">Subastas</a>
-                        <a href="<?php echo $base_url; ?>views/catalogo.php" class="nav-item link-ppi">Categorias</a>
-                        <a href="<?php echo $base_url; ?>404.php" class="nav-item link-ppi">Como funciona</a>
-                        <a href="<?php echo $base_url; ?>views/contacto/contacto.php" class="nav-item link-ppi">Contacto</a>
-                        <a href="<?php echo $base_url; ?>views/subastas/registro-producto.php" class="nav-item link-ppi fw-bold" style="color:#94aa34;">+ Publicar artículo</a>
-                    </div>
-
-                        <div class="row col-xl-4 col-12">
-                            <div class="col-6">
-                                <a href="<?php echo $base_url; ?>views/auth/registro.php" class="btn btn-primary rounded w-100 m-2">Registrarse</a>
-                            </div>
-                            <div class="col-6">
-                                <a href="<?php echo $base_url; ?>views/auth/login.php" class="btn btn-secondary rounded w-100 m-2">Iniciar Sesion</a>
-                            </div>
-                        </div>
-                    </div>
-
-            </nav>
         </div>
-    </div>
-</div>
+    </nav>
+</header>

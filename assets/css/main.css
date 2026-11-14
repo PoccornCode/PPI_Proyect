@@ -22,6 +22,47 @@
     color: #62803f;
 }
 
+.navbar-ppi-wrapper {
+    background-color: #080708 !important;
+    border-bottom: 2px solid #5e7325;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+    z-index: 1030;
+}
+
+.navbar-ppi-wrapper .nav-link.link-ppi {
+    padding: 0.5rem 0.85rem !important;
+    font-size: 0.93rem;
+    font-weight: 500;
+    color: #b0afab !important;
+    transition: color 0.2s ease;
+}
+
+.navbar-ppi-wrapper .nav-link.link-ppi:hover,
+.navbar-ppi-wrapper .nav-link.link-ppi:focus {
+    color: #c8d87a !important;
+}
+
+.btn-outline-publish {
+    color: #c8d87a;
+    background-color: rgba(94, 115, 37, 0.12);
+    border: 1px solid #5e7325;
+    transition: all 0.25s ease;
+}
+
+.btn-outline-publish:hover {
+    color: #ffffff;
+    background-color: #5e7325;
+    border-color: #658807;
+}
+
+@media (max-width: 1199.98px) {
+    .border-top-mobile {
+        border-top: 1px solid #1c2217;
+        margin-top: 0.75rem;
+    }
+}
+
+
 /* ===================== HERO ===================== */
 .hero-ppi {
     position: relative;
