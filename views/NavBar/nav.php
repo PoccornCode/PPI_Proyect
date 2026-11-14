@@ -35,7 +35,7 @@ $base_url = BASE_URL;
                         <a href="<?php echo $base_url; ?>views/catalogo.php" class="nav-item link-ppi">Categorias</a>
                         <a href="<?php echo $base_url; ?>404.php" class="nav-item link-ppi">Como funciona</a>
                         <a href="<?php echo $base_url; ?>views/contacto/contacto.php" class="nav-item link-ppi">Contacto</a>
-                        <a href="<?php echo $base_url; ?>views/subastas/registro-producto.php" class="nav-item link-ppi fw-bold" style="color:#94aa34;">+ Subastar</a>
+                        <a href="<?php echo $base_url; ?>views/subastas/registro-producto.php" class="nav-item link-ppi fw-bold" style="color:#94aa34;">+ Publicar artículo</a>
                     </div>
 
                         <div class="row col-xl-4 col-12">
