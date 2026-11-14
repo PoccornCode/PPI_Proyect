@@ -3,14 +3,21 @@ if (!defined('BASE_URL')) {
     require_once dirname(__DIR__, 2) . '/config/env.php';
 }
 $base_url = BASE_URL;
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+$usuario_logueado = isset($_SESSION['id_usuario']);
+$url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url . "views/auth/login.php");
 ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Raleway:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="<?php echo $base_url; ?>assets/css/main.css?v=25" rel="stylesheet">
 
 <header class="sticky-top navbar-ppi-wrapper" style="background-color: #0c0f0a !important; border-bottom: 2px solid #658807 !important; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7) !important;">
     <nav class="navbar navbar-expand-xl navbar-dark py-2 py-lg-3" style="background-color: transparent !important;">
-        <div class="container px-3 px-lg-4">
+        <div class="container-fluid px-3 px-lg-5">
             
             <a href="<?php echo $base_url; ?>index.php" class="navbar-brand d-flex align-items-baseline gap-1 gavel-brand py-0 me-3 me-xl-4">
                 <span class="brand-name text-main-ppi fw-bold" style="font-size: 1.85rem; line-height: 1; font-family: 'Raleway', sans-serif;">Gavel</span>
@@ -46,11 +53,16 @@ $base_url = BASE_URL;
                     <a href="<?php echo $base_url; ?>views/subastas/registro-producto.php" class="btn btn-outline-publish btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center justify-content-center">
                         <i class="fas fa-plus me-1 small"></i>Publicar artículo
                     </a>
-                    <a href="<?php echo $base_url; ?>views/auth/login.php" class="btn btn-secondary btn-sm px-3 py-2 fw-semibold">
-                        Iniciar Sesión
-                    </a>
-                    <a href="<?php echo $base_url; ?>views/auth/registro.php" class="btn btn-primary btn-sm px-3 py-2 fw-semibold">
-                        Registrarse
+                    <?php if (!$usuario_logueado): ?>
+                        <a href="<?php echo $base_url; ?>views/auth/login.php" class="btn btn-secondary btn-sm px-3 py-2 fw-semibold">
+                            Iniciar Sesión
+                        </a>
+                        <a href="<?php echo $base_url; ?>views/auth/registro.php" class="btn btn-primary btn-sm px-3 py-2 fw-semibold">
+                            Registrarse
+                        </a>
+                    <?php endif; ?>
+                    <a href="<?php echo $url_perfil; ?>" class="btn-nav-profile d-inline-flex align-items-center justify-content-center" title="<?php echo $usuario_logueado ? 'Mi Perfil' : 'Iniciar sesión'; ?>">
+                        <i class="fas fa-user-circle"></i>
                     </a>
                 </div>
             </div>
@@ -58,3 +70,4 @@ $base_url = BASE_URL;
         </div>
     </nav>
 </header>
+

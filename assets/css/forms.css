@@ -221,8 +221,8 @@ div:where(.swal2-container).swal2-backdrop-show,
     background-position: center 32%;
     background-size: cover;
     background-repeat: no-repeat;
-    filter: grayscale(40%) contrast(1.0);
-    opacity: 0.20;
+    filter: grayscale(30%) contrast(1.1) brightness(1.15);
+    opacity: 0.38;
     pointer-events: none;
     z-index: -2;
 }

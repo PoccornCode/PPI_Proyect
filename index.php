@@ -63,7 +63,7 @@ $urlSubasta = 'views/subasta.php?id=';
 
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
-    <link href="assets/css/main.css?v=9" rel="stylesheet">
+    <link href="assets/css/main.css?v=12" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -179,8 +179,7 @@ $urlSubasta = 'views/subasta.php?id=';
             </div>
         </section>
 
-        <!-- ===================== NUEVAS SUBASTAS ===================== -->
-        <section class="py-5" aria-labelledby="titulo-nuevas">
+        <section class="pt-4 pb-5" aria-labelledby="titulo-nuevas">
             <div class="container-fluid px-4 px-lg-5">
                 <div class="d-flex justify-content-between align-items-baseline mb-4 flex-wrap gap-2">
                     <h2 id="titulo-nuevas" class="fw-bold text-main-ppi mb-0">Nuevas subastas</h2>
@@ -207,7 +206,7 @@ $urlSubasta = 'views/subasta.php?id=';
             </div>
         </section>
 
-        <section class="py-5" aria-labelledby="titulo-categorias" style="border-top: 1px solid #191c17;">
+        <section class="pt-5 pb-6" aria-labelledby="titulo-categorias" style="border-top: 1px solid #191c17; padding-bottom: 5rem !important;">
             <div class="container-fluid px-4 px-lg-5">
                 <div class="d-flex justify-content-between align-items-baseline mb-4 flex-wrap gap-2">
                     <div>

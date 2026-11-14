@@ -43,16 +43,57 @@
 }
 
 .btn-outline-publish {
-    color: #c8d87a;
-    background-color: rgba(94, 115, 37, 0.12);
-    border: 1px solid #5e7325;
-    transition: all 0.25s ease;
+    color: #c9c9c9;
+    background-color: transparent;
+    border: 1px solid #364025;
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .btn-outline-publish:hover {
     color: #ffffff;
     background-color: #5e7325;
-    border-color: #658807;
+    border-color: #5e7325;
+}
+
+html {
+    scrollbar-gutter: stable;
+}
+
+/* ===================== BOTÓN PERFIL / USUARIO ===================== */
+.btn-nav-profile {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    border-radius: 50% !important;
+    color: #f0f0f0 !important;
+    background-color: #161a13 !important;
+    border: 1px solid #364222 !important;
+    font-size: 1.35rem !important;
+    text-decoration: none !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45) !important;
+    transition: color 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+}
+
+.btn-nav-profile i {
+    color: inherit !important;
+    font-size: inherit !important;
+    line-height: 1 !important;
+}
+
+.btn-nav-profile:visited,
+.btn-nav-profile:link,
+.btn-nav-profile:active {
+    color: #f0f0f0 !important;
+}
+
+.btn-nav-profile:hover,
+.btn-nav-profile:focus {
+    color: #ffffff !important;
+    background-color: #5e7325 !important;
+    border-color: #94aa34 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(94, 115, 37, 0.35) !important;
 }
 
 @media (max-width: 1199.98px) {
@@ -67,7 +108,7 @@
 .hero-ppi {
     position: relative;
     padding: 110px 0 95px;
-    background: 
+    background:
         linear-gradient(180deg, rgba(8, 7, 8, 0.85) 0%, rgba(8, 7, 8, 0.98) 100%),
         #080708;
     border-bottom: 1px solid #191c17;
@@ -214,8 +255,6 @@
     color: #a3cc00;
 }
 
-
-
 /* Btn de contorno */
 .btn-contorno-ppi {
     color: #c9c9c9;
@@ -253,26 +292,26 @@
 }
 
 .cat-img-wrapper {
-    height: 140px;
+    height: 190px;
     overflow: hidden;
 }
 
 .cat-card-img {
     height: 100%;
     object-fit: cover;
-    filter: brightness(0.72);
+    filter: brightness(0.65);
     transition: transform 0.4s ease, filter 0.4s ease;
 }
 
 .cat-card-ppi:hover .cat-card-img {
-    transform: scale(1.08);
-    filter: brightness(0.85);
+    transform: scale(1.06);
+    filter: brightness(0.82);
 }
 
 .cat-card-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(8, 7, 8, 0.1) 0%, rgba(8, 7, 8, 0.92) 100%);
+    background: linear-gradient(180deg, rgba(8, 7, 8, 0.0) 30%, rgba(8, 7, 8, 0.88) 100%);
     pointer-events: none;
 }
 
@@ -302,4 +341,3 @@
     border-color: #658807;
     transform: translateY(-2px);
 }
-
