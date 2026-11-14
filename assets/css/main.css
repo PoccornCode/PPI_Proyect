@@ -238,37 +238,32 @@
     border-radius: 10px;
 }
 
-.step-card-ppi {
-    background: #0d0f0c;
-    border: 1px solid #1c2217 !important;
+.cat-card-ppi {
+    background: #0f110e;
+    border: 1px solid #1c2217;
     border-radius: 12px;
-    transition: transform 0.25s ease, border-color 0.25s ease;
+    transition: transform 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
 }
 
-.step-card-ppi:hover {
+.cat-card-ppi:hover {
     transform: translateY(-4px);
-    border-color: #5e7325 !important;
+    border-color: #5e7325;
+    background-color: #131710;
 }
 
-.step-icon-wrapper {
-    width: 54px;
-    height: 54px;
-    background-color: #141811;
+.cat-icon-circle {
+    width: 60px;
+    height: 60px;
+    background-color: #080708;
     border: 1px solid #28311d;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
-.step-badge {
-    font-family: 'Raleway', sans-serif;
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: #262e1c;
-    letter-spacing: -1px;
+.cat-card-ppi:hover .cat-icon-circle {
+    background-color: #182012;
+    border-color: #5e7325;
 }
 
-.step-card-ppi:hover .step-badge {
-    color: #5e7325;
-    transition: color 0.25s ease;
-}
 
 /*Ajustes para pantallas pequenas*/
 @media (max-width: 991.98px) {

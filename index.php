@@ -207,58 +207,28 @@ $urlSubasta = 'views/subasta.php?id=';
             </div>
         </section>
 
-        <section class="py-5" aria-labelledby="titulo-como-funciona" style="border-top: 1px solid #191c17;">
+        <section class="py-5" aria-labelledby="titulo-categorias" style="border-top: 1px solid #191c17;">
             <div class="container-fluid px-4 px-lg-5">
-                <div class="text-center max-w-xl mx-auto mb-5">
-                    <span class="hero-label d-inline-block mb-2">Paso a paso</span>
-                    <h2 id="titulo-como-funciona" class="fw-bold text-main-ppi display-6">¿Cómo funciona Gavel.net?</h2>
-                    <p class="text-second-ppi mb-0" style="max-width: 600px; margin: 0 auto;">Subastar y conseguir piezas únicas nunca fue tan transparente y seguro.</p>
+                <div class="d-flex justify-content-between align-items-baseline mb-4 flex-wrap gap-2">
+                    <div>
+                        <span class="hero-label d-inline-block mb-1">Explorar por rubro</span>
+                        <h2 id="titulo-categorias" class="fw-bold text-main-ppi mb-0">Categorías populares</h2>
+                    </div>
+                    <a href="views/catalogo.php" class="link-ppi d-inline p-0 fw-bold small">Ver todas las categorías &rarr;</a>
                 </div>
 
-                <div class="row g-4">
-                    <div class="col-12 col-md-4">
-                        <div class="card h-100 p-4 step-card-ppi border-0 position-relative">
-                            <div class="d-flex align-items-center justify-content-between mb-4">
-                                <div class="step-icon-wrapper rounded-circle d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-box-open fs-4 text-third-ppi"></i>
+                <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-6 g-3 g-lg-4">
+                    <?php foreach ($categorias as $cat) { ?>
+                        <div class="col">
+                            <a href="views/catalogo.php?categoria=<?= urlencode($cat['nombre']) ?>" class="card h-100 p-4 text-center text-decoration-none cat-card-ppi">
+                                <div class="cat-icon-circle mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle">
+                                    <i class="fas <?= e($cat['icono']) ?> fs-4 text-third-ppi"></i>
                                 </div>
-                                <span class="step-badge">01</span>
-                            </div>
-                            <h3 class="fs-5 fw-bold text-main-ppi mb-2">Publica tu Artículo</h3>
-                            <p class="text-second-ppi small mb-0">Registra tu artículo con fotos, descripción y estado para ponerlo a disposición del sistema de subastas.</p>
+                                <h3 class="fs-6 fw-bold text-main-ppi mb-1"><?= e($cat['nombre']) ?></h3>
+                                <span class="small text-second-ppi">Ver lotes</span>
+                            </a>
                         </div>
-                    </div>
-
-                    <div class="col-12 col-md-4">
-                        <div class="card h-100 p-4 step-card-ppi border-0 position-relative">
-                            <div class="d-flex align-items-center justify-content-between mb-4">
-                                <div class="step-icon-wrapper rounded-circle d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-gavel fs-4 text-third-ppi"></i>
-                                </div>
-                                <span class="step-badge">02</span>
-                            </div>
-                            <h3 class="fs-5 fw-bold text-main-ppi mb-2">Inicia la Subasta y Puja</h3>
-                            <p class="text-second-ppi small mb-0">Se apertura la subasta con precio base. Los compradores compiten con pujas transparentes en tiempo real.</p>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-md-4">
-                        <div class="card h-100 p-4 step-card-ppi border-0 position-relative">
-                            <div class="d-flex align-items-center justify-content-between mb-4">
-                                <div class="step-icon-wrapper rounded-circle d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-shield-alt fs-4 text-third-ppi"></i>
-                                </div>
-                                <span class="step-badge">03</span>
-                            </div>
-                            <h3 class="fs-5 fw-bold text-main-ppi mb-2">Gana y Concreta</h3>
-                            <p class="text-second-ppi small mb-0">Al cerrar el tiempo, la mayor oferta se adjudica el artículo con total respaldo y comunicación directa.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="d-flex flex-wrap justify-content-center align-items-center gap-3 mt-5 pt-2">
-                    <a href="views/catalogo.php" class="btn btn-primary px-4 py-2 fw-bold">Explorar catálogo</a>
-                    <a href="views/subastas/registro-producto.php" class="btn btn-contorno-ppi px-4 py-2 fw-bold">Publicar artículo</a>
+                    <?php } ?>
                 </div>
             </div>
         </section>
