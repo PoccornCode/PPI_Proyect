@@ -207,22 +207,64 @@ $urlSubasta = 'views/subasta.php?id=';
             </div>
         </section>
 
-        <!-- ===================== BANNER VENDEDOR ===================== -->
-        <section class="py-5" aria-labelledby="titulo-vender">
+        <section class="py-5" aria-labelledby="titulo-como-funciona" style="border-top: 1px solid #191c17;">
             <div class="container-fluid px-4 px-lg-5">
-                <div class="banner-ppi p-4 p-md-5 d-flex flex-wrap align-items-center justify-content-between gap-4">
-                    <div>
-                        <h2 id="titulo-vender" class="fw-bold text-main-ppi mb-1">¿Tienes algo que vender?</h2>
-                        <p class="mb-0 text-second-ppi">Crea tu subasta, publica tu artículo y deja que los postores hagan el resto.</p>
+                <div class="text-center max-w-xl mx-auto mb-5">
+                    <span class="hero-label d-inline-block mb-2">Paso a paso</span>
+                    <h2 id="titulo-como-funciona" class="fw-bold text-main-ppi display-6">¿Cómo funciona Gavel.net?</h2>
+                    <p class="text-second-ppi mb-0" style="max-width: 600px; margin: 0 auto;">Subastar y conseguir piezas únicas nunca fue tan transparente y seguro.</p>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-12 col-md-4">
+                        <div class="card h-100 p-4 step-card-ppi border-0 position-relative">
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                                <div class="step-icon-wrapper rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-search fs-4 text-third-ppi"></i>
+                                </div>
+                                <span class="step-badge">01</span>
+                            </div>
+                            <h3 class="fs-5 fw-bold text-main-ppi mb-2">Explora o Publica</h3>
+                            <p class="text-second-ppi small mb-0">Descubre lotes exclusivos por categorías o lista tus propios artículos con precios iniciales y reservas seguras.</p>
+                        </div>
                     </div>
-                    <a href="views/subastas/registro-producto.php" class="btn btn-primary py-3 px-5 fw-bold">Publicar subasta</a>
+
+                    <div class="col-12 col-md-4">
+                        <div class="card h-100 p-4 step-card-ppi border-0 position-relative">
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                                <div class="step-icon-wrapper rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-gavel fs-4 text-third-ppi"></i>
+                                </div>
+                                <span class="step-badge">02</span>
+                            </div>
+                            <h3 class="fs-5 fw-bold text-main-ppi mb-2">Puja en Tiempo Real</h3>
+                            <p class="text-second-ppi small mb-0">Participa en subastas activas con total transparencia. Sigue el reloj y supera ofertas de manera instantánea.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <div class="card h-100 p-4 step-card-ppi border-0 position-relative">
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                                <div class="step-icon-wrapper rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-shield-alt fs-4 text-third-ppi"></i>
+                                </div>
+                                <span class="step-badge">03</span>
+                            </div>
+                            <h3 class="fs-5 fw-bold text-main-ppi mb-2">Gana y Recibe Seguro</h3>
+                            <p class="text-second-ppi small mb-0">Al vencer el tiempo, el máximo postor gana. Transacciones protegidas y comunicación directa entre usuarios.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap justify-content-center align-items-center gap-3 mt-5 pt-2">
+                    <a href="views/catalogo.php" class="btn btn-primary px-4 py-2 fw-bold">Explorar catálogo</a>
+                    <a href="views/subastas/registro-producto.php" class="btn btn-contorno-ppi px-4 py-2 fw-bold">Publicar mi subasta</a>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- FOOTER CALIDAD ADAN -->
     <?php include "views/Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
