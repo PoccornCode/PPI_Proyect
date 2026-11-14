@@ -203,3 +203,22 @@
         height: 280px;
     }
 }
+
+.footer-ppi-wrapper {
+    margin-top: auto;
+}
+
+.footer-social-links .btn-outline-ppi-social {
+    color: #a7a59d;
+    background-color: #121510;
+    border: 1px solid #23271f;
+    transition: all 0.3s ease;
+}
+
+.footer-social-links .btn-outline-ppi-social:hover {
+    color: #ffffff;
+    background-color: #5e7325;
+    border-color: #658807;
+    transform: translateY(-2px);
+}
+
