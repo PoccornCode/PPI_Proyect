@@ -55,7 +55,7 @@ $base_url = BASE_URL;
                         </li>
                         <li>
                             <a href="<?php echo $base_url; ?>views/subastas/registro-producto.php" class="link-ppi p-0 d-inline-flex align-items-center">
-                                <i class="fas fa-angle-right me-2 text-third-ppi" style="font-size: 0.75rem;"></i>Vender un lote
+                                <i class="fas fa-angle-right me-2 text-third-ppi" style="font-size: 0.75rem;"></i>Publicar artículo
                             </a>
                         </li>
                     </ul>

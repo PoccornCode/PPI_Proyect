@@ -220,12 +220,12 @@ $urlSubasta = 'views/subasta.php?id=';
                         <div class="card h-100 p-4 step-card-ppi border-0 position-relative">
                             <div class="d-flex align-items-center justify-content-between mb-4">
                                 <div class="step-icon-wrapper rounded-circle d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-search fs-4 text-third-ppi"></i>
+                                    <i class="fas fa-box-open fs-4 text-third-ppi"></i>
                                 </div>
                                 <span class="step-badge">01</span>
                             </div>
-                            <h3 class="fs-5 fw-bold text-main-ppi mb-2">Explora o Publica</h3>
-                            <p class="text-second-ppi small mb-0">Descubre lotes exclusivos por categorías o lista tus propios artículos con precios iniciales y reservas seguras.</p>
+                            <h3 class="fs-5 fw-bold text-main-ppi mb-2">Publica tu Artículo</h3>
+                            <p class="text-second-ppi small mb-0">Registra tu artículo con fotos, descripción y estado para ponerlo a disposición del sistema de subastas.</p>
                         </div>
                     </div>
 
@@ -237,8 +237,8 @@ $urlSubasta = 'views/subasta.php?id=';
                                 </div>
                                 <span class="step-badge">02</span>
                             </div>
-                            <h3 class="fs-5 fw-bold text-main-ppi mb-2">Puja en Tiempo Real</h3>
-                            <p class="text-second-ppi small mb-0">Participa en subastas activas con total transparencia. Sigue el reloj y supera ofertas de manera instantánea.</p>
+                            <h3 class="fs-5 fw-bold text-main-ppi mb-2">Inicia la Subasta y Puja</h3>
+                            <p class="text-second-ppi small mb-0">Se apertura la subasta con precio base. Los compradores compiten con pujas transparentes en tiempo real.</p>
                         </div>
                     </div>
 
@@ -250,15 +250,15 @@ $urlSubasta = 'views/subasta.php?id=';
                                 </div>
                                 <span class="step-badge">03</span>
                             </div>
-                            <h3 class="fs-5 fw-bold text-main-ppi mb-2">Gana y Recibe Seguro</h3>
-                            <p class="text-second-ppi small mb-0">Al vencer el tiempo, el máximo postor gana. Transacciones protegidas y comunicación directa entre usuarios.</p>
+                            <h3 class="fs-5 fw-bold text-main-ppi mb-2">Gana y Concreta</h3>
+                            <p class="text-second-ppi small mb-0">Al cerrar el tiempo, la mayor oferta se adjudica el artículo con total respaldo y comunicación directa.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="d-flex flex-wrap justify-content-center align-items-center gap-3 mt-5 pt-2">
                     <a href="views/catalogo.php" class="btn btn-primary px-4 py-2 fw-bold">Explorar catálogo</a>
-                    <a href="views/subastas/registro-producto.php" class="btn btn-contorno-ppi px-4 py-2 fw-bold">Publicar mi subasta</a>
+                    <a href="views/subastas/registro-producto.php" class="btn btn-contorno-ppi px-4 py-2 fw-bold">Publicar artículo</a>
                 </div>
             </div>
         </section>
