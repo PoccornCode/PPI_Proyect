@@ -42,7 +42,7 @@ $url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url 
                         <a href="<?php echo $base_url; ?>views/catalogo.php" class="nav-link link-ppi">Categorías</a>
                     </li>
                     <li class="nav-item">
-                        <a href="<?php echo $base_url; ?>404.php" class="nav-link link-ppi">Cómo funciona</a>
+                        <a href="<?php echo $base_url; ?>views/como-funciona.php" class="nav-link link-ppi">Cómo funciona</a>
                     </li>
                     <li class="nav-item">
                         <a href="<?php echo $base_url; ?>views/contacto/contacto.php" class="nav-link link-ppi">Contacto</a>

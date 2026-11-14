@@ -514,3 +514,14 @@ html {
     border-color: #658807;
     transform: translateY(-2px);
 }
+
+/* Encabezados y títulos en tema oscuro */
+.text-main-ppi,
+h1.text-main-ppi,
+h2.text-main-ppi,
+h3.text-main-ppi,
+h4.text-main-ppi,
+h5.text-main-ppi,
+h6.text-main-ppi {
+    color: #e5e5e5 !important;
+}
