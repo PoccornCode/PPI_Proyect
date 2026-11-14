@@ -222,24 +222,3 @@
     transform: translateY(-2px);
 }
 
-.footer-gallery-item {
-    background-color: #121510;
-    transition: transform 0.3s ease, border-color 0.3s ease;
-}
-
-.footer-gallery-item:hover {
-    transform: translateY(-2px);
-    border-color: #658807 !important;
-}
-
-.footer-gallery-item .footer-thumb {
-    height: 70px;
-    object-fit: cover;
-    transition: transform 0.3s ease, filter 0.3s ease;
-    filter: brightness(0.9);
-}
-
-.footer-gallery-item:hover .footer-thumb {
-    transform: scale(1.08);
-    filter: brightness(1.05);
-}
