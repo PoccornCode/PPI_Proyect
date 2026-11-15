@@ -30,8 +30,18 @@
     opacity: 1 !important;
 }
 
-.font-password-masked {
-    -webkit-text-security: disc !important;
+.btn-auth-secondary {
+    background-color: transparent !important;
+    border: 1px solid #2b3323 !important;
+    color: #c4ccb8 !important;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-auth-secondary:hover,
+.btn-auth-secondary:focus {
+    background-color: #1a2018 !important;
+    border-color: #658807 !important;
+    color: #ffffff !important;
 }
 
 .password-field-wrapper {

@@ -28,7 +28,7 @@ if (!empty($_SESSION['id_usuario'])) {
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/main.css?v=30" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/forms.css?v=40" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/forms.css?v=41" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -86,11 +86,18 @@ if (!empty($_SESSION['id_usuario'])) {
                                     <button class="w-100 btn btn-primary py-2 fw-bold" type="submit" id="btnLogin">Iniciar sesión</button>
                                 </div>
 
+                                <div class="col-12 text-center mt-3">
+                                    <a href="recuperar-password.php" class="link-ppi link-coral-hover small text-decoration-none">¿Olvidaste tu contraseña?</a>
+                                </div>
+
                             </div>
                         </form>
 
-                        <p class="mt-4 mb-2 text-center text-second-ppi">¿No tienes cuenta? <a href="registro.php" class="link-ppi link-coral-hover fw-bold d-inline p-0">Regístrate aquí</a></p>
-                        <p class="mb-0 text-center"><a href="<?= BASE_URL ?>index.php" class="auth-back-link"><i class="bi bi-arrow-left"></i>Volver al inicio</a></p>
+                        <div class="mt-4 text-center">
+                            <a href="registro.php" class="btn btn-auth-secondary w-100 py-2 fw-semibold">Crear cuenta nueva</a>
+                        </div>
+
+                        <p class="mt-4 mb-0 text-center"><a href="<?= BASE_URL ?>index.php" class="auth-back-link"><i class="bi bi-arrow-left"></i>Volver al inicio</a></p>
                     </div>
                 </div>
             </div>
