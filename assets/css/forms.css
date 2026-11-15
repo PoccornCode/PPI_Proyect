@@ -1,3 +1,39 @@
+.form-control,
+.form-select,
+.form-control:-webkit-autofill,
+.form-control:-webkit-autofill:hover,
+.form-control:-webkit-autofill:focus,
+.form-control:-webkit-autofill:active {
+    background-color: #121511 !important;
+    color: #e2e6dc !important;
+    border-color: #2b3323 !important;
+    -webkit-text-fill-color: #e2e6dc !important;
+    -webkit-box-shadow: 0 0 0 1000px #121511 inset !important;
+    transition: background-color 5000s ease-in-out 0s !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: #161a15 !important;
+    color: #f0f3ec !important;
+    border-color: #658807 !important;
+    box-shadow: 0 0 0 0.25rem rgba(101, 136, 7, 0.25) !important;
+    -webkit-box-shadow: 0 0 0 1000px #161a15 inset, 0 0 0 0.25rem rgba(101, 136, 7, 0.25) !important;
+}
+
+.form-control:disabled,
+.form-control:read-only,
+.form-control:-moz-read-only {
+    background-color: #121511 !important;
+    color: #e2e6dc !important;
+    border-color: #2b3323 !important;
+    opacity: 1 !important;
+}
+
+.font-password-masked {
+    -webkit-text-security: disc !important;
+}
+
 .password-field-wrapper {
     position: relative;
     display: flex;
@@ -269,7 +305,7 @@ div:where(.swal2-container).swal2-backdrop-show,
     content: '';
     position: absolute;
     inset: 0;
-    background: 
+    background:
         radial-gradient(circle at 32% 40%, transparent 20%, rgba(8, 7, 8, 0.88) 80%),
         linear-gradient(180deg, rgba(8, 7, 8, 0.45) 0%, rgba(8, 7, 8, 0.82) 100%);
     pointer-events: none;
@@ -410,7 +446,7 @@ div:where(.swal2-container).swal2-backdrop-show,
         padding-top: 2rem !important;
         padding-bottom: 3rem !important;
     }
-    
+
     .auth-hero-title {
         font-size: 2rem;
         margin-bottom: 1rem;
@@ -533,9 +569,11 @@ div:where(.swal2-container).swal2-backdrop-show,
 .toast-ppi.toast-success {
     border-color: #3b491a;
 }
+
 .toast-ppi.toast-success .toast-ppi-icon {
     color: #7da515;
 }
+
 .toast-ppi.toast-success .toast-ppi-progress {
     background-color: #7da515;
 }
@@ -543,9 +581,11 @@ div:where(.swal2-container).swal2-backdrop-show,
 .toast-ppi.toast-error {
     border-color: #441e1b;
 }
+
 .toast-ppi.toast-error .toast-ppi-icon {
     color: #d8685d;
 }
+
 .toast-ppi.toast-error .toast-ppi-progress {
     background-color: #d8685d;
 }
@@ -553,9 +593,11 @@ div:where(.swal2-container).swal2-backdrop-show,
 .toast-ppi.toast-warning {
     border-color: #443719;
 }
+
 .toast-ppi.toast-warning .toast-ppi-icon {
     color: #e0a944;
 }
+
 .toast-ppi.toast-warning .toast-ppi-progress {
     background-color: #e0a944;
 }
@@ -563,9 +605,11 @@ div:where(.swal2-container).swal2-backdrop-show,
 .toast-ppi.toast-info {
     border-color: #1e2c38;
 }
+
 .toast-ppi.toast-info .toast-ppi-icon {
     color: #5a9fd4;
 }
+
 .toast-ppi.toast-info .toast-ppi-progress {
     background-color: #5a9fd4;
 }

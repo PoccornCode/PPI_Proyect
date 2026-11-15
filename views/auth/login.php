@@ -28,7 +28,7 @@ if (!empty($_SESSION['id_usuario'])) {
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/main.css?v=30" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/forms.css?v=26" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/forms.css?v=40" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -119,7 +119,16 @@ if (!empty($_SESSION['id_usuario'])) {
     <?php include "../Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= BASE_URL ?>assets/js/toast-ppi.js"></script>
     <script src="<?= BASE_URL ?>assets/js/login.js?v=6"></script>
+    <?php if (isset($_GET['verificado']) && $_GET['verificado'] == '1'): ?>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                mostrarToast("success", "Cuenta Verificada", "¡Tu cuenta ha sido activada exitosamente! Ya puedes iniciar sesión.");
+                window.history.replaceState({}, document.title, window.location.pathname);
+            });
+        </script>
+    <?php endif; ?>
 </body>
 
 </html>

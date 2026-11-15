@@ -20,7 +20,7 @@ $pagina = "registro";
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/forms.css?v=26" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/forms.css?v=45" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/main.css?v=30" rel="stylesheet">
 </head>
 
@@ -87,13 +87,13 @@ $pagina = "registro";
 
                                 <div class="col-12">
                                     <label for="username" class="form-label text-main-ppi fw-bold">Nombre de usuario <span class="req-star">*</span></label>
-                                    <input type="text" class="form-control" id="username" name="username" placeholder="Elige un usuario único" maxlength="50" autocomplete="off" required>
+                                    <input type="text" class="form-control" id="username" name="nuevo_reg_username" placeholder="Elige un usuario único" maxlength="50" autocomplete="off" required>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label for="contrasenia" class="form-label text-main-ppi fw-bold">Contraseña <span class="req-star">*</span></label>
                                     <div class="password-field-wrapper">
-                                        <input type="password" class="form-control" id="contrasenia" name="contrasenia" placeholder="Ingresa tu contraseña" minlength="8" autocomplete="new-password" required>
+                                        <input type="text" class="form-control font-password-masked" id="contrasenia" name="nuevo_reg_pass" placeholder="Ingresa tu contraseña" minlength="8" autocomplete="off" spellcheck="false" data-real-type="password" required>
                                         <button type="button" class="btn-toggle-eye" data-target="contrasenia" tabindex="-1" aria-label="Mostrar u ocultar contraseña">
                                             <i class="bi bi-eye"></i>
                                         </button>
@@ -103,7 +103,7 @@ $pagina = "registro";
                                 <div class="col-md-6">
                                     <label for="confirmar_contrasenia" class="form-label text-main-ppi fw-bold">Confirmar Contraseña <span class="req-star">*</span></label>
                                     <div class="password-field-wrapper">
-                                        <input type="password" class="form-control" id="confirmar_contrasenia" name="confirmar_contrasenia" placeholder="Repite tu contraseña" minlength="8" autocomplete="new-password" required>
+                                        <input type="text" class="form-control font-password-masked" id="confirmar_contrasenia" name="nuevo_reg_pass_conf" placeholder="Repite tu contraseña" minlength="8" autocomplete="off" spellcheck="false" data-real-type="password" required>
                                         <button type="button" class="btn-toggle-eye" data-target="confirmar_contrasenia" tabindex="-1" aria-label="Mostrar u ocultar contraseña">
                                             <i class="bi bi-eye"></i>
                                         </button>
@@ -147,7 +147,7 @@ $pagina = "registro";
     <?php include "../Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/registro.js?v=9"></script>
+    <script src="<?= BASE_URL ?>assets/js/registro.js?v=12"></script>
 </body>
 
 </html>

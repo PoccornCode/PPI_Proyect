@@ -163,12 +163,13 @@ document.addEventListener("DOMContentLoaded", () => {
             const icon = btn.querySelector("i");
 
             if (targetInput) {
-                if (targetInput.type === "password") {
-                    targetInput.type = "text";
+                const estaOculto = targetInput.classList.contains("font-password-masked");
+                if (estaOculto) {
+                    targetInput.classList.remove("font-password-masked");
                     icon.classList.remove("bi-eye");
                     icon.classList.add("bi-eye-slash");
                 } else {
-                    targetInput.type = "password";
+                    targetInput.classList.add("font-password-masked");
                     icon.classList.remove("bi-eye-slash");
                     icon.classList.add("bi-eye");
                 }
@@ -227,9 +228,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 const resultado = await respuesta.json();
 
                 if (resultado.estado) {
-                    mostrarModal("success", "¡Registro exitoso!", resultado.mensaje || "Tu cuenta ha sido creada exitosamente.", () => {
-                        window.location.href = "login.php";
-                    });
+                    const emailDestino = encodeURIComponent(resultado.correo || correo.value.trim());
+                    window.location.href = `verificar-codigo.php?correo=${emailDestino}`;
+
                 } else {
                     mostrarModal("danger", "Error", resultado.mensaje || "No se pudo completar el registro.");
                 }
