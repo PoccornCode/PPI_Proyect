@@ -42,7 +42,7 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/main.css?v=14" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/forms.css?v=14" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/productos.css?v=1" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/productos.css?v=2" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi d-flex flex-column min-vh-100">

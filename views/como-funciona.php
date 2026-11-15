@@ -15,6 +15,8 @@ $base_url = BASE_URL;
     <title><?= htmlspecialchars($titulo) ?> | Gavel.net</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
+    <?php include dirname(__DIR__) . '/includes/meta_tags.php'; ?>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Raleway:wght@400;600;700;800&display=swap" rel="stylesheet">
