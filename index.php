@@ -56,6 +56,8 @@ $urlSubasta = 'views/subasta.php?id=';
     <title><?= e($titulo) ?> | Gavel.net</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <?php include __DIR__ . '/includes/meta_tags.php'; ?>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@100;600;800&display=swap" rel="stylesheet">

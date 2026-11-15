@@ -19,16 +19,16 @@ $base_url = BASE_URL;
                         Sistema de subastas en línea. Publica, puja y gana con ofertas transparentes, seguras y en tiempo real.
                     </p>
                     <div class="d-flex align-items-center gap-2 footer-social-links">
-                        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline-ppi-social rounded-circle d-inline-flex align-items-center justify-content-center" title="Twitter / X" style="width: 34px; height: 34px; font-size: 0.85rem;">
+                        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline-ppi-social rounded-circle d-inline-flex align-items-center justify-content-center" title="Twitter / X" aria-label="Síguenos en Twitter" style="width: 34px; height: 34px; font-size: 0.85rem;">
                             <i class="fab fa-twitter"></i>
                         </a>
-                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline-ppi-social rounded-circle d-inline-flex align-items-center justify-content-center" title="Facebook" style="width: 34px; height: 34px; font-size: 0.85rem;">
+                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline-ppi-social rounded-circle d-inline-flex align-items-center justify-content-center" title="Facebook" aria-label="Síguenos en Facebook" style="width: 34px; height: 34px; font-size: 0.85rem;">
                             <i class="fab fa-facebook-f"></i>
                         </a>
-                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline-ppi-social rounded-circle d-inline-flex align-items-center justify-content-center" title="Instagram" style="width: 34px; height: 34px; font-size: 0.85rem;">
+                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline-ppi-social rounded-circle d-inline-flex align-items-center justify-content-center" title="Instagram" aria-label="Síguenos en Instagram" style="width: 34px; height: 34px; font-size: 0.85rem;">
                             <i class="fab fa-instagram"></i>
                         </a>
-                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline-ppi-social rounded-circle d-inline-flex align-items-center justify-content-center" title="LinkedIn" style="width: 34px; height: 34px; font-size: 0.85rem;">
+                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline-ppi-social rounded-circle d-inline-flex align-items-center justify-content-center" title="LinkedIn" aria-label="Conéctate con nosotros en LinkedIn" style="width: 34px; height: 34px; font-size: 0.85rem;">
                             <i class="fab fa-linkedin-in"></i>
                         </a>
                     </div>

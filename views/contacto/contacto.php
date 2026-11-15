@@ -11,6 +11,8 @@ $pagina = "contacto";
     <title><?= $titulo ?> | Gavel.net</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
+    <?php include dirname(__DIR__, 2) . '/includes/meta_tags.php'; ?>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@100;600;800&display=swap" rel="stylesheet">

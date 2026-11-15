@@ -55,7 +55,7 @@ $url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url 
                     </a>
                     <?php if ($usuario_logueado): ?>
                         <div class="dropdown">
-                            <button class="btn-nav-profile d-inline-flex align-items-center justify-content-center border-0" type="button" id="dropdownPerfil" data-bs-toggle="dropdown" aria-expanded="false" title="Mi Cuenta">
+                            <button class="btn-nav-profile d-inline-flex align-items-center justify-content-center border-0" type="button" id="dropdownPerfil" data-bs-toggle="dropdown" aria-expanded="false" title="Mi Cuenta" aria-label="Menú de cuenta de usuario">
                                 <i class="fas fa-user-circle"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end menu-perfil-ppi" aria-labelledby="dropdownPerfil">
@@ -92,7 +92,7 @@ $url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url 
                         <a href="<?php echo $base_url; ?>views/auth/registro.php" class="btn btn-primary btn-sm px-3 py-2 fw-semibold">
                             Registrarse
                         </a>
-                        <a href="<?php echo $url_perfil; ?>" class="btn-nav-profile d-inline-flex align-items-center justify-content-center" title="Iniciar sesión">
+                        <a href="<?php echo $url_perfil; ?>" class="btn-nav-profile d-inline-flex align-items-center justify-content-center" title="Iniciar sesión" aria-label="Acceder a cuenta o perfil">
                             <i class="fas fa-user-circle"></i>
                         </a>
                     <?php endif; ?>
