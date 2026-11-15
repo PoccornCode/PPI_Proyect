@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@100;600;700;800&display=swap');
 
-/* ===================== LOGO / BRAND ===================== */
+/* LOGO / BRAND */
 .gavel-brand {
     font-family: 'Raleway', sans-serif !important;
     text-decoration: none !important;
@@ -524,4 +524,36 @@ h4.text-main-ppi,
 h5.text-main-ppi,
 h6.text-main-ppi {
     color: #e5e5e5 !important;
+}
+
+/* Banner de Cookies*/
+.gavel-cookie-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1050;
+    background-color: rgba(13, 16, 12, 0.96);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-top: 2px solid #658807;
+    box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.6);
+    padding: 1.1rem 0;
+    transform: translateY(100%);
+    opacity: 0;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+}
+
+.gavel-cookie-banner.gavel-cookie-banner--visible {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.gavel-cookie-icon {
+    width: 44px;
+    height: 44px;
+    background: rgba(101, 136, 7, 0.15);
+    border: 1px solid rgba(101, 136, 7, 0.35);
+    border-radius: 10px;
+    font-size: 1.25rem;
 }
