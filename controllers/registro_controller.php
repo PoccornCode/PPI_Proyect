@@ -9,8 +9,9 @@ $apellido = trim($_POST['apellido'] ?? '');
 $correo = trim($_POST['correo'] ?? '');
 $telefono = trim($_POST['telefono'] ?? '');
 $ubicacion = trim($_POST['ubicacion'] ?? '');
-$username = trim($_POST['username'] ?? '');
-$contrasenia = $_POST['contrasenia'] ?? '';
+$username = trim($_POST['username'] ?? ($_POST['nuevo_reg_username'] ?? ''));
+$contrasenia = $_POST['contrasenia'] ?? ($_POST['nuevo_reg_pass'] ?? '');
+$codigo = trim($_POST['codigo'] ?? '');
 
 $dao = new RegistroDAO();
 
@@ -41,6 +42,42 @@ if ($opcion === "guardar") {
     }
 
     $resultado = $dao->registrar($nombre, $apellido, $correo, $telefono, $ubicacion, $username, $contrasenia);
+    echo json_encode($resultado);
+    exit;
+}
+
+if ($opcion === "verificarCodigo") {
+    if (empty($correo) || empty($codigo)) {
+        echo json_encode([
+            "estado" => false,
+            "mensaje" => "El correo y el código son obligatorios."
+        ]);
+        exit;
+    }
+
+    if (!preg_match('/^\d{6}$/', $codigo)) {
+        echo json_encode([
+            "estado" => false,
+            "mensaje" => "El código debe contener exactamente 6 dígitos numéricos."
+        ]);
+        exit;
+    }
+
+    $resultado = $dao->validarCodigo($correo, $codigo, 'registro');
+    echo json_encode($resultado);
+    exit;
+}
+
+if ($opcion === "reenviarCodigo") {
+    if (empty($correo)) {
+        echo json_encode([
+            "estado" => false,
+            "mensaje" => "No se ha proporcionado el correo electrónico."
+        ]);
+        exit;
+    }
+
+    $resultado = $dao->reenviarCodigo($correo, 'registro');
     echo json_encode($resultado);
     exit;
 }
