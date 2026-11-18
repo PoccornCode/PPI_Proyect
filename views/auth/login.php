@@ -87,7 +87,7 @@ if (!empty($_SESSION['id_usuario'])) {
                                 </div>
 
                                 <div class="col-12 text-center mt-3">
-                                    <a href="recuperar-password.php" class="link-ppi link-coral-hover small text-decoration-none">¿Olvidaste tu contraseña?</a>
+                                    <a href="recuperar-clave.php" class="link-ppi link-coral-hover small text-decoration-none">¿Olvidaste tu contraseña?</a>
                                 </div>
 
                             </div>
@@ -132,6 +132,14 @@ if (!empty($_SESSION['id_usuario'])) {
         <script>
             document.addEventListener("DOMContentLoaded", function() {
                 mostrarToast("success", "Cuenta Verificada", "¡Tu cuenta ha sido activada exitosamente! Ya puedes iniciar sesión.");
+                window.history.replaceState({}, document.title, window.location.pathname);
+            });
+        </script>
+    <?php endif; ?>
+    <?php if (isset($_GET['recuperado']) && $_GET['recuperado'] == '1'): ?>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                mostrarToast("success", "Contraseña Actualizada", "Tu contraseña se restableció correctamente. Inicia sesión con tu nueva clave.");
                 window.history.replaceState({}, document.title, window.location.pathname);
             });
         </script>
