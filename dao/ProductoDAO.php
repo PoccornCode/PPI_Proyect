@@ -25,7 +25,6 @@ function insertarProducto($conexion, $nombre, $descripcion, $condicion, $id_cate
         return ['estado' => true, 'mensaje' => 'Producto guardado exitosamente', 'id_producto' => $id_producto];
     } catch (Throwable $e) {
         $conexion->rollback();
-
         foreach ($rutas as $ruta) {
             @unlink(__DIR__ . '/../uploads/productos/' . $ruta);
         }

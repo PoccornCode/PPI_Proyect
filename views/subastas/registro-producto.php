@@ -3,8 +3,21 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+$titulo = "Registrar Producto";
+
 require_once __DIR__ . '/../../config/env.php';
 require_once __DIR__ . '/../../config/conexion.php';
+
+if (!isset($_SESSION['id_usuario'])) {
+    $_SESSION['redirect_after_login'] = BASE_URL . 'views/subastas/registro-producto.php';
+    $_SESSION['flash_toast'] = [
+        'tipo' => 'warning',
+        'titulo' => 'Acceso restringido',
+        'mensaje' => 'Debes iniciar sesión para registrar productos.'
+    ];
+    header("Location: " . BASE_URL . "views/auth/login.php");
+    exit();
+}
 
 $titulo = "Registrar Producto";
 $pagina = "registro-producto";
