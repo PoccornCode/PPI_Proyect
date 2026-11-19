@@ -65,7 +65,7 @@ $urlSubasta = 'views/subasta.php?id=';
 
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
-    <link href="assets/css/main.css?v=12" rel="stylesheet">
+    <link href="assets/css/main.css?v=37" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
