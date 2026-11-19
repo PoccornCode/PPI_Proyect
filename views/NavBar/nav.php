@@ -14,9 +14,11 @@ $url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url 
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Raleway:wght@600;700;800&display=swap" rel="stylesheet">
 <link href="<?php echo $base_url; ?>assets/css/main.css?v=37" rel="stylesheet">
+<link href="<?php echo $base_url; ?>assets/css/theme.css?v=9" rel="stylesheet">
+<script src="<?php echo $base_url; ?>assets/js/theme-toggle.js?v=1"></script>
 
-<header class="sticky-top navbar-ppi-wrapper" style="background-color: #0c0f0a !important; border-bottom: 2px solid #658807 !important; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7) !important;">
-    <nav class="navbar navbar-expand-xl navbar-dark py-2 py-lg-3" style="background-color: transparent !important;">
+<header class="sticky-top navbar-ppi-wrapper">
+    <nav class="navbar navbar-expand-xl py-2 py-lg-3" style="background-color: transparent !important;">
         <div class="container-fluid px-3 px-lg-5">
 
             <a href="<?php echo $base_url; ?>index.php" class="navbar-brand d-flex align-items-baseline gap-1 gavel-brand py-0 me-3 me-xl-4">
@@ -50,6 +52,9 @@ $url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url 
                 </ul>
 
                 <div class="d-flex flex-column flex-xl-row align-items-stretch align-items-xl-center gap-2 pt-3 pt-xl-0 border-top-mobile">
+                    <button type="button" class="btn-theme-toggle align-self-start align-self-xl-center" data-theme-toggle aria-label="Cambiar a tema oscuro" title="Cambiar a tema oscuro" aria-pressed="true">
+                        <i class="fas fa-moon" aria-hidden="true"></i>
+                    </button>
                     <a href="<?php echo $base_url; ?>views/subastas/registro-producto.php" class="btn btn-outline-publish btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center justify-content-center">
                         <i class="fas fa-plus me-1 small"></i>Publicar producto
                     </a>

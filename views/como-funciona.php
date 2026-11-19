@@ -361,7 +361,7 @@ $base_url = BASE_URL;
 
             </div>
 
-            <div class="py-5 my-3" style="border-top: 1px solid #191c17;">
+            <div class="py-5 my-3 section-divider-ppi">
                 <div class="text-center mb-5">
                     <p class="hero-label mb-2 d-inline-block">Seguridad · Confianza</p>
                     <h2 class="section-header-title mb-2">Garantías de la Plataforma</h2>
@@ -407,7 +407,7 @@ $base_url = BASE_URL;
                 </div>
             </div>
 
-            <div class="py-5 my-3" style="border-top: 1px solid #191c17;">
+            <div class="py-5 my-3 section-divider-ppi">
                 <div class="text-center mb-5">
                     <p class="hero-label mb-2 d-inline-block">Dudas frecuentes</p>
                     <h2 class="section-header-title mb-2">Preguntas y Respuestas</h2>
@@ -487,8 +487,8 @@ $base_url = BASE_URL;
                 </div>
             </div>
 
-            <div class="text-center pt-5 pb-3 mt-4" style="border-top: 1px solid #191c17;">
-                <h2 class="section-header-title mb-2" style="color: #ffffff !important;">¿Listo para empezar?</h2>
+            <div class="text-center pt-5 pb-3 mt-4 section-divider-ppi">
+                <h2 class="section-header-title mb-2">¿Listo para empezar?</h2>
                 <p class="section-header-sub small mb-4 mx-auto" style="max-width: 520px;">
                     Encuentra piezas únicas con ofertas en tiempo real o publica tus artículos al mejor postor.
                 </p>

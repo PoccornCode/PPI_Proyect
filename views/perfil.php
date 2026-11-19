@@ -37,9 +37,9 @@ $pagina = "perfil";
 
     <main class="flex-grow-1 py-5">
         <div class="container py-4">
-            <div class="card p-4 p-md-5" style="background-color: #0f110e; border: 1px solid #1c2217; border-radius: 12px;">
+            <div class="card p-4 p-md-5 perfil-card-ppi">
                 <div class="d-flex align-items-center gap-3 mb-4">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 64px; height: 64px; background-color: #141811; border: 2px solid #5e7325;">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center perfil-avatar-ppi">
                         <i class="fas fa-user fs-3 text-third-ppi"></i>
                     </div>
                     <div>

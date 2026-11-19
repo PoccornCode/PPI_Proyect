@@ -13,6 +13,10 @@ $page_url = isset($canonical_url) && !empty($canonical_url) ? $canonical_url : (
 $og_img = isset($og_imagen) && !empty($og_imagen) ? $og_imagen : BASE_URL . "assets/img/newsletter-1.jpg";
 $og_type = isset($meta_tipo) && !empty($meta_tipo) ? $meta_tipo : "website";
 ?>
+<meta name="color-scheme" content="light dark">
+<script>
+(function(){try{var t=localStorage.getItem('gavel_theme');document.documentElement.setAttribute('data-theme',(t==='dark'||t==='light')?t:'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+</script>
 <meta name="description" content="<?= htmlspecialchars($page_desc, ENT_QUOTES, 'UTF-8') ?>">
 <meta name="author" content="Gavel.net">
 <meta name="robots" content="index, follow">

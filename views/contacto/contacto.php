@@ -51,13 +51,13 @@ if (!empty($_SESSION['id_usuario'])) {
 
     <div class="container-fluid py-5">
         <div class="container py-4">
-            <div class="card shadow p-4 p-md-5" style="background-color: #0f110e; border: 1px solid #23271f;">
+            <div class="card shadow p-4 p-md-5 contacto-card-ppi">
                 <div class="row g-4">
                     <div class="col-lg-5">
                         <div>
                             <h2 class="mb-4 text-main-ppi fw-bold">Atención al Cliente y Soporte Técnico</h2>
                             <p class="mb-4 text-second-ppi">¿Tienes alguna duda sobre tus subastas, pagos o tu cuenta? Completa el formulario o contáctanos directamente por nuestros canales de atención.</p>
-                            <div class="rounded overflow-hidden" style="border: 1px solid #23271f;">
+                            <div class="rounded overflow-hidden contacto-map-ppi">
                                 <iframe class="w-100" 
                                 style="height: 425px; border: 0;" src="https://maps.google.com/maps?q=Apastepeque,San%20Vicente,El%20Salvador&t=&z=14&ie=UTF8&iwloc=&output=embed" 
                                 loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
@@ -94,7 +94,7 @@ if (!empty($_SESSION['id_usuario'])) {
                         </form>
                         <div class="row g-4">
                             <div class="col-xl-6">
-                                <div class="d-flex p-4 rounded align-items-center" style="background-color: #131711; border: 1px solid #23271f;">
+                                <div class="d-flex p-4 rounded align-items-center contacto-info-box">
                                     <i class="fas fa-map-marker-alt fa-2x text-third-ppi me-4"></i>
                                     <div>
                                         <h4 class="text-main-ppi fw-bold mb-1">Dirección</h4>
@@ -103,7 +103,7 @@ if (!empty($_SESSION['id_usuario'])) {
                                 </div>
                             </div>
                             <div class="col-xl-6">
-                                <div class="d-flex p-4 rounded align-items-center" style="background-color: #131711; border: 1px solid #23271f;">
+                                <div class="d-flex p-4 rounded align-items-center contacto-info-box">
                                     <i class="fas fa-envelope fa-2x text-third-ppi me-4"></i>
                                     <div class="min-w-0">
                                         <h4 class="text-main-ppi fw-bold mb-1">Correo</h4>
@@ -112,7 +112,7 @@ if (!empty($_SESSION['id_usuario'])) {
                                 </div>
                             </div>
                             <div class="col-xl-6">
-                                <div class="d-flex p-4 rounded align-items-center" style="background-color: #131711; border: 1px solid #23271f;">
+                                <div class="d-flex p-4 rounded align-items-center contacto-info-box">
                                     <i class="fa fa-phone-alt fa-2x text-third-ppi me-4"></i>
                                     <div>
                                         <h4 class="text-main-ppi fw-bold mb-1">Teléfono</h4>
@@ -121,7 +121,7 @@ if (!empty($_SESSION['id_usuario'])) {
                                 </div>
                             </div>
                             <div class="col-xl-6">
-                                <div class="d-flex p-4 rounded align-items-center" style="background-color: #131711; border: 1px solid #23271f;">
+                                <div class="d-flex p-4 rounded align-items-center contacto-info-box">
                                     <i class="fa fa-share-alt fa-2x text-third-ppi me-4"></i>
                                     <div>
                                         <h4 class="text-main-ppi fw-bold mb-1">Redes Sociales</h4>

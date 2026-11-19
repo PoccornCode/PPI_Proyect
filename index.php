@@ -208,7 +208,7 @@ $urlSubasta = 'views/subasta.php?id=';
             </div>
         </section>
 
-        <section class="pt-5 pb-6" aria-labelledby="titulo-categorias" style="border-top: 1px solid #191c17; padding-bottom: 5rem !important;">
+        <section class="pt-5 pb-6 section-divider-ppi" aria-labelledby="titulo-categorias" style="padding-bottom: 5rem !important;">
             <div class="container-fluid px-4 px-lg-5">
                 <div class="d-flex justify-content-between align-items-baseline mb-4 flex-wrap gap-2">
                     <div>

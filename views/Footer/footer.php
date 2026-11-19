@@ -121,7 +121,7 @@ $base_url = BASE_URL;
     </div>
 
     <!-- Barra inferior de Copyright -->
-    <div class="container-fluid bg-dark-ppi-2 py-3" style="border-top: 1px solid #1e2417;">
+    <div class="container-fluid bg-dark-ppi-2 py-3 footer-ppi-bottom">
         <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
             <p class="text-second-ppi mb-0 small text-center text-md-start">
                 &copy; <?php echo date('Y'); ?> <span class="text-main-ppi fw-semibold">Gavel.net</span> &bull; Todos los derechos reservados. 

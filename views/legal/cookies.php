@@ -30,7 +30,7 @@ $base_url = BASE_URL;
     <link href="<?= $base_url ?>assets/css/legal.css" rel="stylesheet">
 </head>
 
-<body style="background-color: #080708; color: #cfd2ca; min-height: 100vh; display: flex; flex-direction: column;">
+<body class="bg-dark-ppi d-flex flex-column min-vh-100">
 
     <?php include dirname(__DIR__) . "/NavBar/nav.php"; ?>
 
