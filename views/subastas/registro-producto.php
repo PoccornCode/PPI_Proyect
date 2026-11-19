@@ -3,11 +3,13 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+require_once __DIR__ . '/../../config/env.php';
 require_once __DIR__ . '/../../config/conexion.php';
 
-$titulo = "Registrar Subasta";
-$pagina = "registro-subasta";
+$titulo = "Registrar Producto";
+$pagina = "registro-producto";
 
+//Agregar a dao o controller despues
 $categorias = [];
 $catQuery = $conexion->query("SELECT id_categoria, nombre FROM sb_categoria ORDER BY nombre ASC");
 if ($catQuery) {
@@ -34,99 +36,11 @@ if ($catQuery) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
     <!-- Customized Bootstrap & Project Stylesheets -->
-    <link href="../../assets/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../../assets/css/style.css" rel="stylesheet">
-    <link href="../../assets/css/forms.css?v=2" rel="stylesheet">
-
-    <style>
-        body.bg-dark-ppi {
-            background-color: #080708 !important;
-        }
-
-        main {
-            background-image: none !important;
-            background-color: #080708 !important;
-        }
-
-        .card-gavel {
-            background-color: #0f110e;
-            border: 1px solid #191c17;
-            border-radius: 12px;
-        }
-
-        .section-title {
-            color: #c9c9c9;
-            font-size: 1.15rem;
-            font-weight: 700;
-            border-bottom: 1px solid #191c17;
-            padding-bottom: 0.6rem;
-            margin-bottom: 1.25rem;
-        }
-
-        .form-select.select-gavel {
-            background-color: #080708;
-            color: #a7a59d;
-            border: 2px solid #191c17;
-            border-radius: 10px;
-        }
-
-        .form-select.select-gavel:focus {
-            border-color: #658807;
-            color: #c9c9c9;
-            box-shadow: 0 0 0 .25rem rgba(101, 136, 7, .25);
-        }
-
-        .input-group-text.addon-gavel {
-            background-color: #191c17;
-            border: 2px solid #191c17;
-            color: #c9c9c9;
-            border-top-left-radius: 10px;
-            border-bottom-left-radius: 10px;
-        }
-
-        /* Zona de carga de fotos sobria */
-        .upload-dropzone {
-            border: 2px dashed #23271f;
-            background: #080708;
-            border-radius: 10px;
-            padding: 2rem 1.25rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .upload-dropzone:hover {
-            border-color: #658807;
-            background: rgba(101, 136, 7, 0.05);
-        }
-
-        .preview-img-box {
-            position: relative;
-            width: 100px;
-            height: 100px;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid #23271f;
-            background: #080708;
-        }
-
-        .preview-img-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .preview-img-box .badge-principal {
-            position: absolute;
-            top: 4px;
-            left: 4px;
-            background: #5e7325;
-            color: #fff;
-            font-size: 0.65rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-    </style>
+    <link href="<?= BASE_URL ?>assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/main.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/forms.css?v=8" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/productos.css?v=1" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -135,21 +49,21 @@ if ($catQuery) {
     <?php include __DIR__ . "/../NavBar/nav.php"; ?>
 
     <main class="py-5">
-        <div class="container py-2">
+        <div class="container-fluid px-4 px-lg-5 py-2">
             <div class="row justify-content-center">
-                <div class="col-lg-9 col-xl-8">
+                <div class="col-lg-9 col-xl-7">
 
                     <div class="d-flex justify-content-between align-items-end mb-4">
                         <div>
-                            <h3 class="text-main-ppi fw-bold mb-1">Registrar Subasta</h3>
-                            <p class="text-second-ppi small mb-0">Completa la información del producto y los términos de la puja.</p>
+                            <h3 class="text-main-ppi fw-bold mb-1">Registrar Producto</h3>
+                            <p class="text-second-ppi small mb-0">Completa la información del producto.</p>
                         </div>
-                        <a href="../../index.php" class="btn btn-secondary btn-sm px-3">
+                        <a href="<?= BASE_URL ?>index.php" class="btn btn-secondary btn-sm px-3">
                             Volver al inicio
                         </a>
                     </div>
 
-                    <form id="formRegistroSubasta" action="../../controllers/crear_producto.php" method="POST" enctype="multipart/form-data" autocomplete="off">
+                    <form id="formRegistroSubasta" action="<?= BASE_URL ?>controllers/ControllerProducto.php" method="POST" enctype="multipart/form-data" autocomplete="off">
 
                         <div class="card card-gavel p-4 mb-4 shadow">
                             <h5 class="section-title">Información del Producto</h5>
@@ -164,6 +78,7 @@ if ($catQuery) {
                                     <label for="id_categoria" class="form-label text-main-ppi fw-bold small">Categoría</label>
                                     <select class="form-select select-gavel" id="id_categoria" name="id_categoria" required>
                                         <option value="" disabled selected>Selecciona una categoría...</option>
+                                        //Agregas a dao o controller despues
                                         <?php if (!empty($categorias)): ?>
                                             <?php foreach ($categorias as $cat): ?>
                                                 <option value="<?= $cat['id_categoria'] ?>"><?= htmlspecialchars($cat['nombre']) ?></option>
@@ -207,46 +122,10 @@ if ($catQuery) {
                             <div id="imagePreviewContainer" class="d-flex flex-wrap gap-2 mt-3"></div>
                         </div>
 
-                        <div class="card card-gavel p-4 mb-4 shadow">
-                            <h5 class="section-title">
-                                <span class="step-num">03.</span> Parámetros de la Subasta
-                            </h5>
-
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label for="precio_inicial" class="form-label text-main-ppi fw-bold small">Precio Inicial ($ USD)</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text addon-gavel">$</span>
-                                        <input type="number" step="0.01" min="1" class="form-control" id="precio_inicial" name="precio_inicial" placeholder="0.00" required>
-                                    </div>
-                                    <span class="text-second-ppi small">Monto inicial con el que comenzarán las ofertas.</span>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label for="incremento_minimo" class="form-label text-main-ppi fw-bold small">Incremento Mínimo ($ USD)</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text addon-gavel">$</span>
-                                        <input type="number" step="0.01" min="0.50" class="form-control" id="incremento_minimo" name="incremento_minimo" placeholder="5.00" required>
-                                    </div>
-                                    <span class="text-second-ppi small">Diferencia mínima entre cada puja consecutiva.</span>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label for="fecha_inicial" class="form-label text-main-ppi fw-bold small">Fecha y Hora de Apertura</label>
-                                    <input type="datetime-local" class="form-control" id="fecha_inicial" name="fecha_inicial" required>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label for="fecha_final" class="form-label text-main-ppi fw-bold small">Fecha y Hora de Cierre</label>
-                                    <input type="datetime-local" class="form-control" id="fecha_final" name="fecha_final" required>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- ACCIONES -->
                         <div class="d-flex justify-content-end gap-3 pb-4">
-                            <a href="../../index.php" class="btn btn-secondary px-4 py-2">Cancelar</a>
-                            <button type="submit" class="btn btn-primary px-5 py-2 fw-bold">Guardar y Publicar Subasta</button>
+                            <a href="<?= BASE_URL ?>index.php" class="btn btn-secondary px-4 py-2">Cancelar</a>
+                            <button type="submit" id="btnGuardar" class="btn btn-primary px-5 py-2 fw-bold">Guardar Producto</button>
                         </div>
 
                     </form>
@@ -256,11 +135,33 @@ if ($catQuery) {
         </div>
     </main>
 
+    <div class="modal fade" id="modalPPI" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-ppi">
+                <div class="modal-header modal-header-ppi">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2" id="modalPPITitulo">
+                        Aviso
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body py-4" id="modalPPICuerpo">
+                    Mensaje
+                </div>
+                <div class="modal-footer modal-footer-ppi">
+                    <button type="button" class="btn btn-ppi-modal btn-sm" id="btnModalPPIAccion" data-bs-dismiss="modal">Entendido</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <?php include __DIR__ . "/../Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="../../assets/js/registro-subasta.js"></script>
+    <script>
+        const RUTA_MIS_PRODUCTOS = "<?= BASE_URL ?>views/subastas/mis-productos.php";
+    </script>
+    <script src="<?= BASE_URL ?>assets/js/toast-ppi.js?v=2"></script>
+    <script src="<?= BASE_URL ?>assets/js/registro-producto.js?v=4"></script>
 </body>
 
 </html>

@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+Allow: /index.php
+Allow: /views/catalogo.php
+Allow: /views/como-funciona.php
+Allow: /views/contacto/
+Allow: /views/legal/
+Allow: /assets/
+
+Disallow: /config/
+Disallow: /dao/
+Disallow: /models/
+Disallow: /controller/
+Disallow: /controllers/
+Disallow: /includes/
+Disallow: /views/auth/
+Disallow: /views/subastas/registro-producto.php
+Disallow: /views/subastas/mis-productos.php
+Disallow: /views/perfil.php
+
+Sitemap: sitemap.xml
+

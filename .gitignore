@@ -4,3 +4,7 @@
 nbproject/
 env.php
 config/env.php
+
+# Imágenes subidas por los usuarios
+uploads/productos/*
+!uploads/productos/.gitkeep

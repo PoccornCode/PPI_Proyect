@@ -9,8 +9,9 @@ $apellido = trim($_POST['apellido'] ?? '');
 $correo = trim($_POST['correo'] ?? '');
 $telefono = trim($_POST['telefono'] ?? '');
 $ubicacion = trim($_POST['ubicacion'] ?? '');
-$username = trim($_POST['username'] ?? '');
-$contrasenia = $_POST['contrasenia'] ?? '';
+$username = trim($_POST['username'] ?? ($_POST['nuevo_reg_username'] ?? ''));
+$contrasenia = $_POST['contrasenia'] ?? ($_POST['nuevo_reg_pass'] ?? '');
+$codigo = trim($_POST['codigo'] ?? '');
 
 $dao = new RegistroDAO();
 
@@ -23,10 +24,11 @@ if ($opcion === "guardar") {
         exit;
     }
 
-    if (strlen($contrasenia) < 8) {
+    $regexContrasenia = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9\s]).{8,}$/';
+    if (!preg_match($regexContrasenia, $contrasenia)) {
         echo json_encode([
             "estado" => false,
-            "mensaje" => "La contraseña debe tener un mínimo de 8 caracteres."
+            "mensaje" => "La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un símbolo (@$!%*?&#.-_)."
         ]);
         exit;
     }
@@ -40,6 +42,42 @@ if ($opcion === "guardar") {
     }
 
     $resultado = $dao->registrar($nombre, $apellido, $correo, $telefono, $ubicacion, $username, $contrasenia);
+    echo json_encode($resultado);
+    exit;
+}
+
+if ($opcion === "verificarCodigo") {
+    if (empty($correo) || empty($codigo)) {
+        echo json_encode([
+            "estado" => false,
+            "mensaje" => "El correo y el código son obligatorios."
+        ]);
+        exit;
+    }
+
+    if (!preg_match('/^\d{6}$/', $codigo)) {
+        echo json_encode([
+            "estado" => false,
+            "mensaje" => "El código debe contener exactamente 6 dígitos numéricos."
+        ]);
+        exit;
+    }
+
+    $resultado = $dao->validarCodigo($correo, $codigo, 'registro');
+    echo json_encode($resultado);
+    exit;
+}
+
+if ($opcion === "reenviarCodigo") {
+    if (empty($correo)) {
+        echo json_encode([
+            "estado" => false,
+            "mensaje" => "No se ha proporcionado el correo electrónico."
+        ]);
+        exit;
+    }
+
+    $resultado = $dao->reenviarCodigo($correo, 'registro');
     echo json_encode($resultado);
     exit;
 }
