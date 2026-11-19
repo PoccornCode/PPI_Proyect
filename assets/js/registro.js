@@ -207,13 +207,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            let redirigiendo = false;
+            const overlayRegistro = document.getElementById("overlayRegistro");
+
             try {
                 const datos = new FormData(formulario);
                 datos.append("opcion", "guardar");
 
+                if (overlayRegistro) {
+                    overlayRegistro.classList.remove("d-none");
+                }
                 if (btnRegistrar) {
                     btnRegistrar.disabled = true;
-                    btnRegistrar.textContent = "Procesando...";
                 }
 
                 const respuesta = await fetch(formulario.action, {
@@ -228,6 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const resultado = await respuesta.json();
 
                 if (resultado.estado) {
+                    redirigiendo = true;
                     const emailDestino = encodeURIComponent(resultado.correo || correo.value.trim());
                     window.location.href = `verificar-codigo.php?correo=${emailDestino}`;
 
@@ -237,9 +243,13 @@ document.addEventListener("DOMContentLoaded", () => {
             } catch (error) {
                 mostrarModal("danger", "Error", error.message || "Error al procesar la solicitud con el servidor.");
             } finally {
-                if (btnRegistrar) {
-                    btnRegistrar.disabled = false;
-                    btnRegistrar.textContent = "Registrarse";
+                if (!redirigiendo) {
+                    if (overlayRegistro) {
+                        overlayRegistro.classList.add("d-none");
+                    }
+                    if (btnRegistrar) {
+                        btnRegistrar.disabled = false;
+                    }
                 }
             }
         });
