@@ -54,6 +54,10 @@
     padding-right: 42px !important;
 }
 
+.font-password-masked {
+    -webkit-text-security: disc;
+}
+
 .password-field-wrapper .form-control.is-valid,
 .password-field-wrapper .form-control.is-invalid,
 .password-field-wrapper input[type="password"].is-valid,
