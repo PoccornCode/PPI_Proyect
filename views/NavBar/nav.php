@@ -13,7 +13,7 @@ $url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Raleway:wght@600;700;800&display=swap" rel="stylesheet">
-<link href="<?php echo $base_url; ?>assets/css/main.css?v=30" rel="stylesheet">
+<link href="<?php echo $base_url; ?>assets/css/main.css?v=37" rel="stylesheet">
 
 <header class="sticky-top navbar-ppi-wrapper" style="background-color: #0c0f0a !important; border-bottom: 2px solid #658807 !important; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7) !important;">
     <nav class="navbar navbar-expand-xl navbar-dark py-2 py-lg-3" style="background-color: transparent !important;">
