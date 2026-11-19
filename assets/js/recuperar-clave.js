@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const otpInputs = document.querySelectorAll(".otp-input");
     const nuevaContrasenia = document.getElementById("nueva_contrasenia");
     const confirmarContrasenia = document.getElementById("confirmar_contrasenia");
+    const overlayRecuperacion = document.getElementById("overlayRecuperacion");
 
     let correoActual = "";
     let countdownInterval = null;
@@ -105,6 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             try {
+                if (overlayRecuperacion) overlayRecuperacion.classList.remove("d-none");
                 btnEnviarCodigo.disabled = true;
                 btnEnviarCodigo.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando código...';
 
@@ -130,6 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } catch (err) {
                 mostrarToast("error", "Error de conexión", "No se pudo comunicar con el servidor.");
             } finally {
+                if (overlayRecuperacion) overlayRecuperacion.classList.add("d-none");
                 btnEnviarCodigo.disabled = false;
                 btnEnviarCodigo.textContent = "Enviar código de recuperación";
             }
@@ -203,6 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!correoActual) return;
 
             try {
+                if (overlayRecuperacion) overlayRecuperacion.classList.remove("d-none");
                 btnReenviar.disabled = true;
                 btnReenviarTexto.textContent = "Enviando...";
 
@@ -225,6 +229,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 mostrarToast("error", "Error", "No se pudo reenviar el código.");
                 btnReenviar.disabled = false;
                 btnReenviarTexto.textContent = "Reenviar código";
+            } finally {
+                if (overlayRecuperacion) overlayRecuperacion.classList.add("d-none");
             }
         });
     }

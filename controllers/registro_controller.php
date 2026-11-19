@@ -16,6 +16,32 @@ $codigo = trim($_POST['codigo'] ?? '');
 $dao = new RegistroDAO();
 
 if ($opcion === "guardar") {
+    // Rate limit básico por IP: máximo 5 registros cada 10 minutos
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    $rlFile = sys_get_temp_dir() . '/ppi_reg_rl_' . md5($ip) . '.json';
+    $ahora = time();
+    $ventana = 600; // 10 minutos
+    $maxIntentos = 5;
+
+    $intentos = [];
+    if (file_exists($rlFile)) {
+        $data = json_decode((string)@file_get_contents($rlFile), true);
+        if (is_array($data)) {
+            $intentos = array_values(array_filter($data, fn($ts) => is_int($ts) && ($ahora - $ts) < $ventana));
+        }
+    }
+
+    if (count($intentos) >= $maxIntentos) {
+        echo json_encode([
+            "estado" => false,
+            "mensaje" => "Has realizado demasiados intentos de registro. Por favor espera unos minutos e intenta nuevamente."
+        ]);
+        exit;
+    }
+
+    $intentos[] = $ahora;
+    @file_put_contents($rlFile, json_encode($intentos), LOCK_EX);
+
     if (empty($nombre) || empty($apellido) || empty($correo) || empty($telefono) || empty($ubicacion) || empty($username) || empty($contrasenia)) {
         echo json_encode([
             "estado" => false,

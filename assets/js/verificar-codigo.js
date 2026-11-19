@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnVerificar = document.getElementById("btnVerificar");
     const btnReenviar = document.getElementById("btnReenviar");
     const btnReenviarTexto = document.getElementById("btnReenviarTexto");
+    const overlayVerificacion = document.getElementById("overlayVerificacion");
 
     inputs.forEach((input, index) => {
         input.addEventListener("input", (e) => {
@@ -146,6 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             try {
+                if (overlayVerificacion) overlayVerificacion.classList.remove("d-none");
                 btnReenviar.disabled = true;
                 btnReenviarTexto.textContent = "Enviando...";
 
@@ -178,6 +180,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
                 btnReenviar.disabled = false;
                 btnReenviarTexto.textContent = "Reenviar código";
+            } finally {
+                if (overlayVerificacion) overlayVerificacion.classList.add("d-none");
             }
         });
     }

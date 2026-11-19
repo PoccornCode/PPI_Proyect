@@ -35,22 +35,43 @@ class RecuperacionDAO
 
     public function solicitarCodigoRecuperacion($correo, $minutosValidez = 15)
     {
-        $usuario = $this->obtenerUsuarioPorCorreo($correo);
-        if (!$usuario) {
-            return [
-                "estado" => false,
-                "mensaje" => "No se encontró ninguna cuenta asociada a este correo electrónico."
-            ];
-        }
+        $mensajeGenerico = "Si el correo está registrado y activo, recibirás un código de recuperación.";
 
-        if ((int)$usuario['estado'] !== 1) {
+        $usuario = $this->obtenerUsuarioPorCorreo($correo);
+        if (!$usuario || (int)$usuario['estado'] !== 1) {
             return [
-                "estado" => false,
-                "mensaje" => "La cuenta está inactiva o pendiente de activación."
+                "estado" => true,
+                "mensaje" => $mensajeGenerico,
+                "correo" => $correo
             ];
         }
 
         $id_usuario = (int)$usuario['id_usuario'];
+
+        // Rate limit en backend: mínimo 60 segundos entre solicitudes
+        $sqlLast = "SELECT expira_en
+                    FROM sb_codigo_verificacion
+                    WHERE id_usuario = ? AND tipo = 'recuperacion'
+                    ORDER BY id_codigo DESC
+                    LIMIT 1";
+        $stmtLast = $this->conexion->prepare($sqlLast);
+        $stmtLast->bind_param("i", $id_usuario);
+        $stmtLast->execute();
+        $resLast = $stmtLast->get_result();
+        $ultimo = $resLast->fetch_assoc();
+        $stmtLast->close();
+
+        if ($ultimo) {
+            $creadoEn = strtotime($ultimo['expira_en']) - ($minutosValidez * 60);
+            $transcurrido = time() - $creadoEn;
+            if ($transcurrido >= 0 && $transcurrido < 60) {
+                $espera = 60 - $transcurrido;
+                return [
+                    "estado" => false,
+                    "mensaje" => "Por favor espera {$espera} segundos antes de solicitar un nuevo código."
+                ];
+            }
+        }
 
         // Invalidar códigos anteriores no utilizados de tipo recuperacion
         $sqlInv = "UPDATE sb_codigo_verificacion 
@@ -70,27 +91,39 @@ class RecuperacionDAO
         $stmt = $this->conexion->prepare($sql);
         $stmt->bind_param("iss", $id_usuario, $codigo, $expiraEn);
         $stmt->execute();
+        $id_codigo = $this->conexion->insert_id;
         $stmt->close();
 
         // Envío de correo mediante el helper Mailer
         $envio = Mailer::enviarCodigoRecuperacion($correo, $usuario['nombre'], $codigo);
 
+        if (empty($envio['exito'])) {
+            $sqlFail = "UPDATE sb_codigo_verificacion SET utilizado = 1 WHERE id_codigo = ?";
+            $stmtFail = $this->conexion->prepare($sqlFail);
+            $stmtFail->bind_param("i", $id_codigo);
+            $stmtFail->execute();
+            $stmtFail->close();
+
+            return [
+                "estado" => false,
+                "mensaje" => "No se pudo enviar el correo de recuperación. Intenta nuevamente más tarde."
+            ];
+        }
+
         return [
             "estado" => true,
-            "mensaje" => "Hemos enviado un código de recuperación a tu correo.",
-            "correo" => $correo,
-            "modo_mail" => $envio['modo'] ?? 'smtp',
-            "codigo_dev" => ($envio['modo'] === 'dev' || empty(SMTP_USER) || SMTP_PASS === 'tu_contraseña_aqui') ? $codigo : null
+            "mensaje" => $mensajeGenerico,
+            "correo" => $correo
         ];
     }
 
     public function restablecerContrasenia($correo, $codigo, $nuevaContrasenia)
     {
         $usuario = $this->obtenerUsuarioPorCorreo($correo);
-        if (!$usuario) {
+        if (!$usuario || (int)$usuario['estado'] !== 1) {
             return [
                 "estado" => false,
-                "mensaje" => "Usuario no encontrado."
+                "mensaje" => "El código es incorrecto o ha expirado."
             ];
         }
 
@@ -168,9 +201,10 @@ class RecuperacionDAO
             ];
         } catch (Throwable $e) {
             $this->conexion->rollback();
+            error_log("[RecuperacionDAO] Error al actualizar contraseña: " . $e->getMessage());
             return [
                 "estado" => false,
-                "mensaje" => "Error al actualizar la contraseña: " . $e->getMessage()
+                "mensaje" => "Ocurrió un error al actualizar la contraseña. Intenta nuevamente."
             ];
         }
     }
