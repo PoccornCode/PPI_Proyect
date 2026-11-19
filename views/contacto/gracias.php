@@ -38,7 +38,7 @@ $pagina = "gracias";
                     <h1 class="display-1 fw-bold text-main-ppi mb-2" style="font-size: 4rem;">¡Gracias!</h1>
                     <h2 class="mb-3 text-main-ppi fw-bold">Mensaje enviado con éxito</h2>
                     <p class="mb-4 text-second-ppi fs-6 mx-auto" style="max-width: 520px;">
-                        Hemos recibido tu consulta o suscripción correctamente. Nuestro equipo revisará la información y te responderá en el menor tiempo posible.
+                        Hemos recibido tu consulta correctamente. Nuestro equipo revisará la información y te responderá en el menor tiempo posible.
                     </p>
                     <div class="pt-2 d-flex flex-wrap justify-content-center gap-3">
                         <a class="btn btn-primary py-3 px-5 fw-bold" href="<?= BASE_URL ?>views/catalogo.php">
