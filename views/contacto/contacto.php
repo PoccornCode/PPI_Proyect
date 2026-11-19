@@ -1,7 +1,26 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once dirname(__DIR__, 2) . '/config/env.php';
 $titulo = "Contacto";
 $pagina = "contacto";
+
+$nombrePre = '';
+$correoPre = '';
+$telefonoPre = '';
+
+if (!empty($_SESSION['id_usuario'])) {
+    require_once dirname(__DIR__, 2) . '/dao/ContactoDAO.php';
+    $contactoDao = new ContactoDAO();
+    $datosUsuario = $contactoDao->obtenerDatosUsuario((int)$_SESSION['id_usuario']);
+    if ($datosUsuario) {
+        $nombreCompleto = trim(($datosUsuario['nombre'] ?? '') . ' ' . ($datosUsuario['apellido'] ?? ''));
+        $nombrePre = mb_convert_case($nombreCompleto, MB_CASE_TITLE, 'UTF-8');
+        $correoPre = $datosUsuario['correo'] ?? '';
+        $telefonoPre = $datosUsuario['telefono'] ?? '';
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -23,7 +42,7 @@ $pagina = "contacto";
     <link href="<?= BASE_URL ?>assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/main.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/forms.css?v=17" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/forms.css?v=47" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -40,31 +59,36 @@ $pagina = "contacto";
                             <p class="mb-4 text-second-ppi">¿Tienes alguna duda sobre tus subastas, pagos o tu cuenta? Completa el formulario o contáctanos directamente por nuestros canales de atención.</p>
                             <div class="rounded overflow-hidden" style="border: 1px solid #23271f;">
                                 <iframe class="w-100" 
-                                style="height: 425px; border: 0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d387191.33750346623!2d-73.97968099999999!3d40.6974881!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sNew%20York%2C%20NY%2C%20USA!5e0!3m2!1sen!2sbd!4v1694259649153!5m2!1sen!2sbd" 
+                                style="height: 425px; border: 0;" src="https://maps.google.com/maps?q=Apastepeque,San%20Vicente,El%20Salvador&t=&z=14&ie=UTF8&iwloc=&output=embed" 
                                 loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-7">
-                        <form action="" class="mb-4" autocomplete="off">
-                            <div class="row g-4">
+                        <form id="formContacto" method="POST" action="<?= BASE_URL ?>controllers/contacto_controller.php" class="mb-4" autocomplete="off" novalidate>
+                            <div class="row g-3">
                                 <div class="col-lg-6">
-                                    <input type="text" class="w-100 form-control py-3" name="name" placeholder="Tu Nombre">
+                                    <label for="nombre" class="form-label text-main-ppi fw-bold">Nombre <span class="req-star">*</span></label>
+                                    <input type="text" class="w-100 form-control py-3" id="nombre" name="nombre" value="<?= htmlspecialchars($nombrePre, ENT_QUOTES, 'UTF-8') ?>" placeholder="Tu Nombre" maxlength="120" required>
                                 </div>
                                 <div class="col-lg-6">
-                                    <input type="email" class="w-100 form-control py-3" name="email" placeholder="Tu Correo Electrónico">
+                                    <label for="correo" class="form-label text-main-ppi fw-bold">Correo Electrónico <span class="req-star">*</span></label>
+                                    <input type="email" class="w-100 form-control py-3" id="correo" name="correo" value="<?= htmlspecialchars($correoPre, ENT_QUOTES, 'UTF-8') ?>" placeholder="correo@ejemplo.com" maxlength="120" required>
                                 </div>
                                 <div class="col-lg-6">
-                                    <input type="text" class="w-100 form-control py-3" name="phone" placeholder="Tu Teléfono">
+                                    <label for="telefono" class="form-label text-main-ppi fw-bold">Teléfono <span class="req-star">*</span></label>
+                                    <input type="tel" class="w-100 form-control py-3" id="telefono" name="telefono" value="<?= htmlspecialchars($telefonoPre, ENT_QUOTES, 'UTF-8') ?>" placeholder="Ej. 7000-0000" maxlength="30" required>
                                 </div>
                                 <div class="col-lg-6">
-                                    <input type="text" class="w-100 form-control py-3" name="subject" placeholder="Asunto">
+                                    <label for="asunto" class="form-label text-main-ppi fw-bold">Asunto <span class="req-star">*</span></label>
+                                    <input type="text" class="w-100 form-control py-3" id="asunto" name="asunto" placeholder="Asunto de tu consulta" maxlength="150" required>
                                 </div>
                                 <div class="col-12">
-                                    <textarea class="w-100 form-control" rows="6" cols="10" placeholder="Escribe tu mensaje..."></textarea>
+                                    <label for="mensaje" class="form-label text-main-ppi fw-bold">Mensaje <span class="req-star">*</span></label>
+                                    <textarea class="w-100 form-control" id="mensaje" name="mensaje" rows="5" cols="10" placeholder="Escribe tu mensaje (mínimo 10 caracteres)..." minlength="10" required></textarea>
                                 </div>
-                                <div class="col-12">
-                                    <button class="w-100 btn btn-primary py-3 fw-bold" type="submit">Enviar Mensaje</button>
+                                <div class="col-12 mt-4">
+                                    <button class="w-100 btn btn-primary py-3 fw-bold" type="submit" id="btnEnviarContacto">Enviar Mensaje</button>
                                 </div>
                             </div>
                         </form>
@@ -74,16 +98,16 @@ $pagina = "contacto";
                                     <i class="fas fa-map-marker-alt fa-2x text-third-ppi me-4"></i>
                                     <div>
                                         <h4 class="text-main-ppi fw-bold mb-1">Dirección</h4>
-                                        <p class="mb-0 text-second-ppi">San Salvador, El Salvador</p>
+                                        <p class="mb-0 text-second-ppi">Apastepeque, San Vicente</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-xl-6">
                                 <div class="d-flex p-4 rounded align-items-center" style="background-color: #131711; border: 1px solid #23271f;">
                                     <i class="fas fa-envelope fa-2x text-third-ppi me-4"></i>
-                                    <div>
+                                    <div class="min-w-0">
                                         <h4 class="text-main-ppi fw-bold mb-1">Correo</h4>
-                                        <p class="mb-0 text-second-ppi">soporte@gavel.net</p>
+                                        <p class="mb-0 text-second-ppi text-break">soportegavelsubastas@gmail.com</p>
                                     </div>
                                 </div>
                             </div>
@@ -92,7 +116,7 @@ $pagina = "contacto";
                                     <i class="fa fa-phone-alt fa-2x text-third-ppi me-4"></i>
                                     <div>
                                         <h4 class="text-main-ppi fw-bold mb-1">Teléfono</h4>
-                                        <p class="mb-0 text-second-ppi">(+503) 2200-0000</p>
+                                        <p class="mb-0 text-second-ppi">(+503) 6767-6757</p>
                                     </div>
                                 </div>
                             </div>
@@ -102,10 +126,10 @@ $pagina = "contacto";
                                     <div>
                                         <h4 class="text-main-ppi fw-bold mb-1">Redes Sociales</h4>
                                         <div class="d-flex">
-                                            <a class="me-3" href="#"><i class="fab fa-twitter text-second-ppi"></i></a>
-                                            <a class="me-3" href="#"><i class="fab fa-facebook-f text-second-ppi"></i></a>
-                                            <a class="me-3" href="#"><i class="fab fa-instagram text-second-ppi"></i></a>
-                                            <a href="#"><i class="fab fa-linkedin-in text-second-ppi"></i></a>
+                                            <a class="me-3" href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter text-second-ppi"></i></a>
+                                            <a class="me-3" href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f text-second-ppi"></i></a>
+                                            <a class="me-3" href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram text-second-ppi"></i></a>
+                                            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in text-second-ppi"></i></a>
                                         </div>
                                     </div>
                                 </div>
@@ -117,9 +141,19 @@ $pagina = "contacto";
         </div>
     </div>
 
+    <div id="overlayContacto" class="registro-loading-overlay d-none" role="status" aria-live="polite">
+        <div class="registro-loading-card">
+            <div class="spinner-border registro-loading-spinner mb-3" aria-hidden="true"></div>
+            <h5 class="text-white fw-bold mb-2">Enviando mensaje...</h5>
+            <p class="text-second-ppi small mb-0">Estamos procesando tu consulta y enviando la confirmación. Esto tomará solo unos segundos.</p>
+        </div>
+    </div>
+
     <?php include "../Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= BASE_URL ?>assets/js/toast-ppi.js"></script>
+    <script src="<?= BASE_URL ?>assets/js/contacto.js"></script>
 </body>
 
 </html>

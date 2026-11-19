@@ -1,4 +1,6 @@
 const REGEX_PASSWORD = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9\s]).{8,}$/;
+const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const REGEX_TELEFONO = /^\d{4}-\d{4}$/;
 
 let modalInstance = null;
 let callbackModal = null;
@@ -49,10 +51,22 @@ function mostrarModal(tipo, titulo, mensaje, onCerrar = null) {
 function validarCampo(campo) {
     if (!campo) return true;
     const valor = campo.value.trim();
-    const vacio = valor === "" || valor === "0";
-    campo.classList.toggle("is-invalid", vacio);
-    campo.classList.toggle("is-valid", !vacio);
-    return !vacio;
+    let valido = valor !== "" && valor !== "0";
+
+    if (valido && campo.id === "correo") {
+        valido = REGEX_EMAIL.test(valor);
+    } else if (valido && campo.id === "telefono") {
+        valido = REGEX_TELEFONO.test(valor);
+    } else if (valido && campo.id === "contrasenia") {
+        valido = REGEX_PASSWORD.test(campo.value);
+    } else if (valido && campo.id === "confirmar_contrasenia") {
+        const pass = document.getElementById("contrasenia");
+        valido = pass ? campo.value === pass.value : true;
+    }
+
+    campo.classList.toggle("is-invalid", !valido);
+    campo.classList.toggle("is-valid", valido);
+    return valido;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
