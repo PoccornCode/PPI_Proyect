@@ -11,7 +11,9 @@ $condicion= trim($_POST['condicion']??'');
 $descripcion= trim($_POST['descripcion']??'');
 $imagenes=$_FILES['imagenes']?? null;
 $opcion= $_POST['opcion']??'';
+$id_producto= $_POST['id_producto']??'';
 $id_usuario = (int)($_SESSION['id_usuario'] ?? 0);
+$id_producto = (int)($_GET['id'] ?? 0);
 
 
 function subirImagenes(?array $archivos): array {
@@ -83,6 +85,50 @@ if($opcion==="guardar"){
     echo json_encode($resultado);
 }
 
+if ($opcion === "modificar") {
+    $id_producto = (int)($_POST['id_producto'] ?? 0);
 
+    if ($id_producto === 0) {
+        echo json_encode(['estado' => false, 'mensaje' => 'Falta el id del producto']);
+        exit;
+    }
 
+    $resultado = modificarProductos($conexion, $nombre, $descripcion, $condicion, $id_categoria, $id_producto, $id_usuario);
+
+    if ($resultado['estado']) {
+        $_SESSION['flash_toast'] = [
+            'tipo' => 'success',
+            'titulo' => '¡Producto actualizado!',
+            'mensaje' => 'Los cambios se guardaron correctamente.'
+        ];
+    }
+
+    echo json_encode($resultado);
+    exit;
+}
+
+if ($id_producto > 0) {
+    $producto = obtenerProductoPorId($conexion, $id_producto, (int)$_SESSION['id_usuario']);
+
+    if (!$producto) {
+        $_SESSION['flash_toast'] = [
+            'tipo' => 'warning',
+            'titulo' => 'Producto no encontrado',
+            'mensaje' => 'No existe o no te pertenece.'
+        ];
+        header("Location: " . BASE_URL . "views/subastas/mis-productos.php");
+        exit();
+    }
+}
+
+$textoBoton = $producto ? "Modificar" : "Guardar Producto";
+
+$condiciones = [
+    "Nuevo" => "Nuevo (Sellado en empaque original)",
+    "Como nuevo" => "Como nuevo (Sin marcas de uso o defectos)",
+    "Excelente" => "Excelente (Mínimo uso, excelente estado funcional)",
+    "Buen estado" => "Buen estado (Signos leves de uso normal)",
+    "Aceptable" => "Aceptable (Marcas visibles de desgaste, funcional)",
+    "Para repuestos o restauración" => "Para repuestos o restauración"
+];
     

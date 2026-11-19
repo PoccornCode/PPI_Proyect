@@ -83,3 +83,31 @@ function obtenerProductosPorUsuario($conexion, $id_usuario) {
     $stmt->close();
     return $productos;
 }
+
+function modificarProductos($conexion, $nombre, $descripcion, $condicion, $id_categoria, $id_producto, $id_usuario){
+
+    try{
+        $stmtVerificar = $conexion->prepare("SELECT id_producto FROM sb_producto WHERE id_producto = ? AND id_usuario = ?");
+        $stmtVerificar->bind_param("ii", $id_producto, $id_usuario);
+        $stmtVerificar->execute();
+        $existe = $stmtVerificar->get_result()->fetch_assoc();
+        $stmtVerificar->close();
+
+        if (!$existe) {
+            return ['estado' => false, 'mensaje' => 'El producto no existe o no te pertenece'];
+        }
+
+        $sql = "UPDATE sb_producto SET nombre = ?, descripcion = ?, condicion = ?, id_categoria = ?
+                WHERE id_producto = ? AND id_usuario = ?";
+
+        $stmt = $conexion->prepare($sql);
+            $stmt->bind_param("sssiii", $nombre, $descripcion, $condicion, $id_categoria, $id_producto, $id_usuario);
+        if (!$stmt->execute()) {
+                throw new RuntimeException('Error al actualizar: ' . $stmt->error);
+            }
+        $stmt->close();
+    }catch(Throwable $e){
+        error_log($e->getMessage());
+            return ['estado' => false, 'mensaje' => 'No se pudo actualizar el producto'];
+    }
+}

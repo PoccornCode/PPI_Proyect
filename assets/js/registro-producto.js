@@ -147,35 +147,67 @@ document.addEventListener("DOMContentLoaded", function () {
     form.addEventListener("submit", async function (e) {
         e.preventDefault();
 
-        if (btnGuardar.textContent.trim() !== textoBotonOriginal) return;
-        if (!validarFormulario()) return;
+        if (btnGuardar.textContent.trim() === textoBotonOriginal){
+            if (!validarFormulario()) return;
 
-        try {
-            const datos = new FormData(form);
-            datos.append("opcion", "guardar");
+            try {
+                const datos = new FormData(form);
+                datos.append("opcion", "guardar");
 
-            btnGuardar.disabled = true;
-            btnGuardar.textContent = "Procesando...";
+                btnGuardar.disabled = true;
+                btnGuardar.textContent = "Procesando...";
 
-            const respuesta = await fetch(form.action, { method: "POST", body: datos });
-            if (!respuesta.ok) throw new Error("Error HTTP: " + respuesta.status);
+                const respuesta = await fetch(form.action, { method: "POST", body: datos });
+                if (!respuesta.ok) throw new Error("Error HTTP: " + respuesta.status);
 
-            const resultado = await respuesta.json();
+                const resultado = await respuesta.json();
 
-            if (resultado.estado) {
-                mostrarToast('success', '¡Producto registrado!', 'Redirigiendo a tu lista de productos...', 2000);
-                setTimeout(() => {
-                    window.location.href = typeof RUTA_MIS_PRODUCTOS !== 'undefined' ? RUTA_MIS_PRODUCTOS : 'mis-productos.php';
-                }, 1200);
-            } else {
-                mostrarModal("error", "No se pudo guardar", resultado.mensaje);
+                if (resultado.estado) {
+                    mostrarToast('success', '¡Producto registrado!', 'Redirigiendo a tu lista de productos...', 2000);
+                    setTimeout(() => {
+                        window.location.href = typeof RUTA_MIS_PRODUCTOS !== 'undefined' ? RUTA_MIS_PRODUCTOS : 'mis-productos.php';
+                    }, 1200);
+                } else {
+                    mostrarModal("error", "No se pudo guardar", resultado.mensaje);
+                }
+            } catch (error) {
+                console.error(error);
+                mostrarModal("error", "Error de conexión", "No se pudo completar la operación. Intenta de nuevo.");
+            } finally {
+                btnGuardar.disabled = false;
+                btnGuardar.textContent = textoBotonOriginal;
             }
-        } catch (error) {
-            console.error(error);
-            mostrarModal("error", "Error de conexión", "No se pudo completar la operación. Intenta de nuevo.");
-        } finally {
-            btnGuardar.disabled = false;
-            btnGuardar.textContent = textoBotonOriginal;
+        }else{
+            try {
+                
+                const datos = new FormData(form);
+                if (!validarFormulario()) return;
+                datos.append("opcion", "modificar");
+
+                btnGuardar.disabled = true;
+                btnGuardar.textContent = "Procesando...";
+
+                const respuesta = await fetch(form.action, { method: "POST", body: datos });
+                if (!respuesta.ok) throw new Error("Error HTTP: " + respuesta.status);
+
+                const resultado = await respuesta.json();
+
+                if (resultado.estado) {
+                    mostrarToast('success', '¡Producto Modificado!', 'Redirigiendo a tu lista de productos...', 2000);
+                    setTimeout(() => {
+                        window.location.href = typeof RUTA_MIS_PRODUCTOS !== 'undefined' ? RUTA_MIS_PRODUCTOS : 'mis-productos.php';
+                    }, 1200);
+                } else {
+                    mostrarModal("error", "No se pudo modificar", resultado.mensaje);
+                }
+            } catch (error) {
+                console.error(error);
+                mostrarModal("error", "Error de conexión", "No se pudo completar la operación. Intenta de nuevo.");
+            } finally {
+                btnGuardar.disabled = false;
+                btnGuardar.textContent = textoBotonOriginal;
+            }
         }
+        
     });
 });
