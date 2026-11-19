@@ -144,10 +144,18 @@ $pagina = "registro";
         </div>
     </div>
 
+    <div id="overlayRegistro" class="registro-loading-overlay d-none" role="status" aria-live="polite">
+        <div class="registro-loading-card">
+            <div class="spinner-border registro-loading-spinner mb-3" aria-hidden="true"></div>
+            <h5 class="text-white fw-bold mb-2">Creando tu cuenta...</h5>
+            <p class="text-second-ppi small mb-0">Estamos enviando el código de verificación a tu correo. Esto tomará solo unos segundos.</p>
+        </div>
+    </div>
+
     <?php include "../Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/registro.js?v=12"></script>
+    <script src="<?= BASE_URL ?>assets/js/registro.js?v=13"></script>
 </body>
 
 </html>

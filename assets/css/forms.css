@@ -636,3 +636,32 @@ div:where(.swal2-container).swal2-backdrop-show,
         width: auto;
     }
 }
+
+.registro-loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1060;
+    padding: 1rem;
+}
+
+.registro-loading-card {
+    background-color: #161a15;
+    border: 1px solid #2b3323;
+    border-radius: 16px;
+    padding: 2rem 2.25rem;
+    max-width: 380px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+}
+
+.registro-loading-spinner {
+    width: 3.25rem;
+    height: 3.25rem;
+    border-width: 0.3rem;
+    color: #7aa30a;
+}
