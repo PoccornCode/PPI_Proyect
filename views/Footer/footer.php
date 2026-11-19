@@ -4,7 +4,7 @@
 
             <div class="pb-2 mb-1 col-12 col-lg-6">
                 <div class="row py-2 mt-3 mb-1">
-                    <div class="col-lg-2 col-4">
+                    <div class="col-lg-2 col-5">
                         <p class="text-main-ppi" style="line-height: 0;
                         font-size:40px">Gavel</p>
                     </div>
@@ -22,7 +22,7 @@
                 </div>
             </div>
 
-            <div class=" mb-1 col-12 col-lg-3">
+            <div class=" mb-1 col-6 col-lg-3">
                 <div>
                     <p class="text-main-ppi fw-bold">
                         Explorar
@@ -38,7 +38,7 @@
                     <a href="404.html" class="nav-item link-ppi px-1">Como funciona</a>
                 </div>
             </div>
-            <div class=" mb-1 col-12 col-lg-3">
+            <div class=" mb-1 col-6 col-lg-3">
                 <div>
                     <p class="text-main-ppi fw-bold">
                         Tu cuenta

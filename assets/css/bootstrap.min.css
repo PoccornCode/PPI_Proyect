@@ -1,4 +1,4 @@
-/*
+/*!
  * Bootstrap v5.0.0 (https://getbootstrap.com/)
  * Copyright 2011-2021 The Bootstrap Authors
  * Copyright 2011-2021 Twitter, Inc.
@@ -110,7 +110,7 @@ main{
     flex: 1;
   /* background-image: url("../img/tileHexa.png");
   background-repeat: repeat;   
-  background-size: 200px 200px;   
+  background-size: 300px 300px;
   background-color: #080708;    */
   
 }
