@@ -104,8 +104,11 @@ html {
 }
 
 
-/*MENÚ DE PERFIL */
-.menu-perfil-ppi {
+/*MENÚ DE PERFIL Y DROPDOWNS DEL NAVBAR */
+.menu-perfil-ppi,
+.navbar .nav-item .dropdown-menu.menu-perfil-ppi,
+.navbar .nav-item:hover .dropdown-menu.menu-perfil-ppi {
+    background: #0f120d !important;
     background-color: #0f120d !important;
     border: 1px solid #28311e !important;
     border-radius: 12px !important;

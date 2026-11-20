@@ -3,6 +3,7 @@ $titulo = "Inicio";
 $pagina = "inicio";
 
 require_once __DIR__ . '/config/env.php';
+require_once __DIR__ . '/controllers/categoria_controller.php';
 
 if (!function_exists('e')) {
     function e($texto)
@@ -11,15 +12,21 @@ if (!function_exists('e')) {
     }
 }
 
-// Datos de ejemplo — reemplazar con consultas reales cuando existan
+// Categorías populares en el Hero y tarjetas inferiores
 $categorias = [
     ['nombre' => 'Arte',           'icono' => 'fa-palette', 'imagen' => 'assets/img/features-life-style.jpg'],
-    ['nombre' => 'Tecnología',     'icono' => 'fa-laptop',  'imagen' => 'assets/img/features-technology.jpg'],
     ['nombre' => 'Coleccionables', 'icono' => 'fa-star',    'imagen' => 'assets/img/features-background.jpg'],
     ['nombre' => 'Hogar',          'icono' => 'fa-home',    'imagen' => 'assets/img/lifestyle-2.jpg'],
-    ['nombre' => 'Vehículos',      'icono' => 'fa-car',     'imagen' => 'assets/img/features-sports-1.jpg'],
     ['nombre' => 'Joyería',        'icono' => 'fa-gem',     'imagen' => 'assets/img/features-fashion.jpg'],
+    ['nombre' => 'Tecnología',     'icono' => 'fa-laptop',  'imagen' => 'assets/img/features-technology.jpg'],
+    ['nombre' => 'Vehículos',      'icono' => 'fa-car',     'imagen' => 'assets/img/features-sports-1.jpg'],
 ];
+
+// Categorías desde el controlador/DAO en orden alfabético para el select del buscador
+$categoriasSelect = obtenerCategoriasCatalogo();
+if (empty($categoriasSelect)) {
+    $categoriasSelect = $categorias;
+}
 
 $destacada = [
     'id'          => 1,
@@ -65,7 +72,7 @@ $urlSubasta = 'views/subasta.php?id=';
 
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
-    <link href="assets/css/main.css?v=37" rel="stylesheet">
+    <link href="assets/css/main.css?v=39" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -112,7 +119,7 @@ $urlSubasta = 'views/subasta.php?id=';
                     <div class="col-sm-6 col-lg-3">
                         <select class="form-select py-3" id="categoria" name="categoria" aria-label="Categoría">
                             <option value="">Todas las categorías</option>
-                            <?php foreach ($categorias as $cat) { ?>
+                            <?php foreach ($categoriasSelect as $cat) { ?>
                                 <option value="<?= e($cat['nombre']) ?>"><?= e($cat['nombre']) ?></option>
                             <?php } ?>
                         </select>
@@ -215,7 +222,7 @@ $urlSubasta = 'views/subasta.php?id=';
                         <span class="hero-label d-inline-block mb-1">Explorar por rubro</span>
                         <h2 id="titulo-categorias" class="fw-bold text-main-ppi mb-0">Categorías populares</h2>
                     </div>
-                    <a href="views/catalogo.php" class="link-ppi d-inline p-0 fw-bold small">Ver todas las categorías &rarr;</a>
+                    <a href="views/categorias.php" class="link-ppi d-inline p-0 fw-bold small">Ver todas las categorías &rarr;</a>
                 </div>
 
                 <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-6 g-3 g-lg-4">
