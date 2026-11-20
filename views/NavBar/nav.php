@@ -9,11 +9,14 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 $usuario_logueado = isset($_SESSION['id_usuario']);
 $url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url . "views/auth/login.php");
+
+require_once dirname(__DIR__, 2) . '/controllers/categoria_controller.php';
+$categorias_nav = obtenerCategoriasPopularesNav(6);
 ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Raleway:wght@600;700;800&display=swap" rel="stylesheet">
-<link href="<?php echo $base_url; ?>assets/css/main.css?v=37" rel="stylesheet">
+<link href="<?php echo $base_url; ?>assets/css/main.css?v=40" rel="stylesheet">
 
 <header class="sticky-top navbar-ppi-wrapper" style="background-color: #0c0f0a !important; border-bottom: 2px solid #658807 !important; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7) !important;">
     <nav class="navbar navbar-expand-xl navbar-dark py-2 py-lg-3" style="background-color: transparent !important;">
@@ -38,8 +41,27 @@ $url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url 
                     <li class="nav-item">
                         <a href="<?php echo $base_url; ?>views/catalogo.php" class="nav-link link-ppi">Subastas</a>
                     </li>
-                    <li class="nav-item">
-                        <a href="<?php echo $base_url; ?>views/catalogo.php" class="nav-link link-ppi">Categorías</a>
+                    <li class="nav-item dropdown">
+                        <a href="<?php echo $base_url; ?>views/categorias.php" class="nav-link link-ppi dropdown-toggle" id="dropdownCategorias" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Categorías
+                        </a>
+                        <ul class="dropdown-menu menu-perfil-ppi" aria-labelledby="dropdownCategorias">
+                            <?php foreach ($categorias_nav as $catNav): ?>
+                                <li>
+                                    <a class="dropdown-item" href="<?php echo $base_url; ?>views/catalogo.php?categoria=<?= urlencode($catNav['nombre']) ?>">
+                                        <?= htmlspecialchars($catNav['nombre']) ?>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <a class="dropdown-item fw-semibold text-third-ppi" href="<?php echo $base_url; ?>views/categorias.php">
+                                    Ver todas las categorías &rarr;
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <a href="<?php echo $base_url; ?>views/como-funciona.php" class="nav-link link-ppi">Cómo funciona</a>
