@@ -12,15 +12,37 @@ if (!function_exists('e')) {
     }
 }
 
-// Categorías populares en el Hero y tarjetas inferiores
-$categorias = [
-    ['nombre' => 'Arte',           'icono' => 'fa-palette', 'imagen' => 'assets/img/features-life-style.jpg'],
-    ['nombre' => 'Coleccionables', 'icono' => 'fa-star',    'imagen' => 'assets/img/features-background.jpg'],
-    ['nombre' => 'Hogar',          'icono' => 'fa-home',    'imagen' => 'assets/img/lifestyle-2.jpg'],
-    ['nombre' => 'Joyería',        'icono' => 'fa-gem',     'imagen' => 'assets/img/features-fashion.jpg'],
-    ['nombre' => 'Tecnología',     'icono' => 'fa-laptop',  'imagen' => 'assets/img/features-technology.jpg'],
-    ['nombre' => 'Vehículos',      'icono' => 'fa-car',     'imagen' => 'assets/img/features-sports-1.jpg'],
+//Iconos Font Awesome para las categorías en las píldoras del Hero
+$iconosCategoria = [
+    'Arte'                   => 'fa-palette',
+    'Coleccionables'         => 'fa-star',
+    'Deportes'               => 'fa-running',
+    'Hogar'                  => 'fa-home',
+    'Instrumentos Musicales' => 'fa-guitar',
+    'Joyería'                => 'fa-gem',
+    'Libros'                 => 'fa-book',
+    'Moda'                   => 'fa-tshirt',
+    'Tecnología'             => 'fa-laptop',
+    'Vehículos'              => 'fa-car',
 ];
+
+// Categorías populares reales desde la BD (ordenadas por cantidad de productos)
+$categorias = obtenerCategoriasPopularesHome(6);
+if (empty($categorias)) {
+    $categorias = [
+        ['nombre' => 'Coleccionables', 'imagen' => 'assets/img/cat-coleccionables.jpg', 'total_productos' => 0],
+        ['nombre' => 'Arte',           'imagen' => 'assets/img/cat-arte.jpg',           'total_productos' => 0],
+        ['nombre' => 'Hogar',          'imagen' => 'assets/img/cat-hogar.jpg',          'total_productos' => 0],
+        ['nombre' => 'Joyería',        'imagen' => 'assets/img/cat-joyeria.jpg',        'total_productos' => 0],
+        ['nombre' => 'Tecnología',     'imagen' => 'assets/img/cat-tecnologia.jpg',     'total_productos' => 0],
+        ['nombre' => 'Vehículos',      'imagen' => 'assets/img/cat-vehiculos.jpg',      'total_productos' => 0],
+    ];
+}
+
+foreach ($categorias as &$catItem) {
+    $catItem['icono'] = $iconosCategoria[$catItem['nombre']] ?? 'fa-tag';
+}
+unset($catItem);
 
 // Categorías desde el controlador/DAO en orden alfabético para el select del buscador
 $categoriasSelect = obtenerCategoriasCatalogo();
@@ -100,9 +122,9 @@ $urlSubasta = 'views/subasta.php?id=';
                         <!-- Categorías rápidas -->
                         <div class="d-flex flex-wrap justify-content-center gap-2">
                             <?php foreach ($categorias as $cat): ?>
-                            <a href="views/catalogo.php?categoria=<?= e($cat['nombre']) ?>" class="hero-cat-pill">
-                                <i class="fa <?= e($cat['icono']) ?>"></i> <?= e($cat['nombre']) ?>
-                            </a>
+                                <a href="views/catalogo.php?categoria=<?= urlencode($cat['nombre']) ?>" class="hero-cat-pill">
+                                    <i class="fa <?= e($cat['icono']) ?>"></i> <?= e($cat['nombre']) ?>
+                                </a>
                             <?php endforeach; ?>
                         </div>
                     </div>
@@ -230,7 +252,7 @@ $urlSubasta = 'views/subasta.php?id=';
                         <div class="col">
                             <a href="views/catalogo.php?categoria=<?= urlencode($cat['nombre']) ?>" class="card h-100 overflow-hidden text-decoration-none cat-card-ppi border-0 position-relative">
                                 <div class="cat-img-wrapper position-relative">
-                                    <img src="<?= e($cat['imagen']) ?>" class="cat-card-img w-100" alt="<?= e($cat['nombre']) ?>">
+                                    <img src="<?= e($cat['imagen']) ?>" class="cat-card-img w-100" alt="<?= e($cat['nombre']) ?>" loading="lazy" decoding="async">
                                     <div class="cat-card-overlay d-flex flex-column justify-content-end p-3">
                                         <h3 class="fs-6 fw-bold text-white mb-0"><?= e($cat['nombre']) ?></h3>
                                     </div>

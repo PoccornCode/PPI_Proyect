@@ -10,7 +10,13 @@ function obtenerCategoriasCatalogo(): array
 function obtenerCategoriasPopularesNav(int $limite = 6): array
 {
     $dao = new CategoriaDAO();
-    return $dao->listarPopulares($limite);
+    return $dao->listarPopulares($limite, true);
+}
+
+function obtenerCategoriasPopularesHome(int $limite = 6): array
+{
+    $dao = new CategoriaDAO();
+    return $dao->listarPopulares($limite, false);
 }
 
 if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {

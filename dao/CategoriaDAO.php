@@ -43,7 +43,7 @@ class CategoriaDAO
         return $categorias;
     }
 
-    public function listarPopulares(int $limite = 6): array
+    public function listarPopulares(int $limite = 6, bool $ordenAlfabetico = true): array
     {
         $categorias = [];
         if (!$this->conexion || $this->conexion->connect_errno) {
@@ -51,7 +51,8 @@ class CategoriaDAO
         }
 
         $limite = max(1, (int)$limite);
-        $sql = "SELECT t.id_categoria, t.nombre, t.descripcion, t.imagen
+        $orderFinal = $ordenAlfabetico ? "t.nombre ASC" : "t.total DESC, t.nombre ASC";
+        $sql = "SELECT t.id_categoria, t.nombre, t.descripcion, t.imagen, t.total
                 FROM (
                     SELECT c.id_categoria, c.nombre, c.descripcion, c.imagen, COUNT(p.id_producto) AS total
                     FROM sb_categoria c
@@ -60,16 +61,17 @@ class CategoriaDAO
                     ORDER BY total DESC, c.nombre ASC
                     LIMIT {$limite}
                 ) AS t
-                ORDER BY t.nombre ASC";
+                ORDER BY {$orderFinal}";
 
         $res = $this->conexion->query($sql);
         if ($res) {
             while ($row = $res->fetch_assoc()) {
                 $categorias[] = [
-                    'id_categoria' => (int)$row['id_categoria'],
-                    'nombre'       => $row['nombre'],
-                    'imagen'       => !empty($row['imagen']) ? $row['imagen'] : 'assets/img/cat-coleccionables.jpg',
-                    'descripcion'  => !empty($row['descripcion']) ? $row['descripcion'] : '',
+                    'id_categoria'    => (int)$row['id_categoria'],
+                    'nombre'          => $row['nombre'],
+                    'imagen'          => !empty($row['imagen']) ? $row['imagen'] : 'assets/img/cat-coleccionables.jpg',
+                    'descripcion'     => !empty($row['descripcion']) ? $row['descripcion'] : '',
+                    'total_productos' => (int)$row['total'],
                 ];
             }
         }
