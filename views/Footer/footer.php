@@ -46,7 +46,7 @@ $base_url = BASE_URL;
                             </a>
                         </li>
                         <li>
-                            <a href="<?php echo $base_url; ?>views/catalogo.php" class="link-ppi p-0 d-inline-flex align-items-center">
+                            <a href="<?php echo $base_url; ?>views/categorias.php" class="link-ppi p-0 d-inline-flex align-items-center">
                                 <i class="fas fa-angle-right me-2 text-third-ppi" style="font-size: 0.75rem;"></i>Categorías
                             </a>
                         </li>
@@ -57,7 +57,7 @@ $base_url = BASE_URL;
                         </li>
                         <li>
                             <a href="<?php echo $base_url; ?>views/subastas/registro-producto.php" class="link-ppi p-0 d-inline-flex align-items-center">
-                                <i class="fas fa-angle-right me-2 text-third-ppi" style="font-size: 0.75rem;"></i>Publicar lote
+                                <i class="fas fa-angle-right me-2 text-third-ppi" style="font-size: 0.75rem;"></i>Registrar producto
                             </a>
                         </li>
                     </ul>

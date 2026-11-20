@@ -104,8 +104,11 @@ html {
 }
 
 
-/*MENÚ DE PERFIL */
-.menu-perfil-ppi {
+/*MENÚ DE PERFIL Y DROPDOWNS DEL NAVBAR */
+.menu-perfil-ppi,
+.navbar .nav-item .dropdown-menu.menu-perfil-ppi,
+.navbar .nav-item:hover .dropdown-menu.menu-perfil-ppi {
+    background: #0f120d !important;
     background-color: #0f120d !important;
     border: 1px solid #28311e !important;
     border-radius: 12px !important;
@@ -395,13 +398,15 @@ html {
 /* Etiqueta Subasta destacada*/
 .etiqueta-ppi {
     display: inline-block;
-    padding: .25rem .75rem;
-    font-size: .8rem;
-    font-weight: 600;
-    color: #94aa34;
-    background-color: #080708;
-    border: 1px solid #5e7325;
-    border-radius: 999px;
+    padding: .3rem .7rem;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #e5e5e5;
+    background-color: rgba(12, 15, 10, 0.88);
+    border-left: 3px solid #658807;
+    border-radius: 2px;
 }
 
 /* Precio y tiempo restante*/
@@ -412,7 +417,7 @@ html {
 
 .tiempo-ppi {
     font-weight: 600;
-    color: #e0a944;
+    color: #e59a86;
 }
 
 /*Lista Terminan pronto */

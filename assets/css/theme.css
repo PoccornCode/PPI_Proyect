@@ -279,8 +279,11 @@
     }
 }
 
-/* Menú desplegable de perfil */
-:root[data-theme="light"] .menu-perfil-ppi {
+/* Menú desplegable de perfil y dropdowns del navbar */
+:root[data-theme="light"] .menu-perfil-ppi,
+:root[data-theme="light"] .navbar .nav-item .dropdown-menu.menu-perfil-ppi,
+:root[data-theme="light"] .navbar .nav-item:hover .dropdown-menu.menu-perfil-ppi {
+    background: var(--gavel-surface) !important;
     background-color: var(--gavel-surface) !important;
     border: 1px solid var(--gavel-border) !important;
     box-shadow: var(--gavel-shadow-lg) !important;
@@ -301,6 +304,10 @@
 
 :root[data-theme="light"] .menu-perfil-ppi .dropdown-item {
     color: var(--gavel-text-main) !important;
+}
+
+:root[data-theme="light"] .menu-perfil-ppi .dropdown-item.text-third-ppi {
+    color: var(--gavel-accent) !important;
 }
 
 :root[data-theme="light"] .menu-perfil-ppi .dropdown-item:hover,
@@ -456,6 +463,34 @@
 
 :root[data-theme="light"] .section-divider-ppi {
     border-top-color: var(--gavel-border) !important;
+}
+
+/* Vista Categorías */
+:root[data-theme="light"] .cat-dir-card {
+    background-color: var(--gavel-surface);
+    border-color: var(--gavel-border);
+    box-shadow: var(--gavel-shadow-sm);
+}
+
+:root[data-theme="light"] .cat-dir-card:hover {
+    border-color: var(--gavel-accent-bright);
+    box-shadow: var(--gavel-shadow-md);
+}
+
+:root[data-theme="light"] .cat-dir-thumb {
+    background-color: var(--gavel-surface-alt);
+}
+
+:root[data-theme="light"] .cat-dir-thumb img {
+    filter: brightness(0.95);
+}
+
+:root[data-theme="light"] .cat-dir-card:hover .cat-dir-thumb img {
+    filter: brightness(1);
+}
+
+:root[data-theme="light"] .categorias-cta {
+    border-top-color: var(--gavel-border);
 }
 
 /* Productos y Mis Productos */
