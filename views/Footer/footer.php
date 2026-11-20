@@ -9,19 +9,11 @@ $base_url = BASE_URL;
         <div class="container py-4">
             <div class="row g-4 align-items-start">
 
-<<<<<<< HEAD
-            <div class="pb-2 mb-1 col-12 col-lg-6">
-                <div class="row py-2 mt-3 mb-1">
-                    <div class="col-lg-2 col-5">
-                        <p class="text-main-ppi" style="line-height: 0;
-                        font-size:40px">Gavel</p>
-=======
                 <!-- Columna 1: Marca y descripción -->
                 <div class="col-12 col-lg-4">
                     <div class="d-flex align-items-baseline gap-1 gavel-brand mb-2">
                         <span class="brand-name text-main-ppi fw-bold" style="font-size: 2.1rem; line-height: 1; font-family: 'Raleway', sans-serif;">Gavel</span>
                         <span class="brand-tld text-third-ppi fw-bold" style="font-size: 1.6rem; line-height: 1; font-family: 'Raleway', sans-serif;">.net</span>
->>>>>>> 57c844387a61ee09b2fafced63b68fc0df590fbb
                     </div>
                     <p class="text-second-ppi pe-lg-3 mb-3" style="line-height: 1.5; font-size: 0.9rem;">
                         Sistema de subastas en línea. Publica, puja y gana con ofertas transparentes, seguras y en tiempo real.
@@ -42,40 +34,6 @@ $base_url = BASE_URL;
                     </div>
                 </div>
 
-<<<<<<< HEAD
-            <div class=" mb-1 col-6 col-lg-3">
-                <div>
-                    <p class="text-main-ppi fw-bold">
-                        Explorar
-                    </p>
-                </div>
-                <div>
-                    <a href="404.html" class="nav-item link-ppi px-1">Subastas</a>
-                </div>
-                <div>
-                    <a href="404.html" class="nav-item link-ppi px-1">Categorias</a>
-                </div>
-                <div>
-                    <a href="404.html" class="nav-item link-ppi px-1">Como funciona</a>
-                </div>
-            </div>
-            <div class=" mb-1 col-6 col-lg-3">
-                <div>
-                    <p class="text-main-ppi fw-bold">
-                        Tu cuenta
-                    </p>
-                </div>
-                <div>
-                    <a href="404.html" class="nav-item link-ppi px-1">Registrarse</a>
-                </div>
-                <div>
-                    <a href="404.html" class="nav-item link-ppi px-1">Iniciar sesion</a>
-                </div>
-                <div>
-                    <a href="404.html" class="nav-item link-ppi px-1">Contacto</a>
-                </div>
-            </div>
-=======
                 <!-- Columna 2: Explorar -->
                 <div class="col-6 col-sm-4 col-lg-2 offset-lg-1">
                     <h6 class="text-main-ppi fw-bold text-uppercase mb-3" style="letter-spacing: 0.8px; font-size: 0.9rem;">
@@ -104,7 +62,6 @@ $base_url = BASE_URL;
                         </li>
                     </ul>
                 </div>
->>>>>>> 57c844387a61ee09b2fafced63b68fc0df590fbb
 
                 <!-- Columna 3: Tu cuenta -->
                 <div class="col-6 col-sm-4 col-lg-2">
