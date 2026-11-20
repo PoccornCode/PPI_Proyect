@@ -5,7 +5,7 @@ if (!defined('BASE_URL')) {
 $base_url = BASE_URL;
 ?>
 <footer class="footer-ppi-wrapper">
-    <div class="container-fluid bg-dark-ppi-2 footer-ppi" style="border-top: 3px solid #658807;">
+    <div class="container-fluid bg-dark-ppi-2 footer-ppi footer-ppi-top">
         <div class="container py-4">
             <div class="row g-4 align-items-start">
 

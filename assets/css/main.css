@@ -501,6 +501,44 @@ html {
     margin-top: auto;
 }
 
+/* Footer: base neutra coherente con el sitio + micro-acento rosa salmón en las flechas */
+.footer-ppi-wrapper {
+    --footer-salmon: #e59a86;
+    --footer-link: #b9b6ac;
+}
+
+.footer-ppi-top {
+    border-top: 2px solid #4c5c1e;
+}
+
+.footer-ppi-wrapper .link-ppi {
+    color: var(--footer-link);
+    transition: color .2s ease;
+}
+
+.footer-ppi-wrapper .link-ppi i.fa-angle-right,
+.footer-ppi-wrapper .link-ppi i.fa-cookie-bite {
+    color: var(--footer-salmon);
+    opacity: .8;
+    transition: transform .2s ease, opacity .2s ease;
+}
+
+.footer-ppi-wrapper .link-ppi:hover,
+.footer-ppi-wrapper .link-ppi:focus {
+    color: #f0f0f0;
+}
+
+.footer-ppi-wrapper .link-ppi:hover i.fa-angle-right,
+.footer-ppi-wrapper .link-ppi:focus i.fa-angle-right {
+    opacity: 1;
+    transform: translateX(3px);
+}
+
+.footer-ppi-wrapper .link-ppi:hover i.fa-cookie-bite,
+.footer-ppi-wrapper .link-ppi:focus i.fa-cookie-bite {
+    opacity: 1;
+}
+
 .footer-social-links .btn-outline-ppi-social {
     color: #a7a59d;
     background-color: #121510;
