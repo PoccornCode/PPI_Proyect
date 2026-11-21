@@ -260,3 +260,64 @@
         }
         return $rutas;  
     }
+
+    function eliminar($conexion, $id_producto, $id_usuario) {
+        try {
+            $conexion->begin_transaction();
+            $sql="SELECT 1 FROM sb_producto WHERE id_producto=? AND id_usuario=?";
+            $stmt=$conexion->prepare($sql);
+            $stmt->bind_param("ii", $id_producto, $id_usuario);
+            if(!$stmt->execute()){
+                throw new RuntimeException('Error al eliminar el producto: ' . $stmt->error);
+            }    
+            
+           $resultado = $stmt->get_result();
+            if ($resultado->num_rows === 0) {
+                throw new RuntimeException('El producto no existe o no pertenece al usuario');
+            }
+
+            $stmt->close();
+
+            $imagenes=obtenerImagenesProducto($conexion, $id_producto);
+            eliminarImagenes($conexion, $id_producto);
+
+            $sqlEliminar="DELETE FROM sb_producto WHERE id_producto = ? AND id_usuario = ?;";
+            $stmt=$conexion->prepare($sqlEliminar);
+            $stmt->bind_param("ii", $id_producto, $id_usuario);
+
+            if(!$stmt->execute()){
+                throw new RuntimeException('Error al eliminar el producto: ' . $stmt->error);
+            } 
+
+            if ($stmt->affected_rows === 0) {
+                throw new RuntimeException('El producto no existe o no pertenece al usuario');
+            }
+            
+            $stmt->close();
+            $conexion->commit();
+
+            foreach ($imagenes as $imagen) {
+                @unlink(__DIR__ . '/../uploads/productos/' . $imagen['ruta']);
+            }
+            return ['estado' => true, 'mensaje' => 'Producto eliminado exitosamente'];
+
+        } catch (\Throwable $e) {
+            $conexion->rollback();
+            error_log($e->getMessage());  
+            return ['estado' => false, 'mensaje' => 'No se pudo eliminar el producto'];
+        }
+        
+    }
+
+    function eliminarImagenes($conexion, $id_producto){
+        $sqlEliminarImg="DELETE FROM sb_imagen_producto WHERE id_producto = ?";
+        $stmt=$conexion->prepare($sqlEliminarImg);
+        $stmt->bind_param("i", $id_producto);
+        
+        if(!$stmt->execute()){
+            throw new RuntimeException('Error al eliminar el producto: ' . $stmt->error);
+        }  
+        $stmt->close();
+    }
+
+

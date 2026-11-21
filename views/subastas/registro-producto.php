@@ -132,9 +132,10 @@ if ($catQuery) {
                                 <p class="text-second-ppi small mb-0">Formatos admitidos: JPG, PNG, WEBP (La primera foto se utilizará como imagen principal)</p>
                                 <input type="file" class="d-none" id="imagenes" name="imagenes[]" multiple accept="image/*">
                             </div>
-
-                            <div id="preview-container" class="d-flex flex-wrap gap-2 mb-3"></div>
-                            <div id="imagePreviewContainer" class="d-flex flex-wrap gap-2 mt-3"></div>
+                            <label for="contenedorImagenesActuales" class="form-label text-main-ppi fw-bold small mb-1 mt-3" id="labelActuales"></label>
+                            <div id="contenedorImagenesActuales" class="d-flex flex-wrap gap-2 mb-3"></div>
+                            <label for="contenedorImagenNuevas" class="form-label text-main-ppi fw-bold small mb-1" id="labelNuevas"></label>
+                            <div id="contenedorImagenNuevas" class="d-flex flex-wrap gap-2"></div>
                         </div>
 
                         <!-- ACCIONES -->

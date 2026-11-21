@@ -135,9 +135,8 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                                             <i class="fas fa-edit"></i> Modificar
                                         </a>
 
-                                        <form action="<?= BASE_URL ?>controllers/ControllerProducto.php" method="POST" class="flex-grow-1" onsubmit="return confirm('¿Seguro que quieres eliminar este producto?');">
+                                        <form action="<?= BASE_URL ?>controllers/ControllerProducto.php?id=<?= (int)$item['id_producto'] ?>" method="POST" class="flex-grow-1 form-eliminar">
                                             <input type="hidden" name="opcion" value="eliminar">
-                                            <input type="hidden" name="id_producto" value="<?= (int)$item['id_producto'] ?>">
                                             <button type="submit" class="btn btn-danger btn-sm w-100">
                                                 <i class="fas fa-trash"></i> Eliminar
                                             </button>
@@ -157,6 +156,7 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>assets/js/toast-ppi.js?v=2"></script>
+    <script src="<?= BASE_URL ?>assets/js/mis-productos.js?v=1"></script>
 
     <?php if (isset($_SESSION['flash_toast'])): ?>
         <?php

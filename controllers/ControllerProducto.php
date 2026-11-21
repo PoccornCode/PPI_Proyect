@@ -12,7 +12,7 @@
     $imagenes=$_FILES['imagenes']?? null;
     $opcion= $_POST['opcion']??'';
     $id_usuario = (int)($_SESSION['id_usuario'] ?? 0);
-    $id_producto = (int)($_GET['id'] ?? 0);
+    $id_producto = (int)($_POST['id_producto'] ?? $_GET['id'] ?? 0);
     $idrutasEliminar = array_values(  // vuelve a numerar los índices desde 0
         array_unique( // quita los valores repetidos
             array_map('intval', // convierte cada valor a número entero
@@ -92,6 +92,12 @@
         exit;
     }
 
+    if ($opcion === "eliminar") {
+        $resultado = eliminar($conexion, $id_producto, $id_usuario);
+        echo json_encode($resultado);
+        exit;
+    }
+
     if ($nombre === '' || $id_categoria === 0 || $condicion === '') {
         echo json_encode(['estado' => false, 'mensaje' => 'Faltan datos obligatorios']);
         exit;
@@ -140,5 +146,6 @@
         echo json_encode($resultado);
     }
 
+   
     
         
