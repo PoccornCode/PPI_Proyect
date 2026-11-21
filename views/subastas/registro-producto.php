@@ -55,7 +55,7 @@ if ($catQuery) {
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/main.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/forms.css?v=8" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/productos.css?v=1" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/productos.css?v=3" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
