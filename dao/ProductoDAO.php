@@ -29,7 +29,6 @@ function insertarProducto($conexion, $nombre, $descripcion, $condicion, $id_cate
         foreach ($rutas as $ruta) {
             @unlink(__DIR__ . '/../uploads/productos/' . $ruta);
         }
-
         error_log($e->getMessage());  
         return ['estado' => false, 'mensaje' => 'No se pudo guardar el producto'];
     } 
@@ -95,6 +94,41 @@ function obtenerProductosPorUsuario($conexion, $id_usuario) {
     return $productos;
 }
 
+function obtenerProductoPorId($conexion, $id_producto, $id_usuario){
+    $sql = "SELECT id_producto, nombre, descripcion, condicion, estado, id_categoria
+    FROM sb_producto WHERE id_producto = ? AND id_usuario = ?;";
+
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param("ii", $id_producto, $id_usuario);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $producto = $resultado->fetch_assoc();
+
+    $stmt->close();
+    return $producto;
+}
+
+function obtenerImagenesProducto($conexion, $id_producto){
+    $sql = "SELECT id_imagen_producto, id_producto, principal, ruta
+        FROM sb_imagen_producto
+        WHERE id_producto = ?
+        ORDER BY principal DESC, id_imagen_producto ASC";
+
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param("i", $id_producto);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+
+    $imagenes = [];
+    while ($row = $resultado->fetch_assoc()) {
+        $imagenes[] = $row;
+    }
+
+    $stmt->close();
+    return $imagenes;
+}
+
+
 function modificarProducto($conexion, $id_producto, $nombre, $descripcion, $condicion, $id_categoria, 
     $id_usuario, $rutasNuevas, $idrutasEliminar)
     {
@@ -115,6 +149,9 @@ function modificarProducto($conexion, $id_producto, $nombre, $descripcion, $cond
         if(!$existe){
             $stmt->close();
             $conexion->rollback();
+            foreach ($rutasNuevas as $ruta) {
+                @unlink(__DIR__ . '/../uploads/productos/' . $ruta);
+            }
             return ['estado' => false, 'mensaje' => 'El producto no existe o no pertenece al usuario'];
         }
 
@@ -133,12 +170,18 @@ function modificarProducto($conexion, $id_producto, $nombre, $descripcion, $cond
 
         //Actualizar imagenes 
         $rutasBorradas=actualizarImagenes($conexion, $id_producto, $rutasNuevas, $idrutasEliminar);
-
         $conexion->commit();
-        return ['estado' => true, 'mensaje' => 'Producto actualizado exitosamente', 'rutas_borradas' => $rutasBorradas]; 
+
+        foreach ($rutasBorradas as $ruta) {
+            @unlink(__DIR__ . '/../uploads/productos/' . $ruta);      
+        }
+        return ['estado' => true, 'mensaje' => 'Producto actualizado exitosamente']; 
 
     }catch(Throwable $e){
         $conexion->rollback();
+        foreach ($rutasNuevas as $ruta) {
+            @unlink(__DIR__ . '/../uploads/productos/' . $ruta);
+        }
         error_log($e->getMessage());  
         return ['estado' => false, 'mensaje' => 'No se pudo actualizar el producto'];
     }

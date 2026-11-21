@@ -131,8 +131,8 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                                     </p>
 
                                     <div class="d-flex gap-2 mt-2">
-                                        <a href="<?= BASE_URL ?>views/subastas/editar-producto.php?id=<?= (int)$item['id_producto'] ?>" class="btn btn-outline-publish btn-sm flex-grow-1">
-                                            <i class="fas fa-edit"></i> Actualizar
+                                        <a href="<?= BASE_URL ?>views/subastas/registro-producto.php?id=<?= (int)$item['id_producto'] ?>" class="btn btn-outline-publish btn-sm flex-grow-1">
+                                            <i class="fas fa-edit"></i> Modificar
                                         </a>
 
                                         <form action="<?= BASE_URL ?>controllers/ControllerProducto.php" method="POST" class="flex-grow-1" onsubmit="return confirm('¿Seguro que quieres eliminar este producto?');">

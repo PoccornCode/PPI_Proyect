@@ -3,13 +3,12 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$titulo = "Registrar Producto";
-
 require_once __DIR__ . '/../../config/env.php';
 require_once __DIR__ . '/../../config/conexion.php';
 
 if (!isset($_SESSION['id_usuario'])) {
-    $_SESSION['redirect_after_login'] = BASE_URL . 'views/subastas/registro-producto.php';
+   $_SESSION['redirect_after_login'] = BASE_URL . 'views/subastas/registro-producto.php'
+    . (isset($_GET['id']) ? '?id=' . (int)$_GET['id'] : '');
     $_SESSION['flash_toast'] = [
         'tipo' => 'warning',
         'titulo' => 'Acceso restringido',
@@ -19,8 +18,11 @@ if (!isset($_SESSION['id_usuario'])) {
     exit();
 }
 
-$titulo = "Registrar Producto";
 $pagina = "registro-producto";
+
+$id_producto = (int)($_GET['id'] ?? 0);
+$titulo = $id_producto > 0 ? "Modificar Producto" : "Registrar Producto";
+$textoBoton = $id_producto > 0 ? "Modificar" : "Guardar Producto";
 
 //Agregar a dao o controller despues
 $categorias = [];
@@ -68,7 +70,7 @@ if ($catQuery) {
 
                     <div class="d-flex justify-content-between align-items-end mb-4">
                         <div>
-                            <h3 class="text-main-ppi fw-bold mb-1">Registrar Producto</h3>
+                            <h3 class="text-main-ppi fw-bold mb-1"><?= htmlspecialchars($titulo) ?></h3>
                             <p class="text-second-ppi small mb-0">Completa la información del producto.</p>
                         </div>
                         <a href="<?= BASE_URL ?>index.php" class="btn btn-secondary btn-sm px-3">
@@ -91,7 +93,6 @@ if ($catQuery) {
                                     <label for="id_categoria" class="form-label text-main-ppi fw-bold small">Categoría</label>
                                     <select class="form-select select-gavel" id="id_categoria" name="id_categoria" required>
                                         <option value="" disabled selected>Selecciona una categoría...</option>
-                                        //Agregas a dao o controller despues
                                         <?php if (!empty($categorias)): ?>
                                             <?php foreach ($categorias as $cat): ?>
                                                 <option value="<?= $cat['id_categoria'] ?>"><?= htmlspecialchars($cat['nombre']) ?></option>
@@ -132,13 +133,14 @@ if ($catQuery) {
                                 <input type="file" class="d-none" id="imagenes" name="imagenes[]" multiple accept="image/*">
                             </div>
 
+                            <div id="preview-container" class="d-flex flex-wrap gap-2 mb-3"></div>
                             <div id="imagePreviewContainer" class="d-flex flex-wrap gap-2 mt-3"></div>
                         </div>
 
                         <!-- ACCIONES -->
                         <div class="d-flex justify-content-end gap-3 pb-4">
                             <a href="<?= BASE_URL ?>index.php" class="btn btn-secondary px-4 py-2">Cancelar</a>
-                            <button type="submit" id="btnGuardar" class="btn btn-primary px-5 py-2 fw-bold">Guardar Producto</button>
+                            <button type="submit" id="btnGuardar" class="btn btn-primary px-5 py-2 fw-bold"><?= htmlspecialchars($textoBoton) ?></button>
                         </div>
 
                     </form>
@@ -172,6 +174,7 @@ if ($catQuery) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const RUTA_MIS_PRODUCTOS = "<?= BASE_URL ?>views/subastas/mis-productos.php";
+        const RUTA_IMAGENES = "<?= BASE_URL ?>uploads/productos/";
     </script>
     <script src="<?= BASE_URL ?>assets/js/toast-ppi.js?v=2"></script>
     <script src="<?= BASE_URL ?>assets/js/registro-producto.js?v=4"></script>
