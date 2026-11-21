@@ -19,8 +19,9 @@ function insertarProducto($conexion, $nombre, $descripcion, $condicion, $id_cate
 
         $id_producto= $conexion->insert_id;
         $stmt->close();
+        $opcion="guardar";
 
-        insertarImagenes($conexion, $id_producto, $rutas);
+        insertarImagenes($conexion, $id_producto, $rutas, $opcion);
         $conexion->commit();
         return ['estado' => true, 'mensaje' => 'Producto guardado exitosamente', 'id_producto' => $id_producto];
     } catch (Throwable $e) {
@@ -34,29 +35,39 @@ function insertarProducto($conexion, $nombre, $descripcion, $condicion, $id_cate
     } 
 }
 
-function insertarImagenes($conexion, $id_producto, $rutas){
+function insertarImagenes($conexion, $id_producto, $rutas, $opcion){
     $sql= "INSERT INTO sb_imagen_producto (id_producto, principal, ruta) 
     VALUES (?, ?, ?)";
-    $stmtImg=$conexion->prepare($sql);
-        
+    $stmtImg=$conexion->prepare($sql); 
     $ruta="";
     $principal=0;
     $stmtImg->bind_param("iis", $id_producto, $principal, $ruta);
 
-    foreach ($rutas as $index => $r) {
-        $ruta= $r;
+    if($opcion==="guardar"){
+        foreach ($rutas as $index => $r) {
+            $ruta= $r;
 
-        if($index===0){
-            $principal=1;
-        }else{
-            $principal=0;
+            if($index===0){
+                $principal=1;
+            }else{
+                $principal=0;
+            }
+
+            if (!$stmtImg->execute()) {
+                $stmtImg->close();
+                throw new RuntimeException('Error al guardar una imágen: ' . $stmtImg->error);
+            }
         }
-
-        if (!$stmtImg->execute()) {
-            $stmtImg->close();
-            throw new RuntimeException('Error al guardar una imágen: ' . $stmtImg->error);
+    }else{
+        foreach ($rutas as $index => $r) {
+            $ruta= $r;     
+            if (!$stmtImg->execute()) {
+                $stmtImg->close();
+                throw new RuntimeException('Error al guardar una imágen: ' . $stmtImg->error);
+            }
         }
     }
+
     $stmtImg->close();
 }
 
@@ -84,21 +95,30 @@ function obtenerProductosPorUsuario($conexion, $id_usuario) {
     return $productos;
 }
 
-function modificarProductos($conexion, $id_producto, $nombre, $descripcion, $condicion, $id_categoria, $id_usuario){
-    $sqlVerificar= "SELECT 1 FROM SB_PRODUCTO WHERE id_producto = ? AND id_usuario=?;";
-    $stmt= $conexion->prepare($sqlVerificar);
-    $stmt->bind_param("ii", $id_producto, $id_usuario);
-    $stmt->execute();
-    $resultado = $stmt->get_result();
-    $existe = $resultado && $resultado->num_rows > 0;
-    if(!$existe){
-        return ['estado' => false, 'mensaje' => 'El producto no existe o no pertenece al usuario'];
-    }
-
-    $stmt->close();
-
+function modificarProducto($conexion, $id_producto, $nombre, $descripcion, $condicion, $id_categoria, 
+    $id_usuario, $rutasNuevas, $idrutasEliminar)
+    {
     try{
         $conexion->begin_transaction();
+
+        $sqlVerificar= "SELECT 1 FROM sb_producto WHERE id_producto = ? AND id_usuario=? FOR UPDATE;";
+        $stmt= $conexion->prepare($sqlVerificar);
+        $stmt->bind_param("ii", $id_producto, $id_usuario);
+
+        if (!$stmt->execute()) {
+            throw new RuntimeException('Error al verificar el producto: ' . $stmt->error);
+        }
+
+        $resultado = $stmt->get_result();
+        $existe = $resultado && $resultado->num_rows > 0;
+
+        if(!$existe){
+            $stmt->close();
+            $conexion->rollback();
+            return ['estado' => false, 'mensaje' => 'El producto no existe o no pertenece al usuario'];
+        }
+
+        $stmt->close(); 
         $sql= "UPDATE sb_producto
         SET nombre = ?, descripcion = ?, condicion = ?, id_categoria = ?
         WHERE id_producto = ? AND id_usuario = ?;";
@@ -110,14 +130,90 @@ function modificarProductos($conexion, $id_producto, $nombre, $descripcion, $con
             throw new RuntimeException('Error al actualizar el producto: ' . $stmt->error);
         }
         $stmt->close();
-        $conexion->commit     ();
-        return ['estado' => true, 'mensaje' => 'Producto actualizado exitosamente']; 
-            
+
+        //Actualizar imagenes 
+        $rutasBorradas=actualizarImagenes($conexion, $id_producto, $rutasNuevas, $idrutasEliminar);
+
+        $conexion->commit();
+        return ['estado' => true, 'mensaje' => 'Producto actualizado exitosamente', 'rutas_borradas' => $rutasBorradas]; 
+
     }catch(Throwable $e){
         $conexion->rollback();
         error_log($e->getMessage());  
         return ['estado' => false, 'mensaje' => 'No se pudo actualizar el producto'];
     }
+}
 
-    
+function actualizarImagenes($conexion, $id_producto, $rutasNuevas, $idrutasEliminar){
+        $sqlSelect="SELECT ruta, principal
+        FROM sb_imagen_producto
+        WHERE id_producto = ? AND id_imagen_producto= ?
+        FOR UPDATE;";
+        
+        $stmt = $conexion->prepare($sqlSelect);
+        $idrutaEliminar=0;
+        $stmt->bind_param("ii", $id_producto, $idrutaEliminar);
+        $rutas = [];
+
+        foreach ($idrutasEliminar as $idrutaEliminar) {
+            if (!$stmt->execute()) {
+                throw new RuntimeException('Error al cargar la ruta la imágen: ' . $stmt->error);
+            }
+            $result = $stmt->get_result()->fetch_assoc();
+
+            if (!$result) {
+                throw new RuntimeException('La lista de fotos cambió. Recarga la página.');
+            }
+
+            $rutas[] = $result['ruta'];
+        }
+
+        $stmt->close();
+        
+        //Eliminar las rutas de la base de datos
+        $sqlEliminar="DELETE FROM sb_imagen_producto
+        WHERE id_producto = ? AND id_imagen_producto = ?;";
+
+        $stmt = $conexion->prepare($sqlEliminar);
+        $idImgEliminar=0;
+        $stmt->bind_param("ii", $id_producto, $idImgEliminar);
+
+        foreach ($idrutasEliminar as $idImgEliminar) {
+            if (!$stmt->execute()) {
+                throw new RuntimeException('Error al borrar la imagen: ' . $stmt->error);
+            }
+            if ($stmt->affected_rows === 0) {
+                throw new RuntimeException('La imagen no existe o no pertenece al producto');
+            }
+       }
+
+        $stmt->close();   
+        $opcion="modificar";
+        if(!empty($rutasNuevas)){
+            insertarImagenes($conexion, $id_producto, $rutasNuevas, $opcion);
+        }
+
+        $sqlHay = "SELECT COUNT(*) AS total FROM sb_imagen_producto
+        WHERE id_producto = ? AND principal = 1;";
+        $stmt = $conexion->prepare($sqlHay);
+        $stmt->bind_param("i", $id_producto);
+        $stmt->execute();
+        $hayPrincipal = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        if ((int)$hayPrincipal['total'] === 0){ //SI entonces guardo la primera imagen como principal 1 (Si es 1 fue pq el aparecio en idRutasEliminar)
+            $sqlPrimera = "UPDATE sb_imagen_producto SET principal = 1
+            WHERE id_producto = ?
+            ORDER BY id_imagen_producto ASC
+            LIMIT 1;";
+
+            $stmt = $conexion->prepare($sqlPrimera);
+            $stmt->bind_param("i", $id_producto);
+
+            if (!$stmt->execute()) {
+                throw new RuntimeException('Error al asignar la principal: ' . $stmt->error);
+            }
+            $stmt->close();
+        }
+        return $rutas;
 }
