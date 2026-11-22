@@ -103,6 +103,8 @@ $pendientes_demo = [
     <link rel="stylesheet" href="<?= $base_url ?>assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="<?= $base_url ?>assets/css/admin-dashboard.css?v=1">
     <link rel="stylesheet" href="<?= $base_url ?>assets/css/moderador-dashboard.css?v=14">
+    <link rel="stylesheet" href="<?= $base_url ?>assets/css/theme.css?v=11">
+    <script src="<?= $base_url ?>assets/js/theme-toggle.js?v=1"></script>
 </head>
 
 <body class="admin-body">
@@ -114,13 +116,13 @@ $pendientes_demo = [
                 <i class="fa-solid fa-bars"></i>
             </button>
             <a href="<?= $base_url ?>index.php" class="adm-brand-link d-flex align-items-center gap-2 text-decoration-none" title="Volver al sitio principal" style="font-family: 'Raleway', sans-serif;">
-                <i class="fa-solid fa-gavel" style="font-size: 1.45rem; line-height: 1; color: #62803f;" aria-hidden="true"></i>
+                <i class="fa-solid fa-gavel mod-brand-icon" style="font-size: 1.45rem; line-height: 1; color: #62803f;" aria-hidden="true"></i>
                 <span class="d-flex flex-column" style="line-height: 1;">
                     <span class="d-flex align-items-baseline gap-1">
-                        <span class="fw-bold" style="font-size: 1.55rem; line-height: 1; color: #c9c9c9; font-family: 'Raleway', sans-serif;">Gavel</span>
-                        <span class="fw-bold" style="font-size: 1.25rem; line-height: 1; color: #62803f; font-family: 'Raleway', sans-serif;">.net</span>
+                        <span class="fw-bold mod-brand-name" style="font-size: 1.55rem; line-height: 1; color: #c9c9c9; font-family: 'Raleway', sans-serif;">Gavel</span>
+                        <span class="fw-bold mod-brand-tld" style="font-size: 1.25rem; line-height: 1; color: #62803f; font-family: 'Raleway', sans-serif;">.net</span>
                     </span>
-                    <span style="font-family: 'Open Sans', sans-serif; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #7c8575; margin-top: 3px;">Moderación</span>
+                    <span class="mod-brand-sub" style="font-family: 'Open Sans', sans-serif; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #7c8575; margin-top: 3px;">Moderación</span>
                 </span>
             </a>
         </div>
@@ -134,6 +136,11 @@ $pendientes_demo = [
         </div>
 
         <div class="adm-topbar-actions">
+            <!-- Conmutador de tema -->
+            <button type="button" class="btn-theme-toggle" data-theme-toggle aria-label="Cambiar a tema oscuro" title="Cambiar a tema oscuro" aria-pressed="true">
+                <i class="fas fa-moon" aria-hidden="true"></i>
+            </button>
+
             <!-- Notificaciones -->
             <div class="dropdown">
                 <button class="adm-icon-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notificaciones">
