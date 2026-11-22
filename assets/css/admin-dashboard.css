@@ -1,6 +1,4 @@
-/* ==========================================================================
-   Gavel.net — Panel de Administración (Diseño de Referencia)
-   ========================================================================== */
+/* Gavel.net — Panel de Administración (Solo archivo de referencia) */
 
 :root {
     --adm-bg: #080a07;
@@ -78,9 +76,7 @@ h1, h2, h3, h4, h5, .adm-brand-text {
     background: #465339;
 }
 
-/* ==========================================================================
-   TOPBAR
-   ========================================================================== */
+/* TOPBAR */
 .adm-topbar {
     position: fixed;
     top: 0;
@@ -304,9 +300,7 @@ h1, h2, h3, h4, h5, .adm-brand-text {
     border-color: var(--adm-border-soft);
 }
 
-/* ==========================================================================
-   SIDEBAR
-   ========================================================================== */
+/* SIDEBAR */
 .adm-sidebar {
     position: fixed;
     top: var(--adm-topbar-h);
@@ -403,9 +397,7 @@ h1, h2, h3, h4, h5, .adm-brand-text {
     z-index: 1025;
 }
 
-/* ==========================================================================
-   MAIN CONTENT AREA
-   ========================================================================== */
+/* MAIN CONTENT AREA */
 .adm-main {
     margin-left: var(--adm-sidebar-w);
     padding: calc(var(--adm-topbar-h) + 26px) 32px 44px;
@@ -508,9 +500,7 @@ h1, h2, h3, h4, h5, .adm-brand-text {
     font-size: 0.78rem;
 }
 
-/* ==========================================================================
-   KPI CARDS
-   ========================================================================== */
+/* KPI CARDS */
 .adm-kpi-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -607,9 +597,7 @@ h1, h2, h3, h4, h5, .adm-brand-text {
     flex-shrink: 0;
 }
 
-/* ==========================================================================
-   PANELS / CARDS
-   ========================================================================== */
+/* PANELS / CARDS */
 .adm-panel {
     background-color: var(--adm-card);
     border: 1px solid var(--adm-border);
@@ -689,9 +677,7 @@ h1, h2, h3, h4, h5, .adm-brand-text {
     gap: 18px;
 }
 
-/* ==========================================================================
-   CHARTS (SVG)
-   ========================================================================== */
+/* CHARTS (SVG) */
 .adm-chart-wrap {
     position: relative;
     width: 100%;
@@ -764,9 +750,7 @@ h1, h2, h3, h4, h5, .adm-brand-text {
     flex-shrink: 0;
 }
 
-/* ==========================================================================
-   RECENT USERS & FEATURED AUCTIONS
-   ========================================================================== */
+/* RECENT USERS & FEATURED AUCTIONS */
 .adm-recent-list {
     display: flex;
     flex-direction: column;
@@ -882,9 +866,7 @@ h1, h2, h3, h4, h5, .adm-brand-text {
     margin-top: auto;
 }
 
-/* ==========================================================================
-   BADGES & STATUS
-   ========================================================================== */
+/* BADGES & STATUS */
 .adm-badge {
     display: inline-flex;
     align-items: center;
@@ -951,9 +933,7 @@ h1, h2, h3, h4, h5, .adm-brand-text {
     box-shadow: 0 0 8px rgba(217, 72, 72, 0.5);
 }
 
-/* ==========================================================================
-   TOOLBAR & DATA TABLES (USUARIOS / SUBASTAS)
-   ========================================================================== */
+/* TOOLBAR & DATA TABLES (USUARIOS / SUBASTAS) */
 .adm-toolbar {
     display: flex;
     align-items: center;
@@ -1203,9 +1183,7 @@ h1, h2, h3, h4, h5, .adm-brand-text {
     color: #10150b;
 }
 
-/* ==========================================================================
-   FINANZAS — TRANSACTIONS
-   ========================================================================== */
+/* FINANZAS — TRANSACTIONS */
 .adm-tx-list {
     display: flex;
     flex-direction: column;
@@ -1267,9 +1245,7 @@ h1, h2, h3, h4, h5, .adm-brand-text {
     margin-top: 2px;
 }
 
-/* ==========================================================================
-   CATEGORÍAS GRID (5 x 2)
-   ========================================================================== */
+/* CATEGORÍAS GRID (5 x 2) */
 .adm-cat-grid {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -1331,9 +1307,7 @@ h1, h2, h3, h4, h5, .adm-brand-text {
     color: var(--adm-text-muted);
 }
 
-/* ==========================================================================
-   PLACEHOLDER SECTIONS (REPORTES & CONFIGURACIÓN)
-   ========================================================================== */
+/* PLACEHOLDER SECTIONS (REPORTES & CONFIGURACIÓN) */
 .adm-placeholder-banner {
     background: linear-gradient(135deg, rgba(167, 204, 59, 0.08), rgba(22, 25, 19, 0.9));
     border: 1px dashed #3f4b32;
@@ -1412,9 +1386,7 @@ h1, h2, h3, h4, h5, .adm-brand-text {
     background-color: #ffffff;
 }
 
-/* ==========================================================================
-   MODALS & TOAST
-   ========================================================================== */
+/* MODALS & TOAST */
 .adm-modal .modal-content {
     background-color: #151912;
     border: 1px solid var(--adm-border);
@@ -1473,9 +1445,7 @@ h1, h2, h3, h4, h5, .adm-brand-text {
     color: var(--adm-accent);
 }
 
-/* ==========================================================================
-   RESPONSIVE BREAKPOINTS
-   ========================================================================== */
+/* RESPONSIVE BREAKPOINTS */
 @media (max-width: 1280px) {
     .adm-kpi-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
