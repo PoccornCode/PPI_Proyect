@@ -1,4 +1,5 @@
 /* Gavel.net — Panel de Administración (Solo archivo de referencia) */
+/*se me subio del local (no debia), no pinta nada*/
 
 :root {
     --adm-bg: #080a07;
@@ -56,7 +57,12 @@ body.admin-body {
     overflow-x: hidden;
 }
 
-h1, h2, h3, h4, h5, .adm-brand-text {
+h1,
+h2,
+h3,
+h4,
+h5,
+.adm-brand-text {
     font-family: 'Raleway', system-ui, -apple-system, sans-serif;
 }
 
@@ -65,13 +71,16 @@ h1, h2, h3, h4, h5, .adm-brand-text {
     width: 8px;
     height: 8px;
 }
+
 ::-webkit-scrollbar-track {
     background: #0d100b;
 }
+
 ::-webkit-scrollbar-thumb {
     background: #2f3827;
     border-radius: 999px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
     background: #465339;
 }
@@ -414,8 +423,15 @@ h1, h2, h3, h4, h5, .adm-brand-text {
 }
 
 @keyframes admFadeIn {
-    from { opacity: 0; transform: translateY(4px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Section Header */
@@ -1125,6 +1141,7 @@ h1, h2, h3, h4, h5, .adm-brand-text {
 .adm-action-btn--edit {
     color: #e2e6de;
 }
+
 .adm-action-btn--edit:hover {
     background-color: #262e20;
     color: var(--adm-accent);
@@ -1133,6 +1150,7 @@ h1, h2, h3, h4, h5, .adm-brand-text {
 .adm-action-btn--delete {
     color: #d94848;
 }
+
 .adm-action-btn--delete:hover {
     background-color: rgba(217, 72, 72, 0.14);
 }
@@ -1377,11 +1395,11 @@ h1, h2, h3, h4, h5, .adm-brand-text {
     transition: transform 0.2s ease;
 }
 
-.adm-switch input:checked + .adm-switch-slider {
+.adm-switch input:checked+.adm-switch-slider {
     background-color: var(--adm-accent-btn);
 }
 
-.adm-switch input:checked + .adm-switch-slider::before {
+.adm-switch input:checked+.adm-switch-slider::before {
     transform: translateX(20px);
     background-color: #ffffff;
 }
@@ -1450,12 +1468,14 @@ h1, h2, h3, h4, h5, .adm-brand-text {
     .adm-kpi-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
     .adm-cat-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 1024px) {
+
     .adm-charts-row,
     .adm-bottom-row,
     .adm-finance-row,
@@ -1471,22 +1491,28 @@ h1, h2, h3, h4, h5, .adm-brand-text {
         background-color: transparent;
         padding: 0 14px;
     }
+
     .adm-mobile-toggle {
         display: inline-flex;
     }
+
     .adm-sidebar {
         transform: translateX(-100%);
     }
+
     .adm-sidebar.open {
         transform: translateX(0);
     }
+
     .adm-sidebar-overlay.open {
         display: block;
     }
+
     .adm-main {
         margin-left: 0;
         padding: calc(var(--adm-topbar-h) + 20px) 18px 36px;
     }
+
     .adm-topbar-search {
         display: none;
     }
@@ -1496,9 +1522,11 @@ h1, h2, h3, h4, h5, .adm-brand-text {
     .adm-kpi-grid {
         grid-template-columns: 1fr;
     }
+
     .adm-featured-grid {
         grid-template-columns: 1fr;
     }
+
     .adm-cat-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
