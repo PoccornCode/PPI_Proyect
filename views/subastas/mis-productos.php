@@ -8,6 +8,7 @@ require_once __DIR__ . '/../../config/conexion.php';
 require_once __DIR__ . '/../../dao/ProductoDAO.php';
 
 if (!isset($_SESSION['id_usuario'])) {
+    $_SESSION['redirect_after_login'] = BASE_URL . 'views/subastas/mis-productos.php';
     $_SESSION['flash_toast'] = [
         'tipo' => 'warning',
         'titulo' => 'Acceso restringido',
@@ -89,11 +90,11 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                             <div class="producto-card">
                                 <div class="producto-img-wrapper">
                                     <img src="<?= $imgRuta ?>" alt="<?= htmlspecialchars($item['nombre']) ?>" onerror="this.onerror=null; this.src='<?= BASE_URL ?>assets/img/hero-img.jpg';">
-                                    <?php if (!empty($item['categoria'])): ?>
+                                    <?php /* if (!empty($item['categoria'])): ?>
                                         <span class="producto-badge-cat">
                                             <i class="fas fa-tag me-1"></i><?= htmlspecialchars($item['categoria']) ?>
                                         </span>
-                                    <?php endif; ?>
+                                    <?php endif; */ ?>
                                 </div>
 
                                 <div class="p-3 d-flex flex-column flex-grow-1">
@@ -129,20 +130,17 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                                         <?= htmlspecialchars($item['descripcion']) ?>
                                     </p>
 
-                                    <div class="border-top border-dark pt-3 mt-auto">
-                                        <?php if (empty($estadoSubasta)): ?>
-                                            <button type="button" class="btn btn-crear-subasta w-100 d-inline-flex align-items-center justify-content-center gap-2" onclick="mostrarToast('info', 'Crear Subasta', 'La función para configurar las fechas y precio de subasta estará disponible próximamente.')">
-                                                <i class="fas fa-gavel"></i> Crear Subasta
+                                    <div class="d-flex gap-2 mt-2">
+                                        <a href="<?= BASE_URL ?>views/subastas/registro-producto.php?id=<?= (int)$item['id_producto'] ?>" class="btn btn-outline-publish btn-sm flex-grow-1">
+                                            <i class="fas fa-edit"></i> Modificar
+                                        </a>
+
+                                        <form action="<?= BASE_URL ?>controllers/ControllerProducto.php?id=<?= (int)$item['id_producto'] ?>" method="POST" class="flex-grow-1 form-eliminar">
+                                            <input type="hidden" name="opcion" value="eliminar">
+                                            <button type="submit" class="btn btn-danger btn-sm w-100">
+                                                <i class="fas fa-trash"></i> Eliminar
                                             </button>
-                                        <?php elseif (strtolower($estadoSubasta) === 'pendiente' || strtolower($estadoSubasta) === 'en revision'): ?>
-                                            <button type="button" class="btn btn-secondary btn-sm w-100 disabled" disabled>
-                                                <i class="fas fa-shield-alt me-1"></i> En revisión por moderador
-                                            </button>
-                                        <?php else: ?>
-                                            <a href="<?= BASE_URL ?>index.php" class="btn btn-secondary btn-sm w-100">
-                                                <i class="fas fa-external-link-alt me-1"></i> Ver Subasta
-                                            </a>
-                                        <?php endif; ?>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -158,6 +156,7 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>assets/js/toast-ppi.js?v=2"></script>
+    <script src="<?= BASE_URL ?>assets/js/mis-productos.js?v=1"></script>
 
     <?php if (isset($_SESSION['flash_toast'])): ?>
         <?php

@@ -1,8 +1,6 @@
-/**
- * Gestor de Consentimiento de Cookies - Gavel.net
- * Almacena la elección en localStorage para evitar reaparición molesta
- * y permite volver a abrir el banner si el usuario desea cambiar su preferencia.
- */
+/*Gestor de Consentimiento de Cookies - Gavel.net 
+almacena la elección en localStorage para evitar reaparición molesta
+y permite volver a abrir el banner si el usuario desea cambiar su preferencia.*/
 (function () {
     'use strict';
 

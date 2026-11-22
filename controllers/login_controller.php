@@ -32,9 +32,16 @@ if ($opcion === "login") {
         $_SESSION['apellido'] = $u['apellido'];
         $_SESSION['username'] = $u['username'];
         $_SESSION['id_rol'] = $u['id_rol'];
+        $_SESSION['last_activity'] = time();
 
-        // Redirige a la raíz del proyecto (auto-detectada)
-        $redirect = BASE_URL . "index.php";
+        if (!empty($_SESSION['redirect_after_login'])) {
+            $redirect = $_SESSION['redirect_after_login'];
+            unset($_SESSION['redirect_after_login']);
+        } else {
+            $redirect = BASE_URL . "index.php";
+        }
+
+        // Redirige a la raíz del proyecto;
         if (!empty($redirect_param)) {
             if (strpos($redirect_param, 'http://') === false && strpos($redirect_param, 'https://') === false) {
                 $redirect = (strpos($redirect_param, BASE_URL) === 0) ? $redirect_param : BASE_URL . ltrim($redirect_param, '/');
