@@ -66,9 +66,17 @@ function inicializarDropzone() {
 
     dropzone.addEventListener("click", () => inputImagenes.click());
     inputImagenes.addEventListener("change", function (event) {
-        const nuevos = Array.from(event.target.files).filter(f => f.type.startsWith("image/"));
+        const permitidos = ["image/jpeg", "image/png", "image/webp"];
+        const elegidos = Array.from(event.target.files);
+        const nuevos = elegidos.filter(f => permitidos.includes(f.type));
+
+        if (nuevos.length < elegidos.length) {
+            mostrarModal("warning", "Formato no válido", "Solo se permiten imágenes JPG, PNG o WEBP.");
+        }
+
         imagenesNuevas.push(...nuevos);
         inputImagenes.value = "";
+
         if (imagenesNuevas.length > 0) dropzone.style.borderColor = "#23271f";
         renderNuevas();
     });
@@ -242,6 +250,7 @@ document.addEventListener("DOMContentLoaded", function () {
     btnGuardar = document.getElementById("btnGuardar");
     textoBotonOriginal = btnGuardar.textContent.trim();
     esEdicion = textoBotonOriginal === "Modificar";
+    const dropzone = document.getElementById("dropzoneImagenes");
 
     inputNombre = document.getElementById("nombre");
     selectCategoria = document.getElementById("id_categoria");
@@ -281,6 +290,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         enviando = true;
         btnGuardar.disabled = true;
+        inputImagenes.disabled = true;
+        dropzone.style.pointerEvents = "none";
+        dropzone.style.opacity = "0.5";
 
         try {
             const datosForm = new FormData(form);
@@ -297,6 +309,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             btnGuardar.disabled = true;
             btnGuardar.textContent = "Procesando...";
+            inputImagenes.disabled = true;
+            dropzone.style.pointerEvents = "none";
+            dropzone.style.opacity = "0.5";
 
             const respuesta = await fetch(urlEnvio, { method: "POST", body: datosForm });
 
@@ -315,15 +330,27 @@ document.addEventListener("DOMContentLoaded", function () {
                 }, 1200);
                 return;
             } else {
+                enviando = false;
                 mostrarModal("error", (esEdicion ? "No se pudo modificar" : "No se pudo guardar"), resultado.mensaje);
                 btnGuardar.disabled = false;
                 btnGuardar.textContent = textoBotonOriginal;
+                inputImagenes.disabled = false;
+                dropzone.style.pointerEvents = "";
+                dropzone.style.opacity = "";
+                if (resultado.errorImagen) {
+                    imagenesNuevas = [];
+                    renderNuevas();
+                }
             }
         } catch (error) {
             console.error(error);
             mostrarModal("error", "Error de conexión", "No se pudo completar la operación. Intenta de nuevo.");
+            enviando = false;
             btnGuardar.disabled = false;
             btnGuardar.textContent = textoBotonOriginal;
+            inputImagenes.disabled = false;
+            dropzone.style.pointerEvents = "";
+            dropzone.style.opacity = "";
         }
     });
 });

@@ -131,7 +131,7 @@
             $rutasNuevas = subirImagenes($imagenes);
         } catch (Throwable $e) {
             error_log($e->getMessage());
-            echo json_encode(['estado' => false, 'mensaje' => $e->getMessage()]);
+            echo json_encode(['estado' => false, 'mensaje' => $e->getMessage(), 'errorImagen'=>true]);
             exit;
         }
         $resultado=modificarProducto($conexion, $id_producto, $nombre, $descripcion, $condicion, $id_categoria, 
