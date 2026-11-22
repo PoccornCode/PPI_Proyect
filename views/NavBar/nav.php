@@ -18,17 +18,20 @@ $categorias_nav = obtenerCategoriasPopularesNav(6);
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Raleway:wght@600;700;800&display=swap" rel="stylesheet">
-<link href="<?php echo $base_url; ?>assets/css/main.css?v=41" rel="stylesheet">
-<link href="<?php echo $base_url; ?>assets/css/theme.css?v=10" rel="stylesheet">
+<link href="<?php echo $base_url; ?>assets/css/main.css?v=43" rel="stylesheet">
+<link href="<?php echo $base_url; ?>assets/css/theme.css?v=11" rel="stylesheet">
 <script src="<?php echo $base_url; ?>assets/js/theme-toggle.js?v=1"></script>
 
 <header class="sticky-top navbar-ppi-wrapper">
     <nav class="navbar navbar-expand-xl py-2 py-lg-3" style="background-color: transparent !important;">
         <div class="container-fluid px-3 px-lg-5">
 
-            <a href="<?php echo $base_url; ?>index.php" class="navbar-brand d-flex align-items-baseline gap-1 gavel-brand py-0 me-3 me-xl-4">
-                <span class="brand-name text-main-ppi fw-bold" style="font-size: 1.85rem; line-height: 1; font-family: 'Raleway', sans-serif;">Gavel</span>
-                <span class="brand-tld text-third-ppi fw-bold" style="font-size: 1.45rem; line-height: 1; font-family: 'Raleway', sans-serif;">.net</span>
+            <a href="<?php echo $base_url; ?>index.php" class="navbar-brand d-flex align-items-center gap-2 gavel-brand py-0 me-3 me-xl-4">
+                <i class="fas fa-gavel brand-icon text-third-ppi" style="font-size: 1.55rem; line-height: 1;" aria-hidden="true"></i>
+                <span class="d-flex align-items-baseline gap-1">
+                    <span class="brand-name text-main-ppi fw-bold" style="font-size: 1.85rem; line-height: 1; font-family: 'Raleway', sans-serif;">Gavel</span>
+                    <span class="brand-tld text-third-ppi fw-bold" style="font-size: 1.45rem; line-height: 1; font-family: 'Raleway', sans-serif;">.net</span>
+                </span>
             </a>
 
             <button class="navbar-toggler border-0 p-2 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,9 +86,15 @@ $categorias_nav = obtenerCategoriasPopularesNav(6);
                         <i class="fas fa-plus me-1 small"></i>Publicar producto
                     </a>
                     <?php if ($usuario_logueado): ?>
+                        <?php
+                        $nav_primer_nombre = trim(explode(' ', trim($_SESSION['nombre'] ?? 'Usuario'))[0]);
+                        $nav_inicial = strtoupper(mb_substr($nav_primer_nombre !== '' ? $nav_primer_nombre : 'U', 0, 1, 'UTF-8'));
+                        ?>
                         <div class="dropdown">
-                            <button class="btn-nav-profile d-inline-flex align-items-center justify-content-center border-0" type="button" id="dropdownPerfil" data-bs-toggle="dropdown" aria-expanded="false" title="Mi Cuenta" aria-label="Menú de cuenta de usuario">
-                                <i class="fas fa-user-circle"></i>
+                            <button class="btn-nav-profile-pill d-inline-flex align-items-center border-0" type="button" id="dropdownPerfil" data-bs-toggle="dropdown" aria-expanded="false" title="Mi Cuenta" aria-label="Menú de cuenta de usuario">
+                                <span class="nav-avatar-circle"><?= htmlspecialchars($nav_inicial) ?></span>
+                                <span class="nav-profile-name"><?= htmlspecialchars($nav_primer_nombre) ?></span>
+                                <i class="fas fa-chevron-down nav-profile-caret"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end menu-perfil-ppi" aria-labelledby="dropdownPerfil">
                                 <li class="menu-perfil-header">
@@ -135,20 +144,23 @@ $categorias_nav = obtenerCategoriasPopularesNav(6);
 <?php if ($usuario_logueado): ?>
     <div class="modal fade" id="modalConfirmLogout" tabindex="-1" aria-labelledby="modalConfirmLogoutLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
-            <div class="modal-content modal-content-ppi">
-                <div class="modal-header modal-header-ppi d-flex align-items-center justify-content-between">
-                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2 m-0" id="modalConfirmLogoutLabel">
-                        <i class="fas fa-sign-out-alt text-warning fs-5"></i>
-                        <span>Cerrar Sesión</span>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-white m-0" id="modalConfirmLogoutLabel">
+                        Cerrar sesión
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-                <div class="modal-body py-3">
-                    <p class="mb-0 text-second-ppi">¿Estás seguro de que deseas salir de tu cuenta de <strong>Gavel.net</strong>?</p>
+                <div class="modal-body py-2">
+                    <p class="mb-0" style="color: #d6ddd0; font-size: 0.93rem; line-height: 1.55;">
+                        ¿Estás seguro de que deseas salir de tu cuenta de <strong class="text-white">Gavel.net</strong>?
+                    </p>
                 </div>
-                <div class="modal-footer modal-footer-ppi d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-outline-secondary btn-sm px-3 py-2 fw-semibold" data-bs-dismiss="modal">Cancelar</button>
-                    <a href="<?php echo $base_url; ?>controllers/logout.php" class="btn btn-danger-salmon btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2">
+                <div class="modal-footer justify-content-end gap-2">
+                    <button type="button" class="btn-logout-modal btn-logout-cancel" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <a href="<?php echo $base_url; ?>controllers/logout.php" class="btn-logout-modal btn-logout-confirm text-decoration-none">
                         <i class="fas fa-sign-out-alt"></i> Sí, cerrar sesión
                     </a>
                 </div>
