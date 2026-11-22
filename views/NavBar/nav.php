@@ -7,6 +7,8 @@ $base_url = BASE_URL;
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+require_once dirname(__DIR__, 2) . '/helpers/sesion_inactividad.php';
+verificarInactividadSesion();
 $usuario_logueado = isset($_SESSION['id_usuario']);
 $url_perfil = $usuario_logueado ? ($base_url . "views/perfil.php") : ($base_url . "views/auth/login.php");
 

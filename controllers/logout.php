@@ -22,5 +22,11 @@ if (ini_get("session.use_cookies")) {
 
 session_destroy();
 
+$reason = $_GET['reason'] ?? '';
+if ($reason === 'inactivity') {
+    header("Location: " . BASE_URL . "views/auth/login.php?reason=inactivity");
+    exit;
+}
+
 header("Location: " . BASE_URL . "index.php");
 exit;

@@ -28,7 +28,7 @@ if (!empty($_SESSION['id_usuario'])) {
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/main.css?v=30" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/forms.css?v=41" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/forms.css?v=42" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -61,6 +61,17 @@ if (!empty($_SESSION['id_usuario'])) {
                     <div class="card auth-card shadow p-4 p-md-5">
                         <h3 class="mb-2 text-center text-main-ppi fw-bold">Iniciar sesión</h3>
                         <p class="mb-4 text-center text-second-ppi fs-6">Ingresa tus credenciales para continuar</p>
+
+                        <?php if (($_GET['reason'] ?? '') === 'inactivity'): ?>
+                            <div class="auth-session-notice mb-4" id="authSessionNotice" role="alert">
+                                <i class="fas fa-clock auth-session-notice-icon"></i>
+                                <div>
+                                    <div class="fw-semibold text-white mb-1">Sesión cerrada por inactividad</div>
+                                    <div>Tu sesión expiró automáticamente por seguridad. Inicia sesión nuevamente para continuar.</div>
+                                </div>
+                                <button type="button" class="auth-session-notice-close" aria-label="Cerrar aviso" onclick="document.getElementById('authSessionNotice').remove()">&times;</button>
+                            </div>
+                        <?php endif; ?>
 
                         <form id="formLogin" name="formLogin" method="POST" action="<?= BASE_URL ?>controllers/login_controller.php" autocomplete="off">
                             <input type="hidden" name="redirect" id="redirect" value="<?= htmlspecialchars($_GET['redirect'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
@@ -140,6 +151,14 @@ if (!empty($_SESSION['id_usuario'])) {
         <script>
             document.addEventListener("DOMContentLoaded", function() {
                 mostrarToast("success", "Contraseña Actualizada", "Tu contraseña se restableció correctamente. Inicia sesión con tu nueva clave.");
+                window.history.replaceState({}, document.title, window.location.pathname);
+            });
+        </script>
+    <?php endif; ?>
+    <?php if (($_GET['reason'] ?? '') === 'inactivity'): ?>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                mostrarToast("warning", "Sesión expirada", "Tu sesión se cerró automáticamente por inactividad. Inicia sesión nuevamente para continuar.", 6000);
                 window.history.replaceState({}, document.title, window.location.pathname);
             });
         </script>

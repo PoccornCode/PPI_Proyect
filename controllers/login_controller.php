@@ -32,6 +32,7 @@ if ($opcion === "login") {
         $_SESSION['apellido'] = $u['apellido'];
         $_SESSION['username'] = $u['username'];
         $_SESSION['id_rol'] = $u['id_rol'];
+        $_SESSION['last_activity'] = time();
 
         if (!empty($_SESSION['redirect_after_login'])) {
             $redirect = $_SESSION['redirect_after_login'];
@@ -40,7 +41,7 @@ if ($opcion === "login") {
             $redirect = BASE_URL . "index.php";
         }
 
-        // Redirige a la raíz del proyecto (auto-detectada);
+        // Redirige a la raíz del proyecto;
         if (!empty($redirect_param)) {
             if (strpos($redirect_param, 'http://') === false && strpos($redirect_param, 'https://') === false) {
                 $redirect = (strpos($redirect_param, BASE_URL) === 0) ? $redirect_param : BASE_URL . ltrim($redirect_param, '/');
@@ -76,4 +77,3 @@ echo json_encode([
     "mensaje" => "Opción no válida o no especificada."
 ]);
 exit;
-
