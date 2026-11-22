@@ -77,12 +77,6 @@ function inicializarDropzone() {
         imagenesNuevas.push(...nuevos);
         inputImagenes.value = "";
 
-        const ultima = imagenesNuevas[imagenesNuevas.length - 1];
-        if (ultima && !permitidos.includes(ultima.type)) {
-            imagenesNuevas.pop();
-            mostrarModal("warning", "Formato no válido", "Solo se permiten imágenes JPG, PNG o WEBP.");
-        }
-
         if (imagenesNuevas.length > 0) dropzone.style.borderColor = "#23271f";
         renderNuevas();
     });
@@ -343,6 +337,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 inputImagenes.disabled = false;
                 dropzone.style.pointerEvents = "";
                 dropzone.style.opacity = "";
+                if (resultado.errorImagen) {
+                    imagenesNuevas = [];
+                    renderNuevas();
+                }
             }
         } catch (error) {
             console.error(error);
@@ -353,10 +351,6 @@ document.addEventListener("DOMContentLoaded", function () {
             inputImagenes.disabled = false;
             dropzone.style.pointerEvents = "";
             dropzone.style.opacity = "";
-            if (resultado.errorImagen) {
-                imagenesNuevas = [];
-                renderNuevas();
-            }
         }
     });
 });

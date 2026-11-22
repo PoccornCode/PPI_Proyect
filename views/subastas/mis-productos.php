@@ -90,11 +90,11 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                             <div class="producto-card">
                                 <div class="producto-img-wrapper">
                                     <img src="<?= $imgRuta ?>" alt="<?= htmlspecialchars($item['nombre']) ?>" onerror="this.onerror=null; this.src='<?= BASE_URL ?>assets/img/hero-img.jpg';">
-                                    <?php/* if (!empty($item['categoria'])): */?>
-                                        <!--<span class="producto-badge-cat">
+                                    <?php /* if (!empty($item['categoria'])): ?>
+                                        <span class="producto-badge-cat">
                                             <i class="fas fa-tag me-1"></i><?= htmlspecialchars($item['categoria']) ?>
-                                        </span> -->
-                                    <?/*php endif; */?>
+                                        </span>
+                                    <?php endif; */ ?>
                                 </div>
 
                                 <div class="p-3 d-flex flex-column flex-grow-1">
