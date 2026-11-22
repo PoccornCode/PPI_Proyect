@@ -28,8 +28,8 @@ require_once dirname(__DIR__) . '/helpers/sesion_inactividad.php';
                         01:00
                     </span>
                 </div>
-                <div class="progress" style="height: 6px; background-color: rgba(255, 255, 255, 0.12);">
-                    <div id="sessionTimeoutProgress" class="progress-bar" role="progressbar" style="width: 100%; background-color: #658807;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="progress session-timeout-progress">
+                    <div id="sessionTimeoutProgress" class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <p class="small text-muted mt-3 mb-0">
                     Haz clic en <strong>Extender sesión</strong> si deseas continuar conectado.

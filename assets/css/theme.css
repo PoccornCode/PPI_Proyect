@@ -725,6 +725,29 @@
     color: var(--gavel-text-second);
 }
 
+:root[data-theme="light"] .auth-session-notice {
+    background-color: var(--gavel-surface-alt);
+    border-color: var(--gavel-border);
+    border-left-color: var(--gavel-accent-bright);
+    color: var(--gavel-text-second);
+}
+
+:root[data-theme="light"] .auth-session-notice .text-white {
+    color: var(--gavel-text-main) !important;
+}
+
+:root[data-theme="light"] .auth-session-notice .auth-session-notice-icon {
+    color: var(--gavel-accent);
+}
+
+:root[data-theme="light"] .auth-session-notice .auth-session-notice-close {
+    color: var(--gavel-text-muted);
+}
+
+:root[data-theme="light"] .auth-session-notice .auth-session-notice-close:hover {
+    color: var(--gavel-text-main);
+}
+
 /* Modales, SweetAlert2, Toasts y Overlay de carga */
 :root[data-theme="light"] .modal-content-ppi {
     background-color: var(--gavel-surface) !important;
@@ -745,6 +768,23 @@
 :root[data-theme="light"] .modal-content-ppi .modal-body,
 :root[data-theme="light"] .modal-body {
     color: var(--gavel-text-second) !important;
+}
+
+.session-timeout-progress {
+    height: 6px;
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.session-timeout-progress .progress-bar {
+    background-color: #658807;
+}
+
+:root[data-theme="light"] .session-timeout-progress {
+    background-color: var(--gavel-border);
+}
+
+:root[data-theme="light"] .session-timeout-progress .progress-bar {
+    background-color: var(--gavel-accent-bright);
 }
 
 :root[data-theme="light"] div:where(.swal2-container).swal2-backdrop-show,
