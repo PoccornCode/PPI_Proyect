@@ -1,8 +1,15 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 if (!defined('BASE_URL')) {
     require_once dirname(__DIR__, 2) . '/config/env.php';
 }
 $base_url = BASE_URL;
+
+$mod_nombre_completo = trim(($_SESSION['nombre'] ?? 'Mod') . ' ' . ($_SESSION['apellido'] ?? 'Gavel'));
+$mod_username = $_SESSION['username'] ?? 'moderador';
+$mod_inicial = strtoupper(mb_substr($mod_nombre_completo, 0, 1, 'UTF-8'));
 
 // Datos de referencia visual (mockup del panel de Moderador)
 $pendientes_demo = [
@@ -16,18 +23,28 @@ $pendientes_demo = [
         'precio'    => '$350.00',
         'estado'    => 'Pendiente',
         'img'       => $base_url . 'assets/img/cat-tecnologia.jpg',
+        'imagenes'  => [
+            $base_url . 'assets/img/cat-tecnologia.jpg',
+            $base_url . 'assets/img/features-technology.jpg',
+            $base_url . 'assets/img/news-1.jpg',
+            $base_url . 'assets/img/news-2.jpg',
+        ],
         'detalle'   => 'Incluye lente 18-55mm, batería original, cargador y correa. Sin rayones en el sensor.',
     ],
     [
         'id'        => 'SUB-205',
         'titulo'    => 'Reloj Vintage Automático 1970',
-        'condicion' => 'Usado',
+        'condicion' => 'Buen estado',
         'fotos'     => 2,
         'categoria' => 'Joyería',
         'vendedor'  => '@coleccionista_sv',
         'precio'    => '$120.00',
         'estado'    => 'Pendiente',
         'img'       => $base_url . 'assets/img/cat-joyeria.jpg',
+        'imagenes'  => [
+            $base_url . 'assets/img/cat-joyeria.jpg',
+            $base_url . 'assets/img/features-fashion.jpg',
+        ],
         'detalle'   => 'Movimiento mecánico automático funcional, caja de acero de 36mm con desgaste leve propio de la época.',
     ],
     [
@@ -40,6 +57,13 @@ $pendientes_demo = [
         'precio'    => '$165.00',
         'estado'    => 'Pendiente',
         'img'       => $base_url . 'assets/img/cat-instrumentos.jpg',
+        'imagenes'  => [
+            $base_url . 'assets/img/cat-instrumentos.jpg',
+            $base_url . 'assets/img/lifestyle-1.jpg',
+            $base_url . 'assets/img/lifestyle-2.jpg',
+            $base_url . 'assets/img/news-3.jpg',
+            $base_url . 'assets/img/news-4.jpg',
+        ],
         'detalle'   => 'Tapa de abeto macizo con estuche rígido incluido. Cuerdas recién cambiadas.',
     ],
     [
@@ -52,37 +76,21 @@ $pendientes_demo = [
         'precio'    => '$140.00',
         'estado'    => 'Pendiente',
         'img'       => $base_url . 'assets/img/cat-coleccionables.jpg',
+        'imagenes'  => [
+            $base_url . 'assets/img/cat-coleccionables.jpg',
+            $base_url . 'assets/img/cat-arte.jpg',
+            $base_url . 'assets/img/cat-hogar.jpg',
+            $base_url . 'assets/img/news-5.jpg',
+            $base_url . 'assets/img/news-6.jpg',
+            $base_url . 'assets/img/news-7.jpg',
+        ],
         'detalle'   => 'Lote de 18 monedas históricas de plata y cobre en álbum protector certificado.',
-    ],
-];
-
-$reportes_demo = [
-    [
-        'id'          => '#REP-104',
-        'motivo'      => 'Posible Réplica / Falsificación',
-        'motivo_tipo' => 'danger',
-        'subasta'     => 'Tarjeta Gráfica RTX 4090 ($80 base)',
-        'reporto'     => '@gamer_pro',
-        'fecha'       => 'Hace 2h',
-        'estado'      => 'Activo',
-        'tipo_accion' => 'replica',
-        'detalle'     => 'El usuario señala que el precio base ($80) es sospechosamente bajo y las fotos no muestran el número de serie.',
-    ],
-    [
-        'id'          => '#REP-102',
-        'motivo'      => 'Ganador no realiza pago',
-        'motivo_tipo' => 'warning',
-        'subasta'     => 'Lote Monedas Antiguas',
-        'reporto'     => '@antiguedades_sv',
-        'fecha'       => 'Ayer',
-        'estado'      => 'Activo',
-        'tipo_accion' => 'impago',
-        'detalle'     => 'Han transcurrido 48 horas desde el cierre de la subasta sin confirmación de pago por parte del postor ganador.',
     ],
 ];
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -94,110 +102,9 @@ $reportes_demo = [
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="<?= $base_url ?>assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="<?= $base_url ?>assets/css/admin-dashboard.css?v=1">
-    <style>
-        .mod-sub-meta {
-            font-size: 0.78rem;
-            color: var(--adm-text-muted);
-            margin-top: 2px;
-        }
-
-        .mod-cat-pill {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px 12px;
-            border-radius: 999px;
-            font-size: 0.78rem;
-            font-weight: 600;
-            background-color: #1f251a;
-            color: #d6ddd0;
-            border: 1px solid var(--adm-border);
-        }
-
-        .mod-badge-danger {
-            background-color: rgba(217, 72, 72, 0.2);
-            color: #ff8e8e;
-            border: 1px solid rgba(217, 72, 72, 0.45);
-        }
-
-        .mod-badge-warning {
-            background-color: rgba(200, 196, 94, 0.2);
-            color: #ebe67a;
-            border: 1px solid rgba(200, 196, 94, 0.45);
-        }
-
-        .mod-btn-sm {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            height: 32px;
-            padding: 0 12px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            border: 1px solid transparent;
-            cursor: pointer;
-            transition: background-color 0.15s ease, transform 0.12s ease, border-color 0.15s ease;
-            white-space: nowrap;
-        }
-
-        .mod-btn-sm:active {
-            transform: scale(0.98);
-        }
-
-        .mod-btn-approve {
-            background-color: rgba(146, 200, 62, 0.18);
-            color: #b9de4b;
-            border-color: rgba(146, 200, 62, 0.45);
-        }
-        .mod-btn-approve:hover {
-            background-color: rgba(146, 200, 62, 0.3);
-        }
-
-        .mod-btn-reject {
-            background-color: rgba(217, 72, 72, 0.16);
-            color: #ff8b8b;
-            border-color: rgba(217, 72, 72, 0.4);
-        }
-        .mod-btn-reject:hover {
-            background-color: rgba(217, 72, 72, 0.28);
-        }
-
-        .mod-btn-pause {
-            background-color: rgba(200, 196, 94, 0.2);
-            color: #f0ea7d;
-            border-color: rgba(200, 196, 94, 0.45);
-        }
-        .mod-btn-pause:hover {
-            background-color: rgba(200, 196, 94, 0.32);
-        }
-
-        .mod-btn-info {
-            background-color: rgba(76, 145, 163, 0.2);
-            color: #82d7ed;
-            border-color: rgba(76, 145, 163, 0.45);
-        }
-        .mod-btn-info:hover {
-            background-color: rgba(76, 145, 163, 0.32);
-        }
-
-        .mod-btn-outline {
-            background-color: #1a1f16;
-            color: #d8ded3;
-            border-color: var(--adm-border);
-        }
-        .mod-btn-outline:hover {
-            background-color: #252c1f;
-            color: #ffffff;
-        }
-
-        .mod-summary-pills {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-    </style>
+    <link rel="stylesheet" href="<?= $base_url ?>assets/css/moderador-dashboard.css?v=14">
 </head>
+
 <body class="admin-body">
 
     <!-- TOPBAR -->
@@ -206,9 +113,15 @@ $reportes_demo = [
             <button type="button" class="adm-mobile-toggle" id="admMobileToggle" aria-label="Abrir menú lateral">
                 <i class="fa-solid fa-bars"></i>
             </button>
-            <a href="<?= $base_url ?>index.php" class="adm-brand-link" title="Volver al sitio principal">
-                <i class="fa-solid fa-gavel adm-brand-icon"></i>
-                <span class="adm-brand-text">Gavel<span>.net</span></span>
+            <a href="<?= $base_url ?>index.php" class="adm-brand-link d-flex align-items-center gap-2 text-decoration-none" title="Volver al sitio principal" style="font-family: 'Raleway', sans-serif;">
+                <i class="fa-solid fa-gavel" style="font-size: 1.45rem; line-height: 1; color: #62803f;" aria-hidden="true"></i>
+                <span class="d-flex flex-column" style="line-height: 1;">
+                    <span class="d-flex align-items-baseline gap-1">
+                        <span class="fw-bold" style="font-size: 1.55rem; line-height: 1; color: #c9c9c9; font-family: 'Raleway', sans-serif;">Gavel</span>
+                        <span class="fw-bold" style="font-size: 1.25rem; line-height: 1; color: #62803f; font-family: 'Raleway', sans-serif;">.net</span>
+                    </span>
+                    <span style="font-family: 'Open Sans', sans-serif; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #7c8575; margin-top: 3px;">Moderación</span>
+                </span>
             </a>
         </div>
 
@@ -216,7 +129,7 @@ $reportes_demo = [
             <div class="adm-search-box">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <span class="adm-search-divider" aria-hidden="true"></span>
-                <input type="search" id="modGlobalSearch" placeholder="Buscar subastas pendientes o reportes..." aria-label="Buscar subastas o reportes">
+                <input type="search" id="modGlobalSearch" placeholder="Buscar subastas pendientes..." aria-label="Buscar subastas pendientes">
             </div>
         </div>
 
@@ -225,12 +138,12 @@ $reportes_demo = [
             <div class="dropdown">
                 <button class="adm-icon-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notificaciones">
                     <i class="fa-regular fa-bell"></i>
-                    <span class="adm-notif-badge" id="modNotifCount">2</span>
+                    <span class="adm-notif-badge" id="modNotifCount">1</span>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end adm-dropdown-menu">
                     <div class="px-2 py-1 d-flex justify-content-between align-items-center">
                         <strong class="text-white small">Alertas de Moderación</strong>
-                        <span class="badge rounded-pill" style="background:#2d3624; color:#a7cc3b;">2 activas</span>
+                        <span class="badge rounded-pill" style="background:#2d3624; color:var(--adm-accent);">1 activa</span>
                     </div>
                     <hr class="dropdown-divider my-1">
                     <button type="button" class="dropdown-item" data-mod-tab="aprobar">
@@ -240,29 +153,26 @@ $reportes_demo = [
                             <div style="font-size:0.74rem; color:#9aa392;">Cola de aprobación</div>
                         </div>
                     </button>
-                    <button type="button" class="dropdown-item" data-mod-tab="reportes">
-                        <i class="fa-solid fa-flag" style="color:#e29ca5;"></i>
-                        <div>
-                            <div class="small text-white"><?= count($reportes_demo) ?> reportes activos</div>
-                            <div style="font-size:0.74rem; color:#9aa392;">Requieren resolución</div>
-                        </div>
-                    </button>
                 </div>
             </div>
 
             <!-- Perfil Moderador -->
             <div class="dropdown">
-                <button class="adm-profile-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <span class="adm-avatar-circle">M</span>
-                    <span class="fw-semibold d-none d-sm-inline">Moderador</span>
+                <button class="adm-profile-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menú de usuario">
+                    <span class="adm-avatar-circle"><?= htmlspecialchars($mod_inicial) ?></span>
+                    <span class="fw-semibold d-none d-sm-inline"><?= htmlspecialchars(explode(' ', $mod_nombre_completo)[0]) ?></span>
                     <i class="fa-solid fa-chevron-down" style="font-size:0.75rem; color:#9aa392;"></i>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end adm-dropdown-menu">
-                    <li class="px-2 py-1">
-                        <div class="small fw-bold text-white">Moderador</div>
-                        <div style="font-size:0.75rem; color:#9aa392;">Centro operativo</div>
+                <ul class="dropdown-menu dropdown-menu-end adm-dropdown-menu menu-perfil-ppi">
+                    <li class="menu-perfil-header">
+                        <div class="menu-perfil-name"><?= htmlspecialchars($mod_nombre_completo) ?></div>
+                        <div class="menu-perfil-user">@<?= htmlspecialchars($mod_username) ?> · Moderador</div>
                     </li>
-                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item" href="<?= $base_url ?>views/perfil.php">
+                            <i class="fa-solid fa-user"></i> Mi Perfil
+                        </a>
+                    </li>
                     <li>
                         <a class="dropdown-item" href="<?= $base_url ?>index.php">
                             <i class="fa-solid fa-arrow-up-right-from-square"></i> Ir al sitio público
@@ -273,43 +183,59 @@ $reportes_demo = [
                             <i class="fa-solid fa-crown"></i> Panel de Administración
                         </a>
                     </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <a class="dropdown-item item-logout" href="#" data-bs-toggle="modal" data-bs-target="#modalConfirmLogout">
+                            <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
     </header>
 
-    <!-- SIDEBAR (Solo 2 pestañas: Aprobar subastas y Reportes) -->
+    <!-- SIDEBAR -->
     <div class="adm-sidebar-overlay" id="admSidebarOverlay"></div>
     <aside class="adm-sidebar" id="admSidebar" aria-label="Navegación de moderación">
+        <div class="mod-sidebar-toggle-row">
+            <span class="mod-sidebar-label">Menú</span>
+            <button type="button" class="mod-collapse-btn" id="modSidebarCollapseBtn" title="Contraer menú" aria-label="Contraer menú" aria-expanded="true">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="16" rx="3"></rect>
+                    <line x1="9" y1="4" x2="9" y2="20"></line>
+                    <polyline class="mod-collapse-arrow" points="15 9 12 12 15 15"></polyline>
+                </svg>
+            </button>
+        </div>
         <nav>
             <ul class="adm-nav-list">
                 <li>
-                    <button type="button" class="adm-nav-btn active" data-mod-tab="aprobar">
+                    <button type="button" class="adm-nav-btn active" data-mod-tab="aprobar" title="Aprobar subastas">
                         <i class="fa-solid fa-clipboard-check"></i>
                         <span>Aprobar subastas</span>
-                    </button>
-                </li>
-                <li>
-                    <button type="button" class="adm-nav-btn" data-mod-tab="reportes">
-                        <i class="fa-solid fa-flag"></i>
-                        <span>Reportes</span>
                     </button>
                 </li>
             </ul>
         </nav>
 
-        <div class="adm-sidebar-greeting">
-            <strong>¡Hola, Moderador!</strong>
-            <span>Todo en orden por ahora.</span>
+        <div class="mod-sidebar-footer">
+            <a href="<?= $base_url ?>index.php" class="mod-sidebar-link" title="Ir al sitio público">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                <span>Sitio público</span>
+            </a>
+            <a href="#" class="mod-sidebar-link mod-sidebar-link--logout" data-bs-toggle="modal" data-bs-target="#modalConfirmLogout" title="Cerrar sesión">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Cerrar sesión</span>
+            </a>
         </div>
     </aside>
 
     <!-- MAIN CONTENT -->
     <main class="adm-main">
 
-        <!-- ===============================================================
-             SECCIÓN 1: APROBAR SUBASTAS (COLA DE PUBLICACIONES PENDIENTES)
-             =============================================================== -->
+        <!-- Sección principal: cola de publicaciones pendientes -->
         <section class="adm-section active" id="sec-aprobar">
             <div class="adm-section-head">
                 <div class="adm-title-group">
@@ -326,6 +252,55 @@ $reportes_demo = [
                 </div>
             </div>
             <hr class="adm-section-divider">
+
+            <!-- KPI Cards (Subastas activas y pendientes) -->
+            <div class="adm-kpi-grid mod-kpi-grid-2">
+                <article class="adm-kpi-card">
+                    <div class="adm-kpi-top">
+                        <div class="adm-kpi-icon"><i class="fa-solid fa-gavel"></i></div>
+                        <div>
+                            <div class="adm-kpi-value">67</div>
+                            <div class="adm-kpi-label">Subastas activas</div>
+                            <div class="adm-kpi-trend"><i class="fa-solid fa-angles-up"></i> +7%</div>
+                        </div>
+                    </div>
+                    <div class="adm-kpi-footer">
+                        <span class="adm-kpi-time"><i class="fa-regular fa-clock"></i> Viernes 20 nov., 16:01</span>
+                        <svg class="adm-sparkline" viewBox="0 0 68 36" aria-hidden="true">
+                            <rect x="2" y="26" width="6" height="10" fill="#4f5c3d" rx="1" />
+                            <rect x="11" y="22" width="6" height="14" fill="#5a6845" rx="1" />
+                            <rect x="20" y="20" width="6" height="16" fill="#5a6845" rx="1" />
+                            <rect x="29" y="17" width="6" height="19" fill="#65754d" rx="1" />
+                            <rect x="38" y="15" width="6" height="21" fill="#6f8054" rx="1" />
+                            <rect x="47" y="11" width="6" height="25" fill="#7a8d5c" rx="1" />
+                            <rect x="56" y="5" width="6" height="31" fill="#8fa769" rx="1" />
+                        </svg>
+                    </div>
+                </article>
+
+                <article class="adm-kpi-card">
+                    <div class="adm-kpi-top">
+                        <div class="adm-kpi-icon"><i class="fa-solid fa-stopwatch"></i></div>
+                        <div>
+                            <div class="adm-kpi-value">127</div>
+                            <div class="adm-kpi-label">Subastas pendientes</div>
+                            <div class="adm-kpi-trend"><i class="fa-solid fa-angles-up"></i> +5%</div>
+                        </div>
+                    </div>
+                    <div class="adm-kpi-footer">
+                        <span class="adm-kpi-time"><i class="fa-regular fa-clock"></i> Viernes 20 nov., 18:04</span>
+                        <svg class="adm-sparkline" viewBox="0 0 68 36" aria-hidden="true">
+                            <rect x="2" y="27" width="6" height="9" fill="#4f5c3d" rx="1" />
+                            <rect x="11" y="24" width="6" height="12" fill="#5a6845" rx="1" />
+                            <rect x="20" y="21" width="6" height="15" fill="#5a6845" rx="1" />
+                            <rect x="29" y="19" width="6" height="17" fill="#65754d" rx="1" />
+                            <rect x="38" y="14" width="6" height="22" fill="#6f8054" rx="1" />
+                            <rect x="47" y="9" width="6" height="27" fill="#7a8d5c" rx="1" />
+                            <rect x="56" y="4" width="6" height="32" fill="#8fa769" rx="1" />
+                        </svg>
+                    </div>
+                </article>
+            </div>
 
             <div class="adm-toolbar">
                 <div class="adm-toolbar-left">
@@ -346,9 +321,10 @@ $reportes_demo = [
 
             <div class="adm-table-card">
                 <div class="adm-table-responsive">
-                    <table class="adm-table">
+                    <table class="adm-table mod-table">
                         <thead>
                             <tr>
+                                <th class="mod-col-eye" aria-label="Ver detalle"></th>
                                 <th><i class="fa-solid fa-cube"></i> Artículo</th>
                                 <th>Categoría</th>
                                 <th>Vendedor</th>
@@ -364,8 +340,27 @@ $reportes_demo = [
                                     data-title="<?= htmlspecialchars($item['titulo']) ?>"
                                     data-vendor="<?= htmlspecialchars($item['vendedor']) ?>"
                                     data-category="<?= htmlspecialchars($item['categoria']) ?>"
-                                    data-status="Pendiente"
-                                >
+                                    data-status="Pendiente">
+                                    <td class="mod-col-eye">
+                                        <button
+                                            type="button"
+                                            class="adm-action-btn adm-action-btn--edit"
+                                            title="Ver detalle de la publicación"
+                                            data-mod-detail
+                                            data-detail-id="<?= htmlspecialchars($item['id']) ?>"
+                                            data-detail-title="<?= htmlspecialchars($item['titulo']) ?>"
+                                            data-detail-meta="<?= htmlspecialchars($item['categoria'] . ' · ' . $item['vendedor'] . ' · ' . $item['precio']) ?>"
+                                            data-detail-body="<?= htmlspecialchars($item['detalle']) ?>"
+                                            data-detail-specs="<?= htmlspecialchars(json_encode([
+                                                                    ['label' => 'Categoría', 'value' => $item['categoria']],
+                                                                    ['label' => 'Vendedor', 'value' => $item['vendedor']],
+                                                                    ['label' => 'Precio base', 'value' => $item['precio']],
+                                                                    ['label' => 'Condición', 'value' => $item['condicion'] . ' (' . (int)$item['fotos'] . ' fotos)'],
+                                                                ], JSON_UNESCAPED_UNICODE)) ?>"
+                                            data-detail-images="<?= htmlspecialchars(json_encode($item['imagenes'], JSON_UNESCAPED_SLASHES)) ?>">
+                                            <i class="fa-regular fa-eye"></i>
+                                        </button>
+                                    </td>
                                     <td>
                                         <div class="adm-cell-item">
                                             <div class="adm-item-thumb">
@@ -379,7 +374,7 @@ $reportes_demo = [
                                             </div>
                                         </div>
                                     </td>
-                                    <td><span class="mod-cat-pill"><?= htmlspecialchars($item['categoria']) ?></span></td>
+                                    <td><?= htmlspecialchars($item['categoria']) ?></td>
                                     <td><?= htmlspecialchars($item['vendedor']) ?></td>
                                     <td class="fw-semibold"><?= htmlspecialchars($item['precio']) ?></td>
                                     <td>
@@ -392,18 +387,6 @@ $reportes_demo = [
                                             </button>
                                             <button type="button" class="mod-btn-sm mod-btn-reject" data-mod-decision="rechazar" data-item="<?= htmlspecialchars($item['titulo']) ?>">
                                                 <i class="fa-solid fa-xmark"></i> Rechazar
-                                            </button>
-                                            <button
-                                                type="button"
-                                                class="adm-action-btn adm-action-btn--edit"
-                                                title="Ver detalle de la publicación"
-                                                data-mod-detail
-                                                data-detail-id="<?= htmlspecialchars($item['id']) ?>"
-                                                data-detail-title="<?= htmlspecialchars($item['titulo']) ?>"
-                                                data-detail-meta="<?= htmlspecialchars($item['categoria'] . ' · ' . $item['vendedor'] . ' · ' . $item['precio']) ?>"
-                                                data-detail-body="<?= htmlspecialchars($item['detalle']) ?>"
-                                            >
-                                                <i class="fa-regular fa-eye"></i>
                                             </button>
                                         </div>
                                     </td>
@@ -420,144 +403,14 @@ $reportes_demo = [
                 </div>
             </div>
         </section>
-
-        <!-- ===============================================================
-             SECCIÓN 2: REPORTES DE USUARIOS Y DISPUTAS
-             =============================================================== -->
-        <section class="adm-section" id="sec-reportes">
-            <div class="adm-section-head">
-                <div class="adm-title-group">
-                    <span class="adm-title-accent" aria-hidden="true"></span>
-                    <div>
-                        <h1>Reportes</h1>
-                        <p>Reportes de usuarios, posibles falsificaciones y disputas de pago.</p>
-                    </div>
-                </div>
-                <div class="mod-summary-pills">
-                    <span class="adm-badge mod-badge-danger" id="modReportsBadge">
-                        <i class="fa-solid fa-triangle-exclamation me-1"></i> <?= count($reportes_demo) ?> casos activos
-                    </span>
-                </div>
-            </div>
-            <hr class="adm-section-divider">
-
-            <div class="adm-toolbar">
-                <div class="adm-toolbar-left">
-                    <div class="adm-input-search">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <span class="adm-search-divider" aria-hidden="true"></span>
-                        <input type="search" id="modReportSearch" placeholder="Buscar por ID, motivo o subasta..." aria-label="Buscar reporte">
-                    </div>
-                    <select class="adm-select-filter" id="modReportTypeFilter" aria-label="Filtrar por tipo de reporte">
-                        <option value="">Todos los motivos</option>
-                        <option value="danger">Posible falsificación</option>
-                        <option value="warning">Incumplimiento de pago</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="adm-table-card">
-                <div class="adm-table-responsive">
-                    <table class="adm-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Motivo del reporte</th>
-                                <th>Subasta afectada</th>
-                                <th>Reportó</th>
-                                <th>Fecha</th>
-                                <th>Resolución de moderador</th>
-                            </tr>
-                        </thead>
-                        <tbody id="modReportsTbody">
-                            <?php foreach ($reportes_demo as $rep): ?>
-                                <tr
-                                    data-id="<?= htmlspecialchars($rep['id']) ?>"
-                                    data-reason="<?= htmlspecialchars($rep['motivo']) ?>"
-                                    data-auction="<?= htmlspecialchars($rep['subasta']) ?>"
-                                    data-type="<?= htmlspecialchars($rep['motivo_tipo']) ?>"
-                                >
-                                    <td class="fw-bold" style="color:#a7cc3b;"><?= htmlspecialchars($rep['id']) ?></td>
-                                    <td>
-                                        <span class="adm-badge <?= $rep['motivo_tipo'] === 'danger' ? 'mod-badge-danger' : 'mod-badge-warning' ?>">
-                                            <?= htmlspecialchars($rep['motivo']) ?>
-                                        </span>
-                                    </td>
-                                    <td class="fw-semibold"><?= htmlspecialchars($rep['subasta']) ?></td>
-                                    <td><?= htmlspecialchars($rep['reporto']) ?></td>
-                                    <td style="color:#9aa392;"><?= htmlspecialchars($rep['fecha']) ?></td>
-                                    <td>
-                                        <div class="adm-action-group">
-                                            <?php if ($rep['tipo_accion'] === 'replica'): ?>
-                                                <button type="button" class="mod-btn-sm mod-btn-pause" data-mod-report-action="Subasta pausada preventivamente para <?= htmlspecialchars($rep['id']) ?>">
-                                                    <i class="fa-solid fa-pause"></i> Pausar subasta
-                                                </button>
-                                                <button type="button" class="mod-btn-sm mod-btn-outline" data-mod-report-action="Mensaje enviado al vendedor del caso <?= htmlspecialchars($rep['id']) ?>">
-                                                    <i class="fa-solid fa-envelope"></i> Contactar vendedor
-                                                </button>
-                                            <?php else: ?>
-                                                <button type="button" class="mod-btn-sm mod-btn-info" data-mod-report-action="Adjudicación al 2do postor iniciada para <?= htmlspecialchars($rep['id']) ?>">
-                                                    <i class="fa-solid fa-rotate-left"></i> Adjudicar a 2do postor
-                                                </button>
-                                            <?php endif; ?>
-                                            <button
-                                                type="button"
-                                                class="adm-action-btn adm-action-btn--edit"
-                                                title="Ver detalle del reporte"
-                                                data-mod-detail
-                                                data-detail-id="<?= htmlspecialchars($rep['id']) ?>"
-                                                data-detail-title="<?= htmlspecialchars($rep['subasta']) ?>"
-                                                data-detail-meta="<?= htmlspecialchars($rep['motivo'] . ' · Reportado por ' . $rep['reporto'] . ' (' . $rep['fecha'] . ')') ?>"
-                                                data-detail-body="<?= htmlspecialchars($rep['detalle']) ?>"
-                                            >
-                                                <i class="fa-regular fa-eye"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="adm-table-footer">
-                    <span class="adm-table-count" id="modReportsCount">Mostrando <?= count($reportes_demo) ?> reportes</span>
-                    <nav class="adm-pagination" aria-label="Paginación de reportes">
-                        <button type="button" class="adm-page-btn active">1</button>
-                    </nav>
-                </div>
-            </div>
-        </section>
     </main>
 
-    <!-- MODAL DETALLE (SUBASTA O REPORTE) -->
-    <div class="modal fade adm-modal" id="modalModDetalle" tabindex="-1" aria-labelledby="modalModDetalleLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="modalModDetalleLabel">
-                        <i class="fa-solid fa-shield-halved me-2" style="color:#a7cc3b;"></i><span id="modDetailCode">Detalle</span>
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body d-flex flex-column gap-2">
-                    <h6 class="text-white fw-bold mb-0" id="modDetailTitle"></h6>
-                    <div class="small" style="color:#a7cc3b;" id="modDetailMeta"></div>
-                    <p class="small mb-0 mt-1" style="color:#d6ddd0;" id="modDetailBody"></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="adm-btn-primary" style="height:36px; font-size:0.86rem;" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- TOAST FEEDBACK -->
-    <div class="adm-toast" id="admToast" role="status" aria-live="polite">
-        <i class="fa-solid fa-circle-info"></i>
-        <span id="admToastMsg"></span>
-    </div>
+    <?php include __DIR__ . '/partials/modal-detalle.php'; ?>
+    <?php include __DIR__ . '/partials/modal-logout.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-dashboard.js?v=1"></script>
+    <script src="<?= $base_url ?>assets/js/toast-ppi.js?v=2"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-dashboard.js?v=2"></script>
 </body>
+
 </html>

@@ -6,6 +6,12 @@
     text-decoration: none !important;
 }
 
+.gavel-brand .brand-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+    color: #62803f;
+}
+
 .gavel-brand .brand-name {
     font-family: 'Raleway', sans-serif !important;
     font-size: 2rem;
@@ -115,6 +121,57 @@ html {
     min-width: 220px !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85), 0 0 1px rgba(101, 136, 7, 0.4) !important;
     padding: 0.5rem 0 !important;
+}
+
+.btn-nav-profile-pill {
+    background: transparent;
+    color: #d6ddd0;
+    gap: 10px;
+    padding: 4px 10px 4px 4px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-nav-profile-pill:hover,
+.btn-nav-profile-pill[aria-expanded="true"] {
+    background-color: #161915;
+    color: #ffffff;
+}
+
+.nav-avatar-circle {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background-color: #2f3c20;
+    color: #a7cc3b;
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 3px #1e211d;
+    flex-shrink: 0;
+}
+
+.nav-profile-name {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #d6ddd0;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nav-profile-caret {
+    font-size: 0.72rem;
+    color: #9aa392;
+    transition: transform 0.2s ease;
+}
+
+.btn-nav-profile-pill[aria-expanded="true"] .nav-profile-caret {
+    transform: rotate(180deg);
 }
 
 .menu-perfil-header {
@@ -599,4 +656,58 @@ h6.text-main-ppi {
     border: 1px solid rgba(101, 136, 7, 0.35);
     border-radius: 10px;
     font-size: 1.25rem;
+}
+
+/* Modal Confirmar Cierre de Sesión */
+#modalConfirmLogout .modal-content {
+    background-color: #151912;
+    border: 1px solid #232623;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+    color: #d6ddd0;
+}
+
+#modalConfirmLogout .modal-header,
+#modalConfirmLogout .modal-footer {
+    border: none;
+}
+
+.btn-logout-modal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 8px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-logout-modal:active {
+    transform: scale(0.98);
+}
+
+.btn-logout-cancel {
+    background-color: #202320;
+    color: #d6ddd0;
+    border: 1px solid #2f342f;
+}
+
+.btn-logout-cancel:hover {
+    background-color: #2a2e2a;
+    color: #ffffff;
+}
+
+.btn-logout-confirm {
+    background-color: #b55663;
+    color: #ffffff;
+    border: none;
+}
+
+.btn-logout-confirm:hover {
+    background-color: #c76572;
+    color: #ffffff;
 }
