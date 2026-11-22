@@ -23,6 +23,9 @@ $pagina = "registro-producto";
 $id_producto = (int)($_GET['id'] ?? 0);
 $titulo = $id_producto > 0 ? "Modificar Producto" : "Registrar Producto";
 $textoBoton = $id_producto > 0 ? "Modificar" : "Guardar Producto";
+$estados= ['pendiente', 'activa', 'rechazada', 'finalizada', 'sin_ofertas', 'cancelada'];
+
+sort($estados);
 
 //Agregar a dao o controller despues
 $categorias = [];
@@ -107,12 +110,10 @@ if ($catQuery) {
                                     <label for="condicion" class="form-label text-main-ppi fw-bold small">Condición</label>
                                     <select class="form-select select-gavel" id="condicion" name="condicion" required>
                                         <option value="" disabled selected>Selecciona la condición del producto...</option>
-                                        <option value="Nuevo">Nuevo (Sellado en empaque original)</option>
-                                        <option value="Como nuevo">Como nuevo (Sin marcas de uso o defectos)</option>
-                                        <option value="Excelente">Excelente (Mínimo uso, excelente estado funcional)</option>
-                                        <option value="Buen estado">Buen estado (Signos leves de uso normal)</option>
-                                        <option value="Aceptable">Aceptable (Marcas visibles de desgaste, funcional)</option>
-                                        <option value="Para repuestos o restauración">Para repuestos o restauración</option>
+                                        <?php foreach ($estados as $estado): ?>
+                                            <?php $textoEstado = ucfirst(str_replace("_", " ", $estado));?> 
+                                            <option value="<?= $estado?>"><?= htmlspecialchars($textoEstado) ?></option>
+                                        <?php endforeach; ?>
                                     </select>
                                 </div>
 
