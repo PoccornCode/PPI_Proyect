@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>Catálogo de Subastas</title>
+    <?php include dirname(__DIR__) . '/includes/meta_tags.php'; ?>
 </head>
 <body>
     <h1>Catálogo de subastas</h1>
