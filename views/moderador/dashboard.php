@@ -5,7 +5,12 @@ if (session_status() === PHP_SESSION_NONE) {
 if (!defined('BASE_URL')) {
     require_once dirname(__DIR__, 2) . '/config/env.php';
 }
+require_once dirname(__DIR__, 2) . '/controllers/moderador_controller.php';
+
 $base_url = BASE_URL;
+$kpisModerador = obtenerKpisModerador();
+$categoriasModerador = obtenerCategoriasModerador();
+$totalPendientesKpi = (int)($kpisModerador['pendientes'] ?? 0);
 
 $mod_nombre_completo = trim(($_SESSION['nombre'] ?? 'Mod') . ' ' . ($_SESSION['apellido'] ?? 'Gavel'));
 $mod_username = $_SESSION['username'] ?? 'moderador';
@@ -138,18 +143,18 @@ $pendientes_demo = [
             <div class="dropdown">
                 <button class="adm-icon-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notificaciones">
                     <i class="fa-regular fa-bell"></i>
-                    <span class="adm-notif-badge" id="modNotifCount">1</span>
+                    <span class="adm-notif-badge" id="modNotifCount"><?= $totalPendientesKpi ?></span>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end adm-dropdown-menu">
                     <div class="px-2 py-1 d-flex justify-content-between align-items-center">
                         <strong class="text-white small">Alertas de Moderación</strong>
-                        <span class="badge rounded-pill" style="background:#2d3624; color:var(--adm-accent);">1 activa</span>
+                        <span class="badge rounded-pill" id="modNotifBadgePill" style="background:#2d3624; color:var(--adm-accent);"><?= $totalPendientesKpi === 1 ? '1 pendiente' : $totalPendientesKpi . ' pendientes' ?></span>
                     </div>
                     <hr class="dropdown-divider my-1">
                     <button type="button" class="dropdown-item" data-mod-tab="aprobar">
                         <i class="fa-solid fa-clock" style="color:#c8c45e;"></i>
                         <div>
-                            <div class="small text-white"><?= count($pendientes_demo) ?> subastas por validar</div>
+                            <div class="small text-white" id="modNotifPendingText"><?= $totalPendientesKpi ?> subastas por validar</div>
                             <div style="font-size:0.74rem; color:#9aa392;">Cola de aprobación</div>
                         </div>
                     </button>
@@ -232,7 +237,6 @@ $pendientes_demo = [
         </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <main class="adm-main">
 
         <!-- Sección principal: cola de publicaciones pendientes -->
@@ -247,60 +251,14 @@ $pendientes_demo = [
                 </div>
                 <div class="mod-summary-pills">
                     <span class="adm-badge adm-badge--pendiente" id="modPendingBadge">
-                        <i class="fa-regular fa-clock me-1"></i> <?= count($pendientes_demo) ?> Por validar
+                        <i class="fa-regular fa-clock me-1"></i> <?= $totalPendientesKpi ?> Por validar
                     </span>
                 </div>
             </div>
             <hr class="adm-section-divider">
 
-            <!-- KPI Cards (Subastas activas y pendientes) -->
-            <div class="adm-kpi-grid mod-kpi-grid-2">
-                <article class="adm-kpi-card">
-                    <div class="adm-kpi-top">
-                        <div class="adm-kpi-icon"><i class="fa-solid fa-gavel"></i></div>
-                        <div>
-                            <div class="adm-kpi-value">67</div>
-                            <div class="adm-kpi-label">Subastas activas</div>
-                            <div class="adm-kpi-trend"><i class="fa-solid fa-angles-up"></i> +7%</div>
-                        </div>
-                    </div>
-                    <div class="adm-kpi-footer">
-                        <span class="adm-kpi-time"><i class="fa-regular fa-clock"></i> Viernes 20 nov., 16:01</span>
-                        <svg class="adm-sparkline" viewBox="0 0 68 36" aria-hidden="true">
-                            <rect x="2" y="26" width="6" height="10" fill="#4f5c3d" rx="1" />
-                            <rect x="11" y="22" width="6" height="14" fill="#5a6845" rx="1" />
-                            <rect x="20" y="20" width="6" height="16" fill="#5a6845" rx="1" />
-                            <rect x="29" y="17" width="6" height="19" fill="#65754d" rx="1" />
-                            <rect x="38" y="15" width="6" height="21" fill="#6f8054" rx="1" />
-                            <rect x="47" y="11" width="6" height="25" fill="#7a8d5c" rx="1" />
-                            <rect x="56" y="5" width="6" height="31" fill="#8fa769" rx="1" />
-                        </svg>
-                    </div>
-                </article>
-
-                <article class="adm-kpi-card">
-                    <div class="adm-kpi-top">
-                        <div class="adm-kpi-icon"><i class="fa-solid fa-stopwatch"></i></div>
-                        <div>
-                            <div class="adm-kpi-value">127</div>
-                            <div class="adm-kpi-label">Subastas pendientes</div>
-                            <div class="adm-kpi-trend"><i class="fa-solid fa-angles-up"></i> +5%</div>
-                        </div>
-                    </div>
-                    <div class="adm-kpi-footer">
-                        <span class="adm-kpi-time"><i class="fa-regular fa-clock"></i> Viernes 20 nov., 18:04</span>
-                        <svg class="adm-sparkline" viewBox="0 0 68 36" aria-hidden="true">
-                            <rect x="2" y="27" width="6" height="9" fill="#4f5c3d" rx="1" />
-                            <rect x="11" y="24" width="6" height="12" fill="#5a6845" rx="1" />
-                            <rect x="20" y="21" width="6" height="15" fill="#5a6845" rx="1" />
-                            <rect x="29" y="19" width="6" height="17" fill="#65754d" rx="1" />
-                            <rect x="38" y="14" width="6" height="22" fill="#6f8054" rx="1" />
-                            <rect x="47" y="9" width="6" height="27" fill="#7a8d5c" rx="1" />
-                            <rect x="56" y="4" width="6" height="32" fill="#8fa769" rx="1" />
-                        </svg>
-                    </div>
-                </article>
-            </div>
+            <!-- KPI Cards (Subastas activas y pendientes - datos reales BD) -->
+            <?php include __DIR__ . '/partials/kpi-subastas.php'; ?>
 
             <div class="adm-toolbar">
                 <div class="adm-toolbar-left">
@@ -311,10 +269,11 @@ $pendientes_demo = [
                     </div>
                     <select class="adm-select-filter" id="modApprovalCatFilter" aria-label="Filtrar por categoría">
                         <option value="">Todas las categorías</option>
-                        <option value="Tecnología">Tecnología</option>
-                        <option value="Joyería">Joyería</option>
-                        <option value="Instrumentos Musicales">Instrumentos Musicales</option>
-                        <option value="Coleccionables">Coleccionables</option>
+                        <?php foreach ($categoriasModerador as $cat): ?>
+                            <option value="<?= htmlspecialchars($cat['nombre']) ?>">
+                                <?= htmlspecialchars($cat['nombre']) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
             </div>
@@ -392,6 +351,15 @@ $pendientes_demo = [
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
+                            <tr id="modApprovalEmptyRow" class="d-none">
+                                <td colspan="7" class="text-center py-4" style="color: #9aa392;">
+                                    <i class="fa-solid fa-magnifying-glass mb-2 d-block" style="font-size: 1.25rem; opacity: 0.7;"></i>
+                                    No se encontraron subastas que coincidan con tu búsqueda.
+                                    <button type="button" class="btn btn-link btn-sm p-0 ms-2" id="modClearFiltersBtn" style="color: var(--adm-accent); text-decoration: none;">
+                                        Limpiar filtros
+                                    </button>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -408,9 +376,14 @@ $pendientes_demo = [
     <?php include __DIR__ . '/partials/modal-detalle.php'; ?>
     <?php include __DIR__ . '/partials/modal-logout.php'; ?>
 
+    <script>
+        window.MOD_BASE_URL = <?= json_encode($base_url, JSON_UNESCAPED_SLASHES) ?>;
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= $base_url ?>assets/js/toast-ppi.js?v=2"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-dashboard.js?v=2"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-kpis.js?v=2"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-filtros.js?v=2"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-dashboard.js?v=4"></script>
 </body>
 
 </html>

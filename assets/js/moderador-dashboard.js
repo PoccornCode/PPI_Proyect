@@ -1,6 +1,3 @@
-/**
- * Gavel.net — Panel de Moderador (Aprobar subastas)
- */
 (function () {
     'use strict';
 
@@ -87,47 +84,8 @@
     const initialHash = window.location.hash.replace('#', '').toLowerCase();
     activateTab(initialHash || 'aprobar', false);
 
-    // Filtros en vivo para aprobar subastas
-    const approvalSearch = document.getElementById('modApprovalSearch');
-    const approvalCatFilter = document.getElementById('modApprovalCatFilter');
-    const approvalTbody = document.getElementById('modApprovalTbody');
-    const approvalCount = document.getElementById('modApprovalCount');
-
-    function filterApprovals() {
-        if (!approvalTbody) return;
-        const term = (approvalSearch?.value || '').trim().toLowerCase();
-        const cat = approvalCatFilter?.value || '';
-        let visible = 0;
-
-        approvalTbody.querySelectorAll('tr').forEach((row) => {
-            const title = (row.dataset.title || '').toLowerCase();
-            const vendor = (row.dataset.vendor || '').toLowerCase();
-            const rowCat = row.dataset.category || '';
-            const match = (!term || title.includes(term) || vendor.includes(term)) && (!cat || rowCat === cat);
-            row.style.display = match ? '' : 'none';
-            if (match) visible++;
-        });
-
-        if (approvalCount) {
-            approvalCount.textContent = `Mostrando ${visible} ${visible === 1 ? 'publicación' : 'publicaciones'}`;
-        }
-    }
-
-    if (approvalSearch) approvalSearch.addEventListener('input', filterApprovals);
-    if (approvalCatFilter) approvalCatFilter.addEventListener('change', filterApprovals);
-
-    // Buscador global de la topbar sincronizado con la tabla de aprobaciones
-    const globalSearch = document.getElementById('modGlobalSearch');
-    if (globalSearch) {
-        globalSearch.addEventListener('input', () => {
-            if (approvalSearch) {
-                approvalSearch.value = globalSearch.value;
-                filterApprovals();
-            }
-        });
-    }
-
     // Acciones de moderación (demo interactivo)
+    const approvalTbody = document.getElementById('modApprovalTbody');
     const pendingBadge = document.getElementById('modPendingBadge');
 
     function updatePendingCounter() {
@@ -159,6 +117,7 @@
                     showToast('error', 'Subasta rechazada', `${itemName} (demo)`);
                 }
                 updatePendingCounter();
+                window.ModeradorKpis?.actualizar();
             }
         });
     });
