@@ -124,7 +124,7 @@ $base_url = BASE_URL;
     <div class="container-fluid bg-dark-ppi-2 py-3" style="border-top: 1px solid #1e2417;">
         <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
             <p class="text-second-ppi mb-0 small text-center text-md-start">
-                &copy; <?php echo date('Y'); ?> <span class="text-main-ppi fw-semibold">Gavel.net</span> &bull; Todos los derechos reservados. 
+                &copy; <?php echo date('Y'); ?> <span class="text-main-ppi fw-semibold">Gavel.net</span> &bull; Todos los derechos reservados.
                 <span class="d-none d-sm-inline">&bull; </span><a href="<?php echo $base_url; ?>views/legal/terminos.php" class="text-second-ppi text-decoration-underline">Aviso Legal</a>
             </p>
             <p class="text-third-ppi mb-0 small text-center text-md-end fw-semibold">
@@ -134,7 +134,6 @@ $base_url = BASE_URL;
     </div>
 </footer>
 
-<!-- Componente Banner de Cookies no invasivo -->
 <?php
 $cookie_banner_file = dirname(__DIR__, 2) . '/includes/cookie-banner.php';
 if (file_exists($cookie_banner_file)) {
@@ -142,3 +141,16 @@ if (file_exists($cookie_banner_file)) {
 }
 ?>
 <script src="<?php echo $base_url; ?>assets/js/cookie-banner.js"></script>
+
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+if (isset($_SESSION['id_usuario'])) {
+    $modal_sesion_inactiva = dirname(__DIR__, 2) . '/includes/modal-sesion-inactiva.php';
+    if (file_exists($modal_sesion_inactiva)) {
+        include $modal_sesion_inactiva;
+    }
+    echo '<script src="' . $base_url . 'assets/js/sesion-inactividad.js"></script>';
+}
+?>
