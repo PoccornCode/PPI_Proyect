@@ -10,88 +10,15 @@ require_once dirname(__DIR__, 2) . '/controllers/moderador_controller.php';
 $base_url = BASE_URL;
 $kpisModerador = obtenerKpisModerador();
 $categoriasModerador = obtenerCategoriasModerador();
-$totalPendientesKpi = (int)($kpisModerador['pendientes'] ?? 0);
+$subastasPendientes = obtenerColaSubastasPendientes($base_url);
+$totalPendientesKpi = (int)($kpisModerador['pendientes'] ?? count($subastasPendientes));
+$perfilMod = obtenerPerfilModeradorActual();
 
-$mod_nombre_completo = trim(($_SESSION['nombre'] ?? 'Mod') . ' ' . ($_SESSION['apellido'] ?? 'Gavel'));
-$mod_username = $_SESSION['username'] ?? 'moderador';
-$mod_inicial = strtoupper(mb_substr($mod_nombre_completo, 0, 1, 'UTF-8'));
-
-// Datos de referencia visual (mockup del panel de Moderador)
-$pendientes_demo = [
-    [
-        'id'        => 'SUB-204',
-        'titulo'    => 'Cámara Réflex Canon EOS 80D',
-        'condicion' => 'Como nuevo',
-        'fotos'     => 4,
-        'categoria' => 'Tecnología',
-        'vendedor'  => '@usuario_vendedor1',
-        'precio'    => '$350.00',
-        'estado'    => 'Pendiente',
-        'img'       => $base_url . 'assets/img/cat-tecnologia.jpg',
-        'imagenes'  => [
-            $base_url . 'assets/img/cat-tecnologia.jpg',
-            $base_url . 'assets/img/features-technology.jpg',
-            $base_url . 'assets/img/news-1.jpg',
-            $base_url . 'assets/img/news-2.jpg',
-        ],
-        'detalle'   => 'Incluye lente 18-55mm, batería original, cargador y correa. Sin rayones en el sensor.',
-    ],
-    [
-        'id'        => 'SUB-205',
-        'titulo'    => 'Reloj Vintage Automático 1970',
-        'condicion' => 'Buen estado',
-        'fotos'     => 2,
-        'categoria' => 'Joyería',
-        'vendedor'  => '@coleccionista_sv',
-        'precio'    => '$120.00',
-        'estado'    => 'Pendiente',
-        'img'       => $base_url . 'assets/img/cat-joyeria.jpg',
-        'imagenes'  => [
-            $base_url . 'assets/img/cat-joyeria.jpg',
-            $base_url . 'assets/img/features-fashion.jpg',
-        ],
-        'detalle'   => 'Movimiento mecánico automático funcional, caja de acero de 36mm con desgaste leve propio de la época.',
-    ],
-    [
-        'id'        => 'SUB-206',
-        'titulo'    => 'Guitarra Acústica de Estudio',
-        'condicion' => 'Excelente',
-        'fotos'     => 5,
-        'categoria' => 'Instrumentos Musicales',
-        'vendedor'  => '@music_store_sv',
-        'precio'    => '$165.00',
-        'estado'    => 'Pendiente',
-        'img'       => $base_url . 'assets/img/cat-instrumentos.jpg',
-        'imagenes'  => [
-            $base_url . 'assets/img/cat-instrumentos.jpg',
-            $base_url . 'assets/img/lifestyle-1.jpg',
-            $base_url . 'assets/img/lifestyle-2.jpg',
-            $base_url . 'assets/img/news-3.jpg',
-            $base_url . 'assets/img/news-4.jpg',
-        ],
-        'detalle'   => 'Tapa de abeto macizo con estuche rígido incluido. Cuerdas recién cambiadas.',
-    ],
-    [
-        'id'        => 'SUB-207',
-        'titulo'    => 'Colección de Monedas Antiguas (18 piezas)',
-        'condicion' => 'Excelente',
-        'fotos'     => 6,
-        'categoria' => 'Coleccionables',
-        'vendedor'  => '@numismatica_latam',
-        'precio'    => '$140.00',
-        'estado'    => 'Pendiente',
-        'img'       => $base_url . 'assets/img/cat-coleccionables.jpg',
-        'imagenes'  => [
-            $base_url . 'assets/img/cat-coleccionables.jpg',
-            $base_url . 'assets/img/cat-arte.jpg',
-            $base_url . 'assets/img/cat-hogar.jpg',
-            $base_url . 'assets/img/news-5.jpg',
-            $base_url . 'assets/img/news-6.jpg',
-            $base_url . 'assets/img/news-7.jpg',
-        ],
-        'detalle'   => 'Lote de 18 monedas históricas de plata y cobre en álbum protector certificado.',
-    ],
-];
+$mod_nombre_completo = $perfilMod['nombre_completo'];
+$mod_primer_nombre = $perfilMod['primer_nombre'];
+$mod_username = $perfilMod['username'];
+$mod_rol_nombre = $perfilMod['rol_nombre'];
+$mod_inicial = $perfilMod['inicial'];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -107,7 +34,7 @@ $pendientes_demo = [
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="<?= $base_url ?>assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="<?= $base_url ?>assets/css/admin-dashboard.css?v=1">
-    <link rel="stylesheet" href="<?= $base_url ?>assets/css/moderador-dashboard.css?v=14">
+    <link rel="stylesheet" href="<?= $base_url ?>assets/css/moderador-dashboard.css?v=19">
 </head>
 
 <body class="admin-body">
@@ -165,13 +92,13 @@ $pendientes_demo = [
             <div class="dropdown">
                 <button class="adm-profile-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menú de usuario">
                     <span class="adm-avatar-circle"><?= htmlspecialchars($mod_inicial) ?></span>
-                    <span class="fw-semibold d-none d-sm-inline"><?= htmlspecialchars(explode(' ', $mod_nombre_completo)[0]) ?></span>
+                    <span class="fw-semibold d-none d-sm-inline"><?= htmlspecialchars($mod_primer_nombre) ?></span>
                     <i class="fa-solid fa-chevron-down" style="font-size:0.75rem; color:#9aa392;"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end adm-dropdown-menu menu-perfil-ppi">
                     <li class="menu-perfil-header">
                         <div class="menu-perfil-name"><?= htmlspecialchars($mod_nombre_completo) ?></div>
-                        <div class="menu-perfil-user">@<?= htmlspecialchars($mod_username) ?> · Moderador</div>
+                        <div class="menu-perfil-user">@<?= htmlspecialchars($mod_username) ?><?= $mod_rol_nombre !== '' ? ' · ' . htmlspecialchars($mod_rol_nombre) : '' ?></div>
                     </li>
                     <li>
                         <a class="dropdown-item" href="<?= $base_url ?>views/perfil.php">
@@ -239,7 +166,6 @@ $pendientes_demo = [
 
     <main class="adm-main">
 
-        <!-- Sección principal: cola de publicaciones pendientes -->
         <section class="adm-section active" id="sec-aprobar">
             <div class="adm-section-head">
                 <div class="adm-title-group">
@@ -257,10 +183,9 @@ $pendientes_demo = [
             </div>
             <hr class="adm-section-divider">
 
-            <!-- KPI Cards (Subastas activas y pendientes - datos reales BD) -->
             <?php include __DIR__ . '/partials/kpi-subastas.php'; ?>
 
-            <div class="adm-toolbar">
+            <div class="adm-toolbar mod-approval-toolbar">
                 <div class="adm-toolbar-left">
                     <div class="adm-input-search">
                         <i class="fa-solid fa-magnifying-glass"></i>
@@ -276,104 +201,22 @@ $pendientes_demo = [
                         <?php endforeach; ?>
                     </select>
                 </div>
-            </div>
-
-            <div class="adm-table-card">
-                <div class="adm-table-responsive">
-                    <table class="adm-table mod-table">
-                        <thead>
-                            <tr>
-                                <th class="mod-col-eye" aria-label="Ver detalle"></th>
-                                <th><i class="fa-solid fa-cube"></i> Artículo</th>
-                                <th>Categoría</th>
-                                <th>Vendedor</th>
-                                <th>Precio base</th>
-                                <th>Estado</th>
-                                <th>Acción de moderación</th>
-                            </tr>
-                        </thead>
-                        <tbody id="modApprovalTbody">
-                            <?php foreach ($pendientes_demo as $item): ?>
-                                <tr
-                                    data-id="<?= htmlspecialchars($item['id']) ?>"
-                                    data-title="<?= htmlspecialchars($item['titulo']) ?>"
-                                    data-vendor="<?= htmlspecialchars($item['vendedor']) ?>"
-                                    data-category="<?= htmlspecialchars($item['categoria']) ?>"
-                                    data-status="Pendiente">
-                                    <td class="mod-col-eye">
-                                        <button
-                                            type="button"
-                                            class="adm-action-btn adm-action-btn--edit"
-                                            title="Ver detalle de la publicación"
-                                            data-mod-detail
-                                            data-detail-id="<?= htmlspecialchars($item['id']) ?>"
-                                            data-detail-title="<?= htmlspecialchars($item['titulo']) ?>"
-                                            data-detail-meta="<?= htmlspecialchars($item['categoria'] . ' · ' . $item['vendedor'] . ' · ' . $item['precio']) ?>"
-                                            data-detail-body="<?= htmlspecialchars($item['detalle']) ?>"
-                                            data-detail-specs="<?= htmlspecialchars(json_encode([
-                                                                    ['label' => 'Categoría', 'value' => $item['categoria']],
-                                                                    ['label' => 'Vendedor', 'value' => $item['vendedor']],
-                                                                    ['label' => 'Precio base', 'value' => $item['precio']],
-                                                                    ['label' => 'Condición', 'value' => $item['condicion'] . ' (' . (int)$item['fotos'] . ' fotos)'],
-                                                                ], JSON_UNESCAPED_UNICODE)) ?>"
-                                            data-detail-images="<?= htmlspecialchars(json_encode($item['imagenes'], JSON_UNESCAPED_SLASHES)) ?>">
-                                            <i class="fa-regular fa-eye"></i>
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <div class="adm-cell-item">
-                                            <div class="adm-item-thumb">
-                                                <img src="<?= htmlspecialchars($item['img']) ?>" alt="<?= htmlspecialchars($item['titulo']) ?>">
-                                            </div>
-                                            <div>
-                                                <div class="adm-item-name"><?= htmlspecialchars($item['titulo']) ?></div>
-                                                <div class="mod-sub-meta">
-                                                    Condición: <?= htmlspecialchars($item['condicion']) ?> · <?= (int)$item['fotos'] ?> fotos subidas
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><?= htmlspecialchars($item['categoria']) ?></td>
-                                    <td><?= htmlspecialchars($item['vendedor']) ?></td>
-                                    <td class="fw-semibold"><?= htmlspecialchars($item['precio']) ?></td>
-                                    <td>
-                                        <span class="adm-badge adm-badge--pendiente mod-row-status">Pendiente</span>
-                                    </td>
-                                    <td>
-                                        <div class="adm-action-group">
-                                            <button type="button" class="mod-btn-sm mod-btn-approve" data-mod-decision="aprobar" data-item="<?= htmlspecialchars($item['titulo']) ?>">
-                                                <i class="fa-solid fa-check"></i> Aprobar
-                                            </button>
-                                            <button type="button" class="mod-btn-sm mod-btn-reject" data-mod-decision="rechazar" data-item="<?= htmlspecialchars($item['titulo']) ?>">
-                                                <i class="fa-solid fa-xmark"></i> Rechazar
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                            <tr id="modApprovalEmptyRow" class="d-none">
-                                <td colspan="7" class="text-center py-4" style="color: #9aa392;">
-                                    <i class="fa-solid fa-magnifying-glass mb-2 d-block" style="font-size: 1.25rem; opacity: 0.7;"></i>
-                                    No se encontraron subastas que coincidan con tu búsqueda.
-                                    <button type="button" class="btn btn-link btn-sm p-0 ms-2" id="modClearFiltersBtn" style="color: var(--adm-accent); text-decoration: none;">
-                                        Limpiar filtros
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="adm-table-footer">
-                    <span class="adm-table-count" id="modApprovalCount">Mostrando <?= count($pendientes_demo) ?> publicaciones</span>
-                    <nav class="adm-pagination" aria-label="Paginación de publicaciones pendientes">
+                <div class="mod-toolbar-meta">
+                    <span class="adm-table-count" id="modApprovalCount">
+                        Mostrando <?= count($subastasPendientes) ?> <?= count($subastasPendientes) === 1 ? 'subasta' : 'subastas' ?>
+                    </span>
+                    <nav class="adm-pagination" id="modApprovalPagination" aria-label="Paginación de subastas pendientes">
                         <button type="button" class="adm-page-btn active">1</button>
                     </nav>
                 </div>
             </div>
+
+            <?php include __DIR__ . '/partials/tabla-pendientes.php'; ?>
         </section>
     </main>
 
     <?php include __DIR__ . '/partials/modal-detalle.php'; ?>
+    <?php include __DIR__ . '/partials/modal-confirmar-decision.php'; ?>
     <?php include __DIR__ . '/partials/modal-logout.php'; ?>
 
     <script>
@@ -381,9 +224,10 @@ $pendientes_demo = [
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= $base_url ?>assets/js/toast-ppi.js?v=2"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-kpis.js?v=2"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-filtros.js?v=2"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-dashboard.js?v=4"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-kpis.js?v=4"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-filtros.js?v=5"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-cola.js?v=3"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-dashboard.js?v=5"></script>
 </body>
 
 </html>

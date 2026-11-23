@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    const REFRESH_INTERVAL_MS = 30000;
+    const REFRESH_INTERVAL_MS = 15000;
     const baseUrl = window.MOD_BASE_URL || '';
     const endpoint = `${baseUrl}controllers/moderador_controller.php?opcion=kpis`;
 
@@ -84,7 +84,8 @@
 
     async function actualizar() {
         try {
-            const response = await fetch(endpoint, {
+            const url = `${endpoint}&_t=${Date.now()}`;
+            const response = await fetch(url, {
                 headers: { Accept: 'application/json' },
                 cache: 'no-store',
             });
@@ -96,12 +97,12 @@
                 return data.kpis;
             }
         } catch (err) {
-            console.error('Error al actualizar KPIs de moderador:', err);
+            console.error('Error al actualizar KPIs:', err);
         }
         return null;
     }
 
-    window.ModeradorKpis = { actualizar };
+    window.ModeradorKpis = { actualizar, renderKpis };
 
     document.addEventListener('DOMContentLoaded', () => {
         setInterval(() => {
@@ -111,6 +112,16 @@
 
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) {
+                actualizar();
+            }
+        });
+
+        window.addEventListener('focus', () => {
+            actualizar();
+        });
+
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
                 actualizar();
             }
         });
