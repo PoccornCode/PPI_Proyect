@@ -260,7 +260,7 @@ $transacciones_demo = [
         <div class="mod-sidebar-footer">
             <a href="<?= $base_url ?>views/moderador/dashboard.php" class="mod-sidebar-link" title="Ir al panel de moderación">
                 <i class="fa-solid fa-shield-halved"></i>
-                <span>Panel de Moderación</span>
+                <span>Moderación</span>
             </a>
             <a href="<?= $base_url ?>index.php" class="mod-sidebar-link" title="Ir al sitio público">
                 <i class="fa-solid fa-arrow-up-right-from-square"></i>

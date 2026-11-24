@@ -167,7 +167,7 @@ $mod_inicial = $perfilMod['inicial'];
             <?php if ($mod_id_rol === 1): ?>
                 <a href="<?= $base_url ?>views/admin/dashboard.php" class="mod-sidebar-link" title="Ir al panel de administración">
                     <i class="fa-solid fa-crown"></i>
-                    <span>Panel de Administración</span>
+                    <span>Administración</span>
                 </a>
             <?php endif; ?>
             <a href="<?= $base_url ?>index.php" class="mod-sidebar-link" title="Ir al sitio público">
