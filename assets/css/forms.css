@@ -622,22 +622,25 @@ div:where(.swal2-container).swal2-backdrop-show,
 }
 
 .toast-ppi.toast-success .toast-ppi-icon {
-    color: #7da515;
+    color: #7b944f;
 }
 
 .toast-ppi.toast-success .toast-ppi-progress {
-    background-color: #7da515;
+    background-color: #7b944f;
 }
 
-.toast-ppi.toast-error {
+.toast-ppi.toast-error,
+.toast-ppi.toast-danger {
     border-color: #441e1b;
 }
 
-.toast-ppi.toast-error .toast-ppi-icon {
+.toast-ppi.toast-error .toast-ppi-icon,
+.toast-ppi.toast-danger .toast-ppi-icon {
     color: #d8685d;
 }
 
-.toast-ppi.toast-error .toast-ppi-progress {
+.toast-ppi.toast-error .toast-ppi-progress,
+.toast-ppi.toast-danger .toast-ppi-progress {
     background-color: #d8685d;
 }
 

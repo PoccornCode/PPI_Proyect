@@ -15,7 +15,8 @@ class ModeradorDAO
         }
     }
 
-    public function inactivarSubastasVencidas(): int
+    public function
+    inactivarSubastasVencidas(): int
     {
         if (!$this->conexion || $this->conexion->connect_errno) {
             return 0;

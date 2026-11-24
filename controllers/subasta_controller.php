@@ -21,6 +21,8 @@ function obtenerNuevasSubastasHome(int $limite = 4): array
 
 if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     header("Content-Type: application/json; charset=UTF-8");
+    header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+    header("Pragma: no-cache");
     $opcion = $_GET['opcion'] ?? 'home';
 
     if ($opcion === 'home') {

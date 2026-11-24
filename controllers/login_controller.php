@@ -37,6 +37,8 @@ if ($opcion === "login") {
         if (!empty($_SESSION['redirect_after_login'])) {
             $redirect = $_SESSION['redirect_after_login'];
             unset($_SESSION['redirect_after_login']);
+        } elseif ((int)$u['id_rol'] === 1) {
+            $redirect = BASE_URL . "views/admin/dashboard.php";
         } elseif ((int)$u['id_rol'] === 3) {
             $redirect = BASE_URL . "views/moderador/dashboard.php";
         } else {

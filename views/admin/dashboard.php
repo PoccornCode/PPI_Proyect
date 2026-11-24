@@ -2,21 +2,24 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
 if (!defined('BASE_URL')) {
     require_once dirname(__DIR__, 2) . '/config/env.php';
 }
-$base_url = BASE_URL;
+require_once dirname(__DIR__, 2) . '/controllers/admin_controller.php';
 
-$adm_nombre = trim((string)($_SESSION['nombre'] ?? 'Admin'));
-$adm_apellido = trim((string)($_SESSION['apellido'] ?? 'Demo'));
-$adm_nombre_completo = trim($adm_nombre . ' ' . $adm_apellido);
-if ($adm_nombre_completo === '') {
-    $adm_nombre_completo = 'Administrador';
-}
-$adm_primer_nombre = trim(explode(' ', $adm_nombre !== '' ? $adm_nombre : 'Admin')[0]);
-$adm_username = trim((string)($_SESSION['username'] ?? 'admin_demo'));
-$adm_rol_nombre = 'Administrador';
-$adm_inicial = strtoupper(mb_substr($adm_primer_nombre !== '' ? $adm_primer_nombre : 'A', 0, 1, 'UTF-8'));
+$base_url = BASE_URL;
+$perfilAdmin = requerirAdministradorAutenticado(false);
+$alertasTopbar = obtenerAlertasTopbarAdmin();
+$kpisAdmin = obtenerKpisAdmin('30d');
+$graficosInicio = obtenerGraficosInicioAdmin('7d');
+
+$adm_nombre_completo = $perfilAdmin['nombre_completo'];
+$adm_primer_nombre = $perfilAdmin['primer_nombre'];
+$adm_username = $perfilAdmin['username'];
+$adm_rol_nombre = $perfilAdmin['rol_nombre'];
+$adm_inicial = $perfilAdmin['inicial'];
 
 // Datos de referencia visual (mockup del panel Admin)
 $usuarios_demo = [
@@ -200,106 +203,7 @@ $transacciones_demo = [
 
 <body class="admin-body">
 
-    <!-- TOPBAR -->
-    <header class="adm-topbar">
-        <div class="adm-topbar-brand">
-            <button type="button" class="adm-mobile-toggle" id="admMobileToggle" aria-label="Abrir menú lateral">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-            <a href="<?= $base_url ?>index.php" class="adm-brand-link d-flex align-items-center gap-2 text-decoration-none" title="Volver al sitio principal" style="font-family: 'Raleway', sans-serif;">
-                <i class="fa-solid fa-gavel" style="font-size: 1.45rem; line-height: 1; color: #62803f;" aria-hidden="true"></i>
-                <span class="d-flex flex-column" style="line-height: 1;">
-                    <span class="d-flex align-items-baseline gap-1">
-                        <span class="fw-bold" style="font-size: 1.55rem; line-height: 1; color: #c9c9c9; font-family: 'Raleway', sans-serif;">Gavel</span>
-                        <span class="fw-bold" style="font-size: 1.25rem; line-height: 1; color: #62803f; font-family: 'Raleway', sans-serif;">.net</span>
-                    </span>
-                    <span style="font-family: 'Open Sans', sans-serif; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #7c8575; margin-top: 3px;">Administración</span>
-                </span>
-            </a>
-        </div>
-
-        <div class="adm-topbar-search">
-            <div class="adm-search-box">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <span class="adm-search-divider" aria-hidden="true"></span>
-                <input type="search" id="admGlobalSearch" placeholder="Buscar usuarios, subastas..." aria-label="Buscar usuarios o subastas">
-            </div>
-        </div>
-
-        <div class="adm-topbar-actions">
-            <!-- Notificaciones -->
-            <div class="dropdown">
-                <button class="adm-icon-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notificaciones">
-                    <i class="fa-regular fa-bell"></i>
-                    <span class="adm-notif-badge" id="admNotifCount">12</span>
-                </button>
-                <div class="dropdown-menu dropdown-menu-end adm-dropdown-menu" style="min-width: 270px;">
-                    <div class="px-2 py-1 d-flex justify-content-between align-items-center gap-2">
-                        <strong class="text-white small">Alertas de Administración</strong>
-                        <span class="badge rounded-pill" style="background:rgba(226, 155, 142, 0.14); color:#e8a599;">12 pendientes</span>
-                    </div>
-                    <hr class="dropdown-divider my-1">
-                    <a class="dropdown-item" href="<?= $base_url ?>views/moderador/dashboard.php">
-                        <i class="fa-solid fa-clock" style="color:#e29b8e;"></i>
-                        <div>
-                            <div class="small text-white">10 subastas por validar</div>
-                            <div style="font-size:0.74rem; color:#9aa392;">Cola de aprobación</div>
-                        </div>
-                    </a>
-                    <button type="button" class="dropdown-item" data-adm-tab="reportes">
-                        <i class="fa-regular fa-envelope" style="color:#8ea958;"></i>
-                        <div>
-                            <div class="small text-white">2 mensajes de contacto</div>
-                            <div style="font-size:0.74rem; color:#9aa392;">Pendientes de respuesta</div>
-                        </div>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Perfil Admin -->
-            <div class="dropdown">
-                <button class="adm-profile-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menú de usuario">
-                    <span class="adm-avatar-circle"><?= htmlspecialchars($adm_inicial) ?></span>
-                    <span class="fw-semibold d-none d-sm-inline"><?= htmlspecialchars($adm_primer_nombre) ?></span>
-                    <i class="fa-solid fa-chevron-down" style="font-size:0.75rem; color:#9aa392;"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end adm-dropdown-menu menu-perfil-ppi">
-                    <li class="menu-perfil-header">
-                        <div class="menu-perfil-name"><?= htmlspecialchars($adm_nombre_completo) ?></div>
-                        <div class="menu-perfil-user">@<?= htmlspecialchars($adm_username) ?> · <?= htmlspecialchars($adm_rol_nombre) ?></div>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="<?= $base_url ?>views/perfil.php">
-                            <i class="fa-solid fa-user"></i> Mi Perfil
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="<?= $base_url ?>index.php">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Ir al sitio público
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="<?= $base_url ?>views/moderador/dashboard.php">
-                            <i class="fa-solid fa-shield-halved"></i> Panel de Moderación
-                        </a>
-                    </li>
-                    <li>
-                        <button type="button" class="dropdown-item" data-adm-tab="configuracion">
-                            <i class="fa-solid fa-gear"></i> Configuración
-                        </button>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li>
-                        <a class="dropdown-item item-logout" href="#" data-bs-toggle="modal" data-bs-target="#modalConfirmLogout">
-                            <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </header>
+    <?php include __DIR__ . '/partials/topbar.php'; ?>
 
     <!-- SIDEBAR -->
     <div class="adm-sidebar-overlay" id="admSidebarOverlay"></div>
@@ -356,6 +260,10 @@ $transacciones_demo = [
         </nav>
 
         <div class="mod-sidebar-footer">
+            <a href="<?= $base_url ?>views/moderador/dashboard.php" class="mod-sidebar-link" title="Ir al panel de moderación">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Moderación</span>
+            </a>
             <a href="<?= $base_url ?>index.php" class="mod-sidebar-link" title="Ir al sitio público">
                 <i class="fa-solid fa-arrow-up-right-from-square"></i>
                 <span>Sitio público</span>
@@ -384,7 +292,7 @@ $transacciones_demo = [
                 </div>
                 <label class="adm-pill-select">
                     <i class="fa-regular fa-calendar"></i>
-                    <select aria-label="Rango de fechas del resumen">
+                    <select id="admKpiRange" aria-label="Rango de fechas del resumen">
                         <option value="30d" selected>Últimos 30 días</option>
                         <option value="7d">Últimos 7 días</option>
                         <option value="90d">Últimos 90 días</option>
@@ -392,174 +300,9 @@ $transacciones_demo = [
                 </label>
             </div>
 
-            <!-- 4 KPI Cards -->
-            <div class="adm-kpi-grid">
-                <article class="adm-kpi-card">
-                    <div class="adm-kpi-top">
-                        <div class="adm-kpi-icon"><i class="fa-solid fa-users"></i></div>
-                        <div>
-                            <div class="adm-kpi-value">616,123</div>
-                            <div class="adm-kpi-label">Usuarios registrados</div>
-                            <div class="adm-kpi-trend"><i class="fa-solid fa-angles-up"></i> +61%</div>
-                        </div>
-                    </div>
-                    <div class="adm-kpi-footer">
-                        <span class="adm-kpi-time"><i class="fa-regular fa-clock"></i> Viernes 20 nov., 11:11</span>
-                        <svg class="adm-sparkline" viewBox="0 0 68 36" aria-hidden="true">
-                            <rect x="2" y="24" width="6" height="12" fill="#4f5c3d" rx="1" />
-                            <rect x="11" y="21" width="6" height="15" fill="#5a6845" rx="1" />
-                            <rect x="20" y="23" width="6" height="13" fill="#5a6845" rx="1" />
-                            <rect x="29" y="18" width="6" height="18" fill="#65754d" rx="1" />
-                            <rect x="38" y="14" width="6" height="22" fill="#6f8054" rx="1" />
-                            <rect x="47" y="10" width="6" height="26" fill="#7a8d5c" rx="1" />
-                            <rect x="56" y="4" width="6" height="32" fill="#8fa769" rx="1" />
-                        </svg>
-                    </div>
-                </article>
+            <?php include __DIR__ . '/partials/kpi-resumen.php'; ?>
 
-                <article class="adm-kpi-card">
-                    <div class="adm-kpi-top">
-                        <div class="adm-kpi-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
-                        <div>
-                            <div class="adm-kpi-value">1,482</div>
-                            <div class="adm-kpi-label">Pujas registradas</div>
-                            <div class="adm-kpi-trend"><i class="fa-solid fa-angles-up"></i> +24%</div>
-                        </div>
-                    </div>
-                    <div class="adm-kpi-footer">
-                        <span class="adm-kpi-time"><i class="fa-regular fa-clock"></i> Viernes 20 nov., 19:30</span>
-                        <svg class="adm-sparkline" viewBox="0 0 68 36" aria-hidden="true">
-                            <rect x="2" y="25" width="6" height="11" fill="#4f5c3d" rx="1" />
-                            <rect x="11" y="23" width="6" height="13" fill="#5a6845" rx="1" />
-                            <rect x="20" y="19" width="6" height="17" fill="#5a6845" rx="1" />
-                            <rect x="29" y="16" width="6" height="20" fill="#65754d" rx="1" />
-                            <rect x="38" y="13" width="6" height="23" fill="#6f8054" rx="1" />
-                            <rect x="47" y="8" width="6" height="28" fill="#7a8d5c" rx="1" />
-                            <rect x="56" y="3" width="6" height="33" fill="#8fa769" rx="1" />
-                        </svg>
-                    </div>
-                </article>
-
-                <article class="adm-kpi-card">
-                    <div class="adm-kpi-top">
-                        <div class="adm-kpi-icon"><i class="fa-solid fa-gavel"></i></div>
-                        <div>
-                            <div class="adm-kpi-value">67</div>
-                            <div class="adm-kpi-label">Subastas activas</div>
-                            <div class="adm-kpi-trend"><i class="fa-solid fa-angles-up"></i> +7%</div>
-                        </div>
-                    </div>
-                    <div class="adm-kpi-footer">
-                        <span class="adm-kpi-time"><i class="fa-regular fa-clock"></i> Viernes 20 nov., 16:01</span>
-                        <svg class="adm-sparkline" viewBox="0 0 68 36" aria-hidden="true">
-                            <rect x="2" y="26" width="6" height="10" fill="#4f5c3d" rx="1" />
-                            <rect x="11" y="22" width="6" height="14" fill="#5a6845" rx="1" />
-                            <rect x="20" y="20" width="6" height="16" fill="#5a6845" rx="1" />
-                            <rect x="29" y="17" width="6" height="19" fill="#65754d" rx="1" />
-                            <rect x="38" y="15" width="6" height="21" fill="#6f8054" rx="1" />
-                            <rect x="47" y="11" width="6" height="25" fill="#7a8d5c" rx="1" />
-                            <rect x="56" y="5" width="6" height="31" fill="#8fa769" rx="1" />
-                        </svg>
-                    </div>
-                </article>
-
-                <article class="adm-kpi-card">
-                    <div class="adm-kpi-top">
-                        <div class="adm-kpi-icon"><i class="fa-solid fa-stopwatch"></i></div>
-                        <div>
-                            <div class="adm-kpi-value">127</div>
-                            <div class="adm-kpi-label">Subastas pendientes</div>
-                            <div class="adm-kpi-trend"><i class="fa-solid fa-angles-up"></i> +5%</div>
-                        </div>
-                    </div>
-                    <div class="adm-kpi-footer">
-                        <span class="adm-kpi-time"><i class="fa-regular fa-clock"></i> Viernes 20 nov., 18:04</span>
-                        <svg class="adm-sparkline" viewBox="0 0 68 36" aria-hidden="true">
-                            <rect x="2" y="27" width="6" height="9" fill="#4f5c3d" rx="1" />
-                            <rect x="11" y="24" width="6" height="12" fill="#5a6845" rx="1" />
-                            <rect x="20" y="21" width="6" height="15" fill="#5a6845" rx="1" />
-                            <rect x="29" y="19" width="6" height="17" fill="#65754d" rx="1" />
-                            <rect x="38" y="14" width="6" height="22" fill="#6f8054" rx="1" />
-                            <rect x="47" y="9" width="6" height="27" fill="#7a8d5c" rx="1" />
-                            <rect x="56" y="4" width="6" height="32" fill="#8fa769" rx="1" />
-                        </svg>
-                    </div>
-                </article>
-            </div>
-
-            <!-- Charts Row -->
-            <div class="adm-charts-row">
-                <div class="adm-panel">
-                    <div class="adm-panel-header">
-                        <h2 class="adm-panel-title">
-                            <i class="fa-solid fa-chart-line"></i> Actividad de la plataforma
-                        </h2>
-                        <label class="adm-pill-select adm-pill-select--sm">
-                            <i class="fa-regular fa-calendar"></i>
-                            <select id="admActivityRange" aria-label="Periodo de actividad">
-                                <option value="7d" selected>Últimos 7 días</option>
-                                <option value="30d">Últimos 30 días</option>
-                                <option value="90d">Últimos 90 días</option>
-                            </select>
-                        </label>
-                    </div>
-                    <div class="adm-panel-body">
-                        <div class="adm-chart-wrap">
-                            <svg id="admActivitySvg" class="adm-svg-chart" viewBox="0 0 560 220" role="img" aria-label="Gráfico de actividad semanal"></svg>
-                            <div id="admActivityTooltip" class="adm-chart-tooltip"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="adm-panel">
-                    <div class="adm-panel-header">
-                        <h2 class="adm-panel-title">
-                            <i class="fa-solid fa-chart-pie"></i> Distribución de subastas
-                        </h2>
-                    </div>
-                    <div class="adm-panel-body">
-                        <div class="adm-donut-layout">
-                            <svg width="168" height="168" viewBox="0 0 180 180" role="img" aria-label="Distribución de subastas: 67% activas, 11% finalizadas, 16% canceladas">
-                                <!-- Circumference of r=64 is ~402.12 -->
-                                <circle cx="90" cy="90" r="64" fill="none" stroke="#252c1f" stroke-width="26" />
-                                <!-- Activas ~69% -->
-                                <circle cx="90" cy="90" r="64" fill="none" stroke="#75865d" stroke-width="26"
-                                    stroke-dasharray="282 402.12" stroke-dashoffset="0"
-                                    transform="rotate(-90 90 90)" />
-                                <!-- Finalizadas ~13% -->
-                                <circle cx="90" cy="90" r="64" fill="none" stroke="#4c91a3" stroke-width="26"
-                                    stroke-dasharray="52 402.12" stroke-dashoffset="-282"
-                                    transform="rotate(-90 90 90)" />
-                                <!-- Canceladas ~17% -->
-                                <circle cx="90" cy="90" r="64" fill="none" stroke="#c8c45e" stroke-width="26"
-                                    stroke-dasharray="68.12 402.12" stroke-dashoffset="-334"
-                                    transform="rotate(-90 90 90)" />
-                            </svg>
-
-                            <ul class="adm-donut-legend">
-                                <li>
-                                    <span class="adm-legend-label">
-                                        <span class="adm-legend-dot" style="background:#75865d;"></span> Activas
-                                    </span>
-                                    <strong>67%</strong>
-                                </li>
-                                <li>
-                                    <span class="adm-legend-label">
-                                        <span class="adm-legend-dot" style="background:#4c91a3;"></span> Finalizadas
-                                    </span>
-                                    <strong>11%</strong>
-                                </li>
-                                <li>
-                                    <span class="adm-legend-label">
-                                        <span class="adm-legend-dot" style="background:#c8c45e;"></span> Canceladas
-                                    </span>
-                                    <strong>16%</strong>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <?php include __DIR__ . '/partials/graficos-inicio.php'; ?>
 
             <!-- Bottom Row: Usuarios recientes & Subastas destacadas -->
             <div class="adm-bottom-row">
@@ -1757,14 +1500,19 @@ $transacciones_demo = [
     <?php include dirname(__DIR__) . '/moderador/partials/modal-logout.php'; ?>
 
     <script>
+        window.ADM_BASE_URL = <?= json_encode($base_url, JSON_UNESCAPED_SLASHES) ?>;
+        window.ADM_GRAFICOS_INICIO = <?= json_encode($graficosInicio, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
         window.ADM_CATEGORIES_DEMO = {
             baseUrl: <?= json_encode($base_url, JSON_UNESCAPED_SLASHES) ?>,
             categorias: <?= json_encode($categorias_admin, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
         };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= $base_url ?>assets/js/toast-ppi.js?v=2"></script>
-    <script src="<?= $base_url ?>assets/js/admin-dashboard-referencia.js?v=10"></script>
+    <script src="<?= $base_url ?>assets/js/toast-ppi.js?v=3"></script>
+    <script src="<?= $base_url ?>assets/js/admin-kpis.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-kpis.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/admin-graficos.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-graficos.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/admin-dashboard.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-dashboard.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/admin-dashboard-referencia.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-dashboard-referencia.js') ?>"></script>
 </body>
 
 </html>

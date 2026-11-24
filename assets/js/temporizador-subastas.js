@@ -1,6 +1,40 @@
 (function () {
     let actualizandoHome = false;
     let ultimaFirmaHome = '';
+    const preciosPrevios = new Map();
+
+    function registrarPrecios(destacada, pronto, nuevas, animar) {
+        const cambiados = new Set();
+        const revisar = (item) => {
+            if (!item) return;
+            const prev = preciosPrevios.get(item.id);
+            if (animar && prev !== undefined && prev !== item.precio) {
+                cambiados.add(String(item.id));
+            }
+            preciosPrevios.set(item.id, item.precio);
+        };
+        revisar(destacada);
+        if (Array.isArray(pronto)) pronto.forEach(revisar);
+        if (Array.isArray(nuevas)) nuevas.forEach(revisar);
+        return cambiados;
+    }
+
+    function resaltarPreciosCambiados(cambiados) {
+        if (!cambiados.size) return;
+        cambiados.forEach((id) => {
+            document.querySelectorAll(`[data-precio-subasta="${id}"]`).forEach((el) => {
+                if (typeof el.animate === 'function') {
+                    el.animate(
+                        [
+                            { color: '#8fa870', opacity: 0.75 },
+                            { opacity: 1 }
+                        ],
+                        { duration: 650, easing: 'ease-out' }
+                    );
+                }
+            });
+        });
+    }
 
     function obtenerFirmaHome(destacada, pronto, nuevas) {
         const dFirma = destacada ? `${destacada.id}:${destacada.precio}` : 'none';
@@ -52,7 +86,7 @@
                         </div>
                         <div class="col-md-5">
                             <span class="d-block small text-second-ppi">Puja actual</span>
-                            <span class="d-block display-6 precio-ppi">$${escaparHtml(d.precio)}</span>
+                            <span class="d-block display-6 precio-ppi" data-precio-subasta="${escaparHtml(String(d.id))}">$${escaparHtml(d.precio)}</span>
                             <span class="d-block mb-3 tiempo-ppi"><i class="far fa-clock me-2"></i><span data-countdown="${escaparHtml(d.fecha_final_iso)}" data-countdown-prefix="Termina en ">Termina en ${escaparHtml(d.tiempo)}</span></span>
                             <a href="views/subasta.php?id=${encodeURIComponent(d.id)}" class="w-100 btn btn-primary py-2 fw-bold">Pujar ahora</a>
                         </div>
@@ -83,7 +117,7 @@
                 <img src="${escaparHtml(item.imagen)}" class="foto-lote-mini" alt="">
                 <span class="d-flex flex-column">
                     <span class="fw-bold">${escaparHtml(item.titulo)}</span>
-                    <span class="small text-second-ppi">$${escaparHtml(item.precio)}</span>
+                    <span class="small text-second-ppi" data-precio-subasta="${escaparHtml(String(item.id))}">$${escaparHtml(item.precio)}</span>
                     <span class="small tiempo-ppi" data-countdown="${escaparHtml(item.fecha_final_iso)}" data-countdown-prefix="Termina en ">Termina en ${escaparHtml(item.tiempo)}</span>
                 </span>
             </a>`).join('');
@@ -116,7 +150,7 @@
                         <span class="small text-uppercase text-second-ppi">${escaparHtml(item.categoria)}</span>
                         <h3 class="fs-6 fw-bold text-main-ppi mt-1">${escaparHtml(item.titulo)}</h3>
                         <div class="d-flex justify-content-between align-items-center mt-auto pt-2 mb-3">
-                            <span class="h5 mb-0 precio-ppi">$${escaparHtml(item.precio)}</span>
+                            <span class="h5 mb-0 precio-ppi" data-precio-subasta="${escaparHtml(String(item.id))}">$${escaparHtml(item.precio)}</span>
                             <span class="small tiempo-ppi" data-countdown="${escaparHtml(item.fecha_final_iso)}">${escaparHtml(item.tiempo)}</span>
                         </div>
                         <a href="views/subasta.php?id=${encodeURIComponent(item.id)}" class="btn btn-contorno-ppi fw-bold">Ver subasta</a>
@@ -133,10 +167,12 @@
 
         actualizandoHome = true;
         try {
-            const resp = await fetch('controllers/subasta_controller.php?opcion=home', { cache: 'no-store' });
+            const resp = await fetch(`controllers/subasta_controller.php?opcion=home&_t=${Date.now()}`, { cache: 'no-store' });
             if (!resp.ok) return;
             const data = await resp.json();
             if (data && data.estado) {
+                const primeraVez = ultimaFirmaHome === '';
+                const cambiados = registrarPrecios(data.destacada, data.pronto, data.nuevas, !primeraVez);
                 const nuevaFirma = obtenerFirmaHome(data.destacada, data.pronto, data.nuevas);
                 if (nuevaFirma !== ultimaFirmaHome) {
                     ultimaFirmaHome = nuevaFirma;
@@ -144,6 +180,7 @@
                     renderPronto(data.pronto);
                     renderNuevas(data.nuevas);
                     actualizarContadores();
+                    resaltarPreciosCambiados(cambiados);
                 }
             }
         } catch (err) {
@@ -196,10 +233,16 @@
     actualizarContadores();
     setInterval(actualizarContadores, 1000);
 
-    // Sincronización automática cada 10s (solo si la pestaña está visible y solo redibuja si hubo cambios)
+    // Sincronización automática cada 2s (solo si la pestaña está visible y solo redibuja si hubo cambios)
     setInterval(() => {
         if (!document.hidden) {
             refrescarSubastasHome();
         }
-    }, 10000);
+    }, 2000);
+
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            refrescarSubastasHome();
+        }
+    });
 })();

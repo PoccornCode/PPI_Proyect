@@ -6,9 +6,14 @@ $titulo = "Iniciar Sesión";
 $pagina = "login";
 
 if (!empty($_SESSION['id_usuario'])) {
-    $destino = ((int)($_SESSION['id_rol'] ?? 0) === 3)
-        ? (BASE_URL . "views/moderador/dashboard.php")
-        : (BASE_URL . "index.php");
+    $rolSesion = (int)($_SESSION['id_rol'] ?? 0);
+    if ($rolSesion === 1) {
+        $destino = BASE_URL . "views/admin/dashboard.php";
+    } elseif ($rolSesion === 3) {
+        $destino = BASE_URL . "views/moderador/dashboard.php";
+    } else {
+        $destino = BASE_URL . "index.php";
+    }
     header("Location: " . $destino);
     exit;
 }

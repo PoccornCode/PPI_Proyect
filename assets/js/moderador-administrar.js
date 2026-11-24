@@ -150,6 +150,141 @@
         }
     }
 
+    function escHtml(valor) {
+        return String(valor ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function construirFilaAdministrar(item) {
+        const cantFotos = Number(item.fotos || 0);
+        const textoFotos = cantFotos === 1 ? '1 foto subida' : `${cantFotos} fotos subidas`;
+        const estadoRaw = String(item.estado_raw || item.estado || 'pendiente').toLowerCase();
+        const badgeInfo = BADGE_MAP[estadoRaw] || { clase: 'adm-badge--pendiente', texto: estadoRaw };
+        const esFinalizada = estadoRaw === 'finalizada';
+        const meta = `${item.categoria || ''} · ${item.vendedor || ''} · ${item.precio || ''}`;
+        const specsJson = JSON.stringify(item.specs || []);
+        const imgsJson = JSON.stringify(item.imagenes || []);
+
+        const tr = document.createElement('tr');
+        tr.dataset.id = item.id || '';
+        tr.dataset.subastaId = String(item.id_subasta || 0);
+        tr.dataset.title = item.titulo || '';
+        tr.dataset.vendor = item.vendedor || '';
+        tr.dataset.category = item.categoria || '';
+        tr.dataset.status = estadoRaw;
+
+        tr.innerHTML = `
+            <td class="mod-col-eye">
+                <button
+                    type="button"
+                    class="adm-action-btn adm-action-btn--edit"
+                    title="Ver detalle de la publicación"
+                    data-mod-detail
+                    data-detail-id="${escHtml(item.id)}"
+                    data-detail-title="${escHtml(item.titulo)}"
+                    data-detail-meta="${escHtml(meta)}"
+                    data-detail-body="${escHtml(item.detalle)}"
+                    data-detail-specs="${escHtml(specsJson)}"
+                    data-detail-images="${escHtml(imgsJson)}">
+                    <i class="fa-regular fa-eye"></i>
+                </button>
+            </td>
+            <td>
+                <div class="adm-cell-item">
+                    <div class="adm-item-thumb">
+                        <img src="${escHtml(item.img)}" alt="${escHtml(item.titulo)}">
+                    </div>
+                    <div>
+                        <div class="adm-item-name">${escHtml(item.titulo)}</div>
+                        <div class="mod-sub-meta">
+                            Condición: ${escHtml(item.condicion)} · ${escHtml(textoFotos)}
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td>${escHtml(item.categoria)}</td>
+            <td>${escHtml(item.vendedor)}</td>
+            <td class="fw-semibold">${escHtml(item.precio)}</td>
+            <td>
+                <span class="adm-badge ${escHtml(badgeInfo.clase)} mod-manage-badge">${escHtml(badgeInfo.texto)}</span>
+            </td>
+            <td>
+                <div class="adm-action-group">
+                    <button
+                        type="button"
+                        class="adm-action-btn adm-action-btn--edit mod-btn-edit-status"
+                        data-subasta-id="${Number(item.id_subasta || 0)}"
+                        data-item="${escHtml(item.titulo)}"
+                        data-current-status="${escHtml(estadoRaw)}"
+                        ${esFinalizada ? 'disabled' : ''}
+                        title="${esFinalizada ? 'Las subastas finalizadas no se pueden modificar' : 'Cambiar estado'}"
+                        aria-label="${esFinalizada ? 'Subasta finalizada' : 'Cambiar estado de ' + escHtml(item.titulo)}">
+                        <i class="fa-regular fa-pen-to-square"></i>
+                    </button>
+                </div>
+            </td>
+        `;
+        return tr;
+    }
+
+    function sincronizarEstadoLocal(idSubasta, nuevoEstado) {
+        const row = tbody.querySelector(`tr[data-subasta-id="${idSubasta}"]`);
+        if (!row) return;
+        aplicarEstadoVisualFila(row, nuevoEstado);
+        filtrar(false);
+    }
+
+    let recargandoTodas = false;
+
+    async function recargarTodas() {
+        if (recargandoTodas) return;
+        recargandoTodas = true;
+        try {
+            const resp = await fetch(`${baseUrl}controllers/moderador_controller.php?opcion=todas&_t=${Date.now()}`, {
+                headers: { Accept: 'application/json' },
+                cache: 'no-store'
+            });
+
+            const data = await resp.json().catch(() => ({}));
+            if (resp.status === 401 || data?.expired || data?.auth_required) {
+                window.location.href = data?.redirect || `${baseUrl}views/auth/login.php${data?.expired ? '?reason=inactivity' : ''}`;
+                return;
+            }
+            if (!resp.ok || !data?.estado || !Array.isArray(data.subastas)) return;
+
+            tbody.querySelectorAll('tr[data-id]').forEach((tr) => tr.remove());
+
+            const frag = document.createDocumentFragment();
+            data.subastas.forEach((item) => {
+                frag.appendChild(construirFilaAdministrar(item));
+            });
+
+            if (emptyRow) {
+                tbody.insertBefore(frag, emptyRow);
+            } else {
+                tbody.appendChild(frag);
+            }
+
+            const totalBadge = document.getElementById('modManageTotalBadge');
+            if (totalBadge) {
+                const n = data.subastas.length;
+                totalBadge.innerHTML = `<i class="fa-solid fa-layer-group me-1"></i> ${n} ${n === 1 ? 'Subasta' : 'Subastas'}`;
+            }
+
+            if (data.kpis && window.ModeradorKpis?.renderKpis) {
+                window.ModeradorKpis.renderKpis(data.kpis);
+            }
+            filtrar(false);
+        } catch (err) {
+            console.error('Error al sincronizar listado de subastas:', err);
+        } finally {
+            recargandoTodas = false;
+        }
+    }
+
     function aplicarEstadoVisualFila(row, estado) {
         const estadoNorm = String(estado || '').toLowerCase();
         row.dataset.status = estadoNorm;
@@ -205,6 +340,7 @@
                 if (data.conflicto && data.estado_actual) {
                     aplicarEstadoVisualFila(row, data.estado_actual);
                     filtrar(false);
+                    window.ModeradorCola?.recargarPendientes();
                     notificar('warning', 'Conflicto de edición', data.mensaje || 'Otro moderador ya modificó esta subasta.');
                     return { ok: false, conflicto: true, estadoActual: data.estado_actual };
                 }
@@ -215,6 +351,7 @@
             aplicarEstadoVisualFila(row, nuevoEstado);
             notificar('success', 'Estado actualizado', data.mensaje || 'El estado se actualizó correctamente.');
             filtrar(false);
+            window.ModeradorCola?.recargarPendientes();
             return { ok: true };
         } catch (err) {
             notificar('error', 'Error de conexión', 'Error de comunicación al actualizar la subasta.');
@@ -361,4 +498,5 @@
     });
 
     filtrar(true);
+    window.ModeradorAdministrar = { sincronizarEstadoLocal, recargarTodas, filtrar };
 })();

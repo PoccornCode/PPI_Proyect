@@ -68,6 +68,14 @@
             history.replaceState(null, '', `#${target}`);
         }
 
+        if (pushHash) {
+            if (target === 'aprobar') {
+                window.ModeradorCola?.recargarPendientes();
+            } else if (target === 'administrar') {
+                window.ModeradorAdministrar?.recargarTodas();
+            }
+        }
+
         closeMobileSidebar();
     }
 
@@ -89,4 +97,17 @@
 
     const initialHash = window.location.hash.replace('#', '').toLowerCase();
     activateTab(initialHash || 'aprobar', false);
+
+    function sincronizarPestanaActiva() {
+        if (document.getElementById('sec-administrar')?.classList.contains('active')) {
+            window.ModeradorAdministrar?.recargarTodas();
+        } else {
+            window.ModeradorCola?.recargarPendientes();
+        }
+    }
+
+    window.addEventListener('focus', sincronizarPestanaActiva);
+    window.addEventListener('pageshow', (e) => {
+        if (e.persisted) sincronizarPestanaActiva();
+    });
 })();

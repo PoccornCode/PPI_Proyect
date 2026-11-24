@@ -2,6 +2,8 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
 if (!defined('BASE_URL')) {
     require_once dirname(__DIR__, 2) . '/config/env.php';
 }
@@ -36,8 +38,8 @@ $mod_inicial = $perfilMod['inicial'];
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Raleway:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="<?= $base_url ?>assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="<?= $base_url ?>assets/css/admin-dashboard.css?v=1">
-    <link rel="stylesheet" href="<?= $base_url ?>assets/css/moderador-dashboard.css?v=32">
+    <link rel="stylesheet" href="<?= $base_url ?>assets/css/admin-dashboard.css?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/css/admin-dashboard.css') ?>">
+    <link rel="stylesheet" href="<?= $base_url ?>assets/css/moderador-dashboard.css?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/css/moderador-dashboard.css') ?>">
 </head>
 
 <body class="admin-body">
@@ -164,6 +166,12 @@ $mod_inicial = $perfilMod['inicial'];
         </nav>
 
         <div class="mod-sidebar-footer">
+            <?php if ($mod_id_rol === 1): ?>
+                <a href="<?= $base_url ?>views/admin/dashboard.php" class="mod-sidebar-link" title="Ir al panel de administración">
+                    <i class="fa-solid fa-crown"></i>
+                    <span>Administración</span>
+                </a>
+            <?php endif; ?>
             <a href="<?= $base_url ?>index.php" class="mod-sidebar-link" title="Ir al sitio público">
                 <i class="fa-solid fa-arrow-up-right-from-square"></i>
                 <span>Sitio público</span>
@@ -274,13 +282,13 @@ $mod_inicial = $perfilMod['inicial'];
         window.MOD_BASE_URL = <?= json_encode($base_url, JSON_UNESCAPED_SLASHES) ?>;
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= $base_url ?>assets/js/toast-ppi.js?v=2"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-kpis.js?v=5"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-paginacion.js?v=1"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-filtros.js?v=7"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-cola.js?v=6"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-administrar.js?v=10"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-dashboard.js?v=8"></script>
+    <script src="<?= $base_url ?>assets/js/toast-ppi.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/toast-ppi.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-kpis.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/moderador-kpis.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-paginacion.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/moderador-paginacion.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-filtros.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/moderador-filtros.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-cola.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/moderador-cola.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-administrar.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/moderador-administrar.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-dashboard.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/moderador-dashboard.js') ?>"></script>
 </body>
 
 </html>

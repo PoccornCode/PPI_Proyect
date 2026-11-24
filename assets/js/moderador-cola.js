@@ -35,6 +35,134 @@
     let galleryImages = [];
     let galleryIndex = 0;
 
+    function escHtml(valor) {
+        return String(valor ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function construirFilaPendiente(item) {
+        const cantFotos = Number(item.fotos || 0);
+        const textoFotos = cantFotos === 1 ? '1 foto subida' : `${cantFotos} fotos subidas`;
+        const meta = `${item.categoria || ''} · ${item.vendedor || ''} · ${item.precio || ''}`;
+        const specsJson = JSON.stringify(item.specs || []);
+        const imgsJson = JSON.stringify(item.imagenes || []);
+
+        const tr = document.createElement('tr');
+        tr.dataset.id = item.id || '';
+        tr.dataset.subastaId = String(item.id_subasta || 0);
+        tr.dataset.title = item.titulo || '';
+        tr.dataset.vendor = item.vendedor || '';
+        tr.dataset.category = item.categoria || '';
+        tr.dataset.status = 'Pendiente';
+
+        tr.innerHTML = `
+            <td class="mod-col-eye">
+                <button
+                    type="button"
+                    class="adm-action-btn adm-action-btn--edit"
+                    title="Ver detalle de la publicación"
+                    data-mod-detail
+                    data-detail-id="${escHtml(item.id)}"
+                    data-detail-title="${escHtml(item.titulo)}"
+                    data-detail-meta="${escHtml(meta)}"
+                    data-detail-body="${escHtml(item.detalle)}"
+                    data-detail-specs="${escHtml(specsJson)}"
+                    data-detail-images="${escHtml(imgsJson)}">
+                    <i class="fa-regular fa-eye"></i>
+                </button>
+            </td>
+            <td>
+                <div class="adm-cell-item">
+                    <div class="adm-item-thumb">
+                        <img src="${escHtml(item.img)}" alt="${escHtml(item.titulo)}">
+                    </div>
+                    <div>
+                        <div class="adm-item-name">${escHtml(item.titulo)}</div>
+                        <div class="mod-sub-meta">
+                            Condición: ${escHtml(item.condicion)} · ${escHtml(textoFotos)}
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td>${escHtml(item.categoria)}</td>
+            <td>${escHtml(item.vendedor)}</td>
+            <td class="fw-semibold">${escHtml(item.precio)}</td>
+            <td>
+                <span class="adm-badge adm-badge--pendiente mod-row-status">Pendiente</span>
+            </td>
+            <td>
+                <div class="adm-action-group">
+                    <button
+                        type="button"
+                        class="mod-btn-sm mod-btn-approve"
+                        data-mod-decision="aprobar"
+                        data-subasta-id="${Number(item.id_subasta || 0)}"
+                        data-item="${escHtml(item.titulo)}">
+                        <i class="fa-solid fa-check"></i> Aprobar
+                    </button>
+                    <button
+                        type="button"
+                        class="mod-btn-sm mod-btn-reject"
+                        data-mod-decision="rechazar"
+                        data-subasta-id="${Number(item.id_subasta || 0)}"
+                        data-item="${escHtml(item.titulo)}">
+                        <i class="fa-solid fa-xmark"></i> Rechazar
+                    </button>
+                </div>
+            </td>
+        `;
+        return tr;
+    }
+
+    let recargandoPendientes = false;
+
+    async function recargarPendientes() {
+        if (!approvalTbody || recargandoPendientes) return;
+        // Evita reemplazar filas mientras una animación de aprobación/rechazo está en curso
+        if (approvalTbody.querySelector('tr[data-processing="1"]')) return;
+
+        recargandoPendientes = true;
+        try {
+            const resp = await fetch(`${endpoint}?opcion=pendientes&_t=${Date.now()}`, {
+                headers: { Accept: 'application/json' },
+                cache: 'no-store'
+            });
+
+            const data = await resp.json().catch(() => ({}));
+            if (resp.status === 401 || data?.expired || data?.auth_required) {
+                window.location.href = data?.redirect || `${baseUrl}views/auth/login.php${data?.expired ? '?reason=inactivity' : ''}`;
+                return;
+            }
+            if (!resp.ok || !data?.estado || !Array.isArray(data.pendientes)) return;
+
+            const emptyRow = document.getElementById('modApprovalEmptyRow');
+            approvalTbody.querySelectorAll('tr[data-id]').forEach((tr) => tr.remove());
+
+            const frag = document.createDocumentFragment();
+            data.pendientes.forEach((item) => {
+                frag.appendChild(construirFilaPendiente(item));
+            });
+
+            if (emptyRow) {
+                approvalTbody.insertBefore(frag, emptyRow);
+            } else {
+                approvalTbody.appendChild(frag);
+            }
+
+            if (data.kpis && window.ModeradorKpis?.renderKpis) {
+                window.ModeradorKpis.renderKpis(data.kpis);
+            }
+            window.ModeradorFiltros?.filtrar(false);
+        } catch (err) {
+            console.error('Error al sincronizar cola pendiente:', err);
+        } finally {
+            recargandoPendientes = false;
+        }
+    }
+
     function showToast(tipo, titulo, mensaje) {
         if (typeof mostrarToast === 'function') {
             mostrarToast(tipo, titulo, mensaje, 3500);
@@ -101,6 +229,11 @@
             } else {
                 showToast('error', 'Subasta rechazada', `${itemName} fue rechazada.`);
             }
+
+            window.ModeradorAdministrar?.sincronizarEstadoLocal(
+                idSubasta,
+                decision === 'aprobar' ? 'activa' : 'rechazada'
+            );
 
             if (data.kpis && window.ModeradorKpis?.renderKpis) {
                 window.ModeradorKpis.renderKpis(data.kpis);
@@ -370,5 +503,5 @@
         });
     }
 
-    window.ModeradorCola = { procesarDecision };
+    window.ModeradorCola = { procesarDecision, recargarPendientes };
 })();
