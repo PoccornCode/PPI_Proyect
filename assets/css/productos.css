@@ -100,12 +100,11 @@ main {
 }
 
 .status-badge.status-activa {
-    color: #8db61b;
+    color: #8ea35a;
 }
 
 .status-badge.status-activa .status-dot {
-    background-color: #8db61b;
-    box-shadow: 0 0 6px rgba(141, 182, 27, 0.45);
+    background-color: #8ea35a;
 }
 
 .status-badge.status-finalizada {
@@ -132,6 +131,34 @@ main {
     border-color: #7d9933;
     color: #ffffff;
     transform: translateY(-1px);
+}
+
+.btn.btn-modificar-producto {
+    background-color: #202320;
+    color: #d6ddd0;
+    border: 1px solid #2f342f;
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn.btn-modificar-producto:hover,
+.btn.btn-modificar-producto:focus {
+    background-color: #2a2e2a;
+    color: #ffffff;
+    border-color: #3d443d;
+}
+
+.btn.btn-eliminar-producto {
+    background-color: #b55663;
+    color: #ffffff;
+    border: 1px solid #b55663;
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn.btn-eliminar-producto:hover,
+.btn.btn-eliminar-producto:focus {
+    background-color: #c76572;
+    color: #ffffff;
+    border-color: #c76572;
 }
 
 .empty-state-box {

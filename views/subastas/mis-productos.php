@@ -44,7 +44,7 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/main.css?v=14" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/forms.css?v=14" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/productos.css?v=2" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/productos.css?v=5" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi d-flex flex-column min-vh-100">
@@ -136,13 +136,13 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                                     </p>
 
                                     <div class="d-flex gap-2 mt-2">
-                                        <a href="<?= BASE_URL ?>views/subastas/registro-producto.php?id=<?= (int)$item['id_producto'] ?>" class="btn btn-outline-publish btn-sm flex-grow-1">
+                                        <a href="<?= BASE_URL ?>views/subastas/registro-producto.php?id=<?= (int)$item['id_producto'] ?>" class="btn btn-modificar-producto btn-sm flex-grow-1">
                                             <i class="fas fa-edit"></i> Modificar
                                         </a>
 
                                         <form action="<?= BASE_URL ?>controllers/ControllerProducto.php?id=<?= (int)$item['id_producto'] ?>" method="POST" class="flex-grow-1 form-eliminar">
                                             <input type="hidden" name="opcion" value="eliminar">
-                                            <button type="submit" class="btn btn-danger btn-sm w-100">
+                                            <button type="submit" class="btn btn-eliminar-producto btn-sm w-100">
                                                 <i class="fas fa-trash"></i> Eliminar
                                             </button>
                                         </form>
