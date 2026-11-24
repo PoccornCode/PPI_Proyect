@@ -1,10 +1,10 @@
 (function () {
     'use strict';
 
-    const PAGE_SIZE = 5;
     const globalSearch = document.getElementById('modGlobalSearch');
     const approvalSearch = document.getElementById('modApprovalSearch');
     const approvalCatFilter = document.getElementById('modApprovalCatFilter');
+    const pageSizeSelect = document.getElementById('modApprovalPageSize');
     const approvalTbody = document.getElementById('modApprovalTbody');
     const approvalCount = document.getElementById('modApprovalCount');
     const paginationEl = document.getElementById('modApprovalPagination');
@@ -14,6 +14,7 @@
     const clearBtn = document.getElementById('modClearFiltersBtn');
 
     let activeSearchEl = approvalSearch || globalSearch;
+    let pageSize = Number(pageSizeSelect?.value) || 4;
     let currentPage = 1;
 
     function normalizarTexto(texto) {
@@ -30,23 +31,16 @@
     }
 
     function renderPaginacion(totalPages) {
-        if (!paginationEl) return;
-        paginationEl.innerHTML = '';
-
-        const paginas = Math.max(1, totalPages);
-        for (let i = 1; i <= paginas; i++) {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = `adm-page-btn ${i === currentPage ? 'active' : ''}`.trim();
-            btn.textContent = String(i);
-            btn.addEventListener('click', () => {
-                if (currentPage !== i) {
-                    currentPage = i;
-                    filtrar(false);
-                }
-            });
-            paginationEl.appendChild(btn);
-        }
+        if (!paginationEl || !window.ModPaginacion) return;
+        window.ModPaginacion.render(paginationEl, {
+            currentPage,
+            totalPages,
+            maxVisible: 5,
+            onPageChange: (nextPage) => {
+                currentPage = nextPage;
+                filtrar(false);
+            }
+        });
     }
 
     function actualizarEstadoVacio(total, coincidencias, hayFiltros) {
@@ -108,13 +102,13 @@
         });
 
         const totalMatching = matchingRows.length;
-        const totalPages = Math.max(1, Math.ceil(totalMatching / PAGE_SIZE));
+        const totalPages = Math.max(1, Math.ceil(totalMatching / pageSize));
         if (currentPage > totalPages) {
             currentPage = totalPages;
         }
 
-        const startIdx = (currentPage - 1) * PAGE_SIZE;
-        const endIdx = startIdx + PAGE_SIZE;
+        const startIdx = (currentPage - 1) * pageSize;
+        const endIdx = startIdx + pageSize;
         let visibleOnPage = 0;
 
         matchingRows.forEach((row, idx) => {
@@ -127,12 +121,13 @@
         renderPaginacion(totalPages);
 
         if (approvalCount) {
-            if (hayFiltros) {
-                approvalCount.textContent = `Mostrando ${visibleOnPage} de ${totalMatching} ${totalMatching === 1 ? 'subasta' : 'subastas'}`;
-            } else if (totalMatching > PAGE_SIZE) {
-                approvalCount.textContent = `Mostrando ${visibleOnPage} de ${total} ${total === 1 ? 'subasta' : 'subastas'}`;
+            if (totalMatching === 0) {
+                approvalCount.textContent = '0 registros';
             } else {
-                approvalCount.textContent = `Mostrando ${totalMatching} ${totalMatching === 1 ? 'subasta' : 'subastas'}`;
+                const desde = startIdx + 1;
+                const hasta = startIdx + visibleOnPage;
+                const etiqueta = totalMatching === 1 ? 'registro' : 'registros';
+                approvalCount.textContent = `Mostrando ${desde}–${hasta} de ${totalMatching} ${etiqueta}`;
             }
         }
     }
@@ -174,6 +169,13 @@
 
     if (approvalCatFilter) {
         approvalCatFilter.addEventListener('change', () => filtrar(true));
+    }
+
+    if (pageSizeSelect) {
+        pageSizeSelect.addEventListener('change', () => {
+            pageSize = Number(pageSizeSelect.value) || 4;
+            filtrar(true);
+        });
     }
 
     if (clearBtn) {

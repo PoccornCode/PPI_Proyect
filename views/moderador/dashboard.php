@@ -11,6 +11,7 @@ $base_url = BASE_URL;
 $kpisModerador = obtenerKpisModerador();
 $categoriasModerador = obtenerCategoriasModerador();
 $subastasPendientes = obtenerColaSubastasPendientes($base_url);
+$todasSubastas = obtenerTodasSubastasModerador($base_url);
 $totalPendientesKpi = (int)($kpisModerador['pendientes'] ?? count($subastasPendientes));
 $perfilMod = obtenerPerfilModeradorActual();
 
@@ -34,7 +35,7 @@ $mod_inicial = $perfilMod['inicial'];
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="<?= $base_url ?>assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="<?= $base_url ?>assets/css/admin-dashboard.css?v=1">
-    <link rel="stylesheet" href="<?= $base_url ?>assets/css/moderador-dashboard.css?v=19">
+    <link rel="stylesheet" href="<?= $base_url ?>assets/css/moderador-dashboard.css?v=31">
 </head>
 
 <body class="admin-body">
@@ -149,6 +150,12 @@ $mod_inicial = $perfilMod['inicial'];
                         <span>Aprobar subastas</span>
                     </button>
                 </li>
+                <li>
+                    <button type="button" class="adm-nav-btn" data-mod-tab="administrar" title="Administrar subastas">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span>Administrar subastas</span>
+                    </button>
+                </li>
             </ul>
         </nav>
 
@@ -201,22 +208,62 @@ $mod_inicial = $perfilMod['inicial'];
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="mod-toolbar-meta">
-                    <span class="adm-table-count" id="modApprovalCount">
-                        Mostrando <?= count($subastasPendientes) ?> <?= count($subastasPendientes) === 1 ? 'subasta' : 'subastas' ?>
-                    </span>
-                    <nav class="adm-pagination" id="modApprovalPagination" aria-label="Paginación de subastas pendientes">
-                        <button type="button" class="adm-page-btn active">1</button>
-                    </nav>
-                </div>
             </div>
 
             <?php include __DIR__ . '/partials/tabla-pendientes.php'; ?>
+        </section>
+
+        <section class="adm-section" id="sec-administrar">
+            <div class="adm-section-head">
+                <div class="adm-title-group">
+                    <span class="adm-title-accent" aria-hidden="true"></span>
+                    <div>
+                        <h1>Administrar subastas</h1>
+                        <p>Consulta todas las subastas y gestiona su estado en cualquier etapa del ciclo.</p>
+                    </div>
+                </div>
+                <div class="mod-summary-pills">
+                    <span class="adm-badge adm-badge--activa" id="modManageTotalBadge">
+                        <i class="fa-solid fa-layer-group me-1"></i> <?= count($todasSubastas) ?> Subastas
+                    </span>
+                </div>
+            </div>
+            <hr class="adm-section-divider">
+
+            <div class="adm-toolbar mod-approval-toolbar">
+                <div class="adm-toolbar-left">
+                    <div class="adm-input-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <span class="adm-search-divider" aria-hidden="true"></span>
+                        <input type="search" id="modManageSearch" placeholder="Buscar artículo, vendedor o ID..." aria-label="Buscar subasta">
+                    </div>
+                    <select class="adm-select-filter" id="modManageCatFilter" aria-label="Filtrar por categoría">
+                        <option value="">Todas las categorías</option>
+                        <?php foreach ($categoriasModerador as $cat): ?>
+                            <option value="<?= htmlspecialchars($cat['nombre']) ?>">
+                                <?= htmlspecialchars($cat['nombre']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <select class="adm-select-filter" id="modManageStatusFilter" aria-label="Filtrar por estado">
+                        <option value="">Todos los estados</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="activa">Activa</option>
+                        <option value="finalizada">Finalizada</option>
+                        <option value="sin_ofertas">Sin ofertas</option>
+                        <option value="rechazada">Rechazada</option>
+                        <option value="cancelada">Cancelada</option>
+                    </select>
+                </div>
+            </div>
+
+            <?php include __DIR__ . '/partials/tabla-administrar-subastas.php'; ?>
         </section>
     </main>
 
     <?php include __DIR__ . '/partials/modal-detalle.php'; ?>
     <?php include __DIR__ . '/partials/modal-confirmar-decision.php'; ?>
+    <?php include __DIR__ . '/partials/modal-administrar-estado.php'; ?>
     <?php include __DIR__ . '/partials/modal-logout.php'; ?>
 
     <script>
@@ -225,9 +272,11 @@ $mod_inicial = $perfilMod['inicial'];
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= $base_url ?>assets/js/toast-ppi.js?v=2"></script>
     <script src="<?= $base_url ?>assets/js/moderador-kpis.js?v=4"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-filtros.js?v=5"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-paginacion.js?v=1"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-filtros.js?v=6"></script>
     <script src="<?= $base_url ?>assets/js/moderador-cola.js?v=3"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-dashboard.js?v=5"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-administrar.js?v=6"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-dashboard.js?v=6"></script>
 </body>
 
 </html>

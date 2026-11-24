@@ -315,4 +315,124 @@ class ModeradorDAO
             return ['estado' => false, 'mensaje' => 'No se pudo procesar la acción de moderación.'];
         }
     }
+
+    public function listarTodasSubastas(): array
+    {
+        $subastas = [];
+        if (!$this->conexion || $this->conexion->connect_errno) {
+            return $subastas;
+        }
+
+        $sql = "SELECT s.id_subasta, s.precio_inicial, s.incremento_minimo,
+                       s.fecha_inicial, s.fecha_final, s.estado,
+                       p.id_producto, p.nombre AS titulo, p.descripcion, p.condicion,
+                       c.nombre AS categoria, c.imagen AS categoria_imagen,
+                       u.username, u.nombre AS vendedor_nombre, u.apellido AS vendedor_apellido
+                FROM sb_subasta s
+                INNER JOIN sb_producto p ON s.id_producto = p.id_producto
+                LEFT JOIN sb_categoria c ON p.id_categoria = c.id_categoria
+                LEFT JOIN sb_usuario u ON p.id_usuario = u.id_usuario
+                ORDER BY s.id_subasta DESC";
+
+        $res = $this->conexion->query($sql);
+        if (!$res) {
+            return $subastas;
+        }
+
+        $idsProductos = [];
+        while ($row = $res->fetch_assoc()) {
+            $idProd = (int)$row['id_producto'];
+            $idsProductos[] = $idProd;
+            $row['imagenes'] = [];
+            $subastas[] = $row;
+        }
+
+        if (!empty($idsProductos)) {
+            $mapaImagenes = $this->obtenerImagenesPorProductos($idsProductos);
+            foreach ($subastas as &$item) {
+                $idProd = (int)$item['id_producto'];
+                $item['imagenes'] = $mapaImagenes[$idProd] ?? [];
+            }
+            unset($item);
+        }
+
+        return $subastas;
+    }
+
+    public function cambiarEstadoSubasta(int $idSubasta, string $nuevoEstado): array
+    {
+        if (!$this->conexion || $this->conexion->connect_errno) {
+            return ['estado' => false, 'mensaje' => 'Error de conexión con la base de datos.'];
+        }
+
+        $nuevoEstado = strtolower(trim($nuevoEstado));
+        $estadosPermitidos = ['pendiente', 'activa', 'rechazada', 'cancelada'];
+        if ($idSubasta <= 0 || !in_array($nuevoEstado, $estadosPermitidos, true)) {
+            return ['estado' => false, 'mensaje' => 'Estado o subasta no válidos.'];
+        }
+
+        try {
+            $this->conexion->begin_transaction();
+
+            $sqlSelect = "SELECT s.id_subasta, s.estado, s.fecha_inicial, s.fecha_final, p.nombre AS titulo
+                          FROM sb_subasta s
+                          INNER JOIN sb_producto p ON s.id_producto = p.id_producto
+                          WHERE s.id_subasta = ?
+                          FOR UPDATE";
+            $stmt = $this->conexion->prepare($sqlSelect);
+            $stmt->bind_param('i', $idSubasta);
+            $stmt->execute();
+            $subasta = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+
+            if (!$subasta) {
+                $this->conexion->rollback();
+                return ['estado' => false, 'mensaje' => 'La subasta seleccionada no existe.'];
+            }
+
+            if (strtolower((string)$subasta['estado']) === 'finalizada') {
+                $this->conexion->rollback();
+                return ['estado' => false, 'mensaje' => 'Una subasta finalizada no puede cambiar de estado.'];
+            }
+
+            if ($nuevoEstado === 'activa') {
+                $finTs = strtotime((string)$subasta['fecha_final']) ?: 0;
+                if ($finTs <= time()) {
+                    $inicioTs = strtotime((string)$subasta['fecha_inicial']) ?: time();
+                    $duracionSeg = max(86400, ($finTs > $inicioTs) ? ($finTs - $inicioTs) : 86400);
+                    $sqlUpdate = "UPDATE sb_subasta
+                                  SET estado = 'activa',
+                                      fecha_inicial = NOW(),
+                                      fecha_final = DATE_ADD(NOW(), INTERVAL ? SECOND)
+                                  WHERE id_subasta = ?";
+                    $stmtUp = $this->conexion->prepare($sqlUpdate);
+                    $stmtUp->bind_param('ii', $duracionSeg, $idSubasta);
+                } else {
+                    $sqlUpdate = "UPDATE sb_subasta SET estado = 'activa' WHERE id_subasta = ?";
+                    $stmtUp = $this->conexion->prepare($sqlUpdate);
+                    $stmtUp->bind_param('i', $idSubasta);
+                }
+            } else {
+                $sqlUpdate = "UPDATE sb_subasta SET estado = ? WHERE id_subasta = ?";
+                $stmtUp = $this->conexion->prepare($sqlUpdate);
+                $stmtUp->bind_param('si', $nuevoEstado, $idSubasta);
+            }
+
+            $stmtUp->execute();
+            $stmtUp->close();
+            $this->conexion->commit();
+
+            return [
+                'estado'       => true,
+                'id_subasta'   => $idSubasta,
+                'titulo'       => $subasta['titulo'],
+                'nuevo_estado' => $nuevoEstado,
+                'mensaje'      => 'El estado de la subasta se actualizó correctamente.',
+            ];
+        } catch (Throwable $e) {
+            $this->conexion->rollback();
+            error_log($e->getMessage());
+            return ['estado' => false, 'mensaje' => 'No se pudo actualizar el estado de la subasta.'];
+        }
+    }
 }

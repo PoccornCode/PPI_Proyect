@@ -99,4 +99,23 @@ $totalListaPendientes = count($subastasPendientes);
             </tbody>
         </table>
     </div>
+    <div class="mod-table-footer">
+        <div class="mod-table-footer-info">
+            <span class="adm-table-count" id="modApprovalCount">
+                Mostrando <?= $totalListaPendientes ?> <?= $totalListaPendientes === 1 ? 'registro' : 'registros' ?>
+            </span>
+        </div>
+        <div class="mod-table-footer-controls">
+            <label class="mod-page-size-wrap" for="modApprovalPageSize">
+                <span>Por página</span>
+                <select class="mod-page-size-select" id="modApprovalPageSize" aria-label="Registros por página">
+                    <option value="4" selected>4</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+            </label>
+            <nav class="mod-pagination" id="modApprovalPagination" aria-label="Paginación de subastas pendientes"></nav>
+        </div>
+    </div>
 </div>

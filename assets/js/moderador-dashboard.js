@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    const VALID_TABS = ['aprobar'];
+    const VALID_TABS = ['aprobar', 'administrar'];
 
     const navButtons = document.querySelectorAll('[data-mod-tab]');
     const sections = document.querySelectorAll('.adm-section');

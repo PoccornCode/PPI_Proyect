@@ -238,6 +238,27 @@ function moderarSubastaPendiente(int $idSubasta, string $decision): array
     return $dao->moderarSubasta($idSubasta, $decision);
 }
 
+function obtenerTodasSubastasModerador(string $baseUrl = ''): array
+{
+    $dao = new ModeradorDAO();
+    $filas = $dao->listarTodasSubastas();
+    $lista = [];
+
+    foreach ($filas as $fila) {
+        $item = formatearSubastaPendiente($fila, $baseUrl);
+        $item['estado_raw'] = strtolower((string)($fila['estado'] ?? 'pendiente'));
+        $lista[] = $item;
+    }
+
+    return $lista;
+}
+
+function cambiarEstadoSubastaModerador(int $idSubasta, string $nuevoEstado): array
+{
+    $dao = new ModeradorDAO();
+    return $dao->cambiarEstadoSubasta($idSubasta, $nuevoEstado);
+}
+
 if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -280,6 +301,28 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
         $idSubasta = (int)($_POST['id_subasta'] ?? 0);
         $decision  = (string)($_POST['decision'] ?? '');
         $resultado = moderarSubastaPendiente($idSubasta, $decision);
+
+        if ($resultado['estado']) {
+            $resultado['kpis'] = obtenerKpisModerador();
+        }
+
+        echo json_encode($resultado, JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    if ($opcion === 'todas') {
+        echo json_encode([
+            'estado'   => true,
+            'subastas' => obtenerTodasSubastasModerador(BASE_URL),
+            'kpis'     => obtenerKpisModerador(),
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'cambiar_estado') {
+        $idSubasta   = (int)($_POST['id_subasta'] ?? 0);
+        $nuevoEstado = (string)($_POST['nuevo_estado'] ?? '');
+        $resultado   = cambiarEstadoSubastaModerador($idSubasta, $nuevoEstado);
 
         if ($resultado['estado']) {
             $resultado['kpis'] = obtenerKpisModerador();
