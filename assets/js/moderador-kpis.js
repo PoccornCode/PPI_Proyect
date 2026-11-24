@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    const REFRESH_INTERVAL_MS = 15000;
+    const REFRESH_INTERVAL_MS = 2000;
     const baseUrl = window.MOD_BASE_URL || '';
     const endpoint = `${baseUrl}controllers/moderador_controller.php?opcion=kpis`;
 
@@ -110,9 +110,11 @@
     window.ModeradorKpis = { actualizar, renderKpis };
 
     document.addEventListener('DOMContentLoaded', () => {
-        setInterval(() => {
-            if (document.hidden) return;
-            actualizar();
+        let enCurso = false;
+        setInterval(async () => {
+            if (document.hidden || enCurso) return;
+            enCurso = true;
+            try { await actualizar(); } finally { enCurso = false; }
         }, REFRESH_INTERVAL_MS);
 
         document.addEventListener('visibilitychange', () => {

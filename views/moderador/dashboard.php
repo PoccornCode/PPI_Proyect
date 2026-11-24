@@ -275,7 +275,7 @@ $mod_inicial = $perfilMod['inicial'];
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= $base_url ?>assets/js/toast-ppi.js?v=2"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-kpis.js?v=5"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-kpis.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/moderador-kpis.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/moderador-paginacion.js?v=1"></script>
     <script src="<?= $base_url ?>assets/js/moderador-filtros.js?v=7"></script>
     <script src="<?= $base_url ?>assets/js/moderador-cola.js?v=6"></script>
