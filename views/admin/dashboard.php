@@ -5,18 +5,17 @@ if (session_status() === PHP_SESSION_NONE) {
 if (!defined('BASE_URL')) {
     require_once dirname(__DIR__, 2) . '/config/env.php';
 }
-$base_url = BASE_URL;
+require_once dirname(__DIR__, 2) . '/controllers/admin_controller.php';
 
-$adm_nombre = trim((string)($_SESSION['nombre'] ?? 'Admin'));
-$adm_apellido = trim((string)($_SESSION['apellido'] ?? 'Demo'));
-$adm_nombre_completo = trim($adm_nombre . ' ' . $adm_apellido);
-if ($adm_nombre_completo === '') {
-    $adm_nombre_completo = 'Administrador';
-}
-$adm_primer_nombre = trim(explode(' ', $adm_nombre !== '' ? $adm_nombre : 'Admin')[0]);
-$adm_username = trim((string)($_SESSION['username'] ?? 'admin_demo'));
-$adm_rol_nombre = 'Administrador';
-$adm_inicial = strtoupper(mb_substr($adm_primer_nombre !== '' ? $adm_primer_nombre : 'A', 0, 1, 'UTF-8'));
+$base_url = BASE_URL;
+$perfilAdmin = requerirAdministradorAutenticado(false);
+$alertasTopbar = obtenerAlertasTopbarAdmin();
+
+$adm_nombre_completo = $perfilAdmin['nombre_completo'];
+$adm_primer_nombre = $perfilAdmin['primer_nombre'];
+$adm_username = $perfilAdmin['username'];
+$adm_rol_nombre = $perfilAdmin['rol_nombre'];
+$adm_inicial = $perfilAdmin['inicial'];
 
 // Datos de referencia visual (mockup del panel Admin)
 $usuarios_demo = [
@@ -200,106 +199,7 @@ $transacciones_demo = [
 
 <body class="admin-body">
 
-    <!-- TOPBAR -->
-    <header class="adm-topbar">
-        <div class="adm-topbar-brand">
-            <button type="button" class="adm-mobile-toggle" id="admMobileToggle" aria-label="Abrir menú lateral">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-            <a href="<?= $base_url ?>index.php" class="adm-brand-link d-flex align-items-center gap-2 text-decoration-none" title="Volver al sitio principal" style="font-family: 'Raleway', sans-serif;">
-                <i class="fa-solid fa-gavel" style="font-size: 1.45rem; line-height: 1; color: #62803f;" aria-hidden="true"></i>
-                <span class="d-flex flex-column" style="line-height: 1;">
-                    <span class="d-flex align-items-baseline gap-1">
-                        <span class="fw-bold" style="font-size: 1.55rem; line-height: 1; color: #c9c9c9; font-family: 'Raleway', sans-serif;">Gavel</span>
-                        <span class="fw-bold" style="font-size: 1.25rem; line-height: 1; color: #62803f; font-family: 'Raleway', sans-serif;">.net</span>
-                    </span>
-                    <span style="font-family: 'Open Sans', sans-serif; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #7c8575; margin-top: 3px;">Administración</span>
-                </span>
-            </a>
-        </div>
-
-        <div class="adm-topbar-search">
-            <div class="adm-search-box">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <span class="adm-search-divider" aria-hidden="true"></span>
-                <input type="search" id="admGlobalSearch" placeholder="Buscar usuarios, subastas..." aria-label="Buscar usuarios o subastas">
-            </div>
-        </div>
-
-        <div class="adm-topbar-actions">
-            <!-- Notificaciones -->
-            <div class="dropdown">
-                <button class="adm-icon-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notificaciones">
-                    <i class="fa-regular fa-bell"></i>
-                    <span class="adm-notif-badge" id="admNotifCount">12</span>
-                </button>
-                <div class="dropdown-menu dropdown-menu-end adm-dropdown-menu" style="min-width: 270px;">
-                    <div class="px-2 py-1 d-flex justify-content-between align-items-center gap-2">
-                        <strong class="text-white small">Alertas de Administración</strong>
-                        <span class="badge rounded-pill" style="background:rgba(226, 155, 142, 0.14); color:#e8a599;">12 pendientes</span>
-                    </div>
-                    <hr class="dropdown-divider my-1">
-                    <a class="dropdown-item" href="<?= $base_url ?>views/moderador/dashboard.php">
-                        <i class="fa-solid fa-clock" style="color:#e29b8e;"></i>
-                        <div>
-                            <div class="small text-white">10 subastas por validar</div>
-                            <div style="font-size:0.74rem; color:#9aa392;">Cola de aprobación</div>
-                        </div>
-                    </a>
-                    <button type="button" class="dropdown-item" data-adm-tab="reportes">
-                        <i class="fa-regular fa-envelope" style="color:#8ea958;"></i>
-                        <div>
-                            <div class="small text-white">2 mensajes de contacto</div>
-                            <div style="font-size:0.74rem; color:#9aa392;">Pendientes de respuesta</div>
-                        </div>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Perfil Admin -->
-            <div class="dropdown">
-                <button class="adm-profile-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menú de usuario">
-                    <span class="adm-avatar-circle"><?= htmlspecialchars($adm_inicial) ?></span>
-                    <span class="fw-semibold d-none d-sm-inline"><?= htmlspecialchars($adm_primer_nombre) ?></span>
-                    <i class="fa-solid fa-chevron-down" style="font-size:0.75rem; color:#9aa392;"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end adm-dropdown-menu menu-perfil-ppi">
-                    <li class="menu-perfil-header">
-                        <div class="menu-perfil-name"><?= htmlspecialchars($adm_nombre_completo) ?></div>
-                        <div class="menu-perfil-user">@<?= htmlspecialchars($adm_username) ?> · <?= htmlspecialchars($adm_rol_nombre) ?></div>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="<?= $base_url ?>views/perfil.php">
-                            <i class="fa-solid fa-user"></i> Mi Perfil
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="<?= $base_url ?>index.php">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Ir al sitio público
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="<?= $base_url ?>views/moderador/dashboard.php">
-                            <i class="fa-solid fa-shield-halved"></i> Panel de Moderación
-                        </a>
-                    </li>
-                    <li>
-                        <button type="button" class="dropdown-item" data-adm-tab="configuracion">
-                            <i class="fa-solid fa-gear"></i> Configuración
-                        </button>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li>
-                        <a class="dropdown-item item-logout" href="#" data-bs-toggle="modal" data-bs-target="#modalConfirmLogout">
-                            <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </header>
+    <?php include __DIR__ . '/partials/topbar.php'; ?>
 
     <!-- SIDEBAR -->
     <div class="adm-sidebar-overlay" id="admSidebarOverlay"></div>
@@ -1757,6 +1657,7 @@ $transacciones_demo = [
     <?php include dirname(__DIR__) . '/moderador/partials/modal-logout.php'; ?>
 
     <script>
+        window.ADM_BASE_URL = <?= json_encode($base_url, JSON_UNESCAPED_SLASHES) ?>;
         window.ADM_CATEGORIES_DEMO = {
             baseUrl: <?= json_encode($base_url, JSON_UNESCAPED_SLASHES) ?>,
             categorias: <?= json_encode($categorias_admin, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
@@ -1764,7 +1665,8 @@ $transacciones_demo = [
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= $base_url ?>assets/js/toast-ppi.js?v=2"></script>
-    <script src="<?= $base_url ?>assets/js/admin-dashboard-referencia.js?v=10"></script>
+    <script src="<?= $base_url ?>assets/js/admin-dashboard.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-dashboard.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/admin-dashboard-referencia.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-dashboard-referencia.js') ?>"></script>
 </body>
 
 </html>
