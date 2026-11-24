@@ -11,6 +11,7 @@ $base_url = BASE_URL;
 $perfilAdmin = requerirAdministradorAutenticado(false);
 $alertasTopbar = obtenerAlertasTopbarAdmin();
 $kpisAdmin = obtenerKpisAdmin('30d');
+$graficosInicio = obtenerGraficosInicioAdmin('7d');
 
 $adm_nombre_completo = $perfilAdmin['nombre_completo'];
 $adm_primer_nombre = $perfilAdmin['primer_nombre'];
@@ -257,6 +258,10 @@ $transacciones_demo = [
         </nav>
 
         <div class="mod-sidebar-footer">
+            <a href="<?= $base_url ?>views/moderador/dashboard.php" class="mod-sidebar-link" title="Ir al panel de moderación">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Panel de Moderación</span>
+            </a>
             <a href="<?= $base_url ?>index.php" class="mod-sidebar-link" title="Ir al sitio público">
                 <i class="fa-solid fa-arrow-up-right-from-square"></i>
                 <span>Sitio público</span>
@@ -295,79 +300,7 @@ $transacciones_demo = [
 
             <?php include __DIR__ . '/partials/kpi-resumen.php'; ?>
 
-            <!-- Charts Row -->
-            <div class="adm-charts-row">
-                <div class="adm-panel">
-                    <div class="adm-panel-header">
-                        <h2 class="adm-panel-title">
-                            <i class="fa-solid fa-chart-line"></i> Actividad de la plataforma
-                        </h2>
-                        <label class="adm-pill-select adm-pill-select--sm">
-                            <i class="fa-regular fa-calendar"></i>
-                            <select id="admActivityRange" aria-label="Periodo de actividad">
-                                <option value="7d" selected>Últimos 7 días</option>
-                                <option value="30d">Últimos 30 días</option>
-                                <option value="90d">Últimos 90 días</option>
-                            </select>
-                        </label>
-                    </div>
-                    <div class="adm-panel-body">
-                        <div class="adm-chart-wrap">
-                            <svg id="admActivitySvg" class="adm-svg-chart" viewBox="0 0 560 220" role="img" aria-label="Gráfico de actividad semanal"></svg>
-                            <div id="admActivityTooltip" class="adm-chart-tooltip"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="adm-panel">
-                    <div class="adm-panel-header">
-                        <h2 class="adm-panel-title">
-                            <i class="fa-solid fa-chart-pie"></i> Distribución de subastas
-                        </h2>
-                    </div>
-                    <div class="adm-panel-body">
-                        <div class="adm-donut-layout">
-                            <svg width="168" height="168" viewBox="0 0 180 180" role="img" aria-label="Distribución de subastas: 67% activas, 11% finalizadas, 16% canceladas">
-                                <!-- Circumference of r=64 is ~402.12 -->
-                                <circle cx="90" cy="90" r="64" fill="none" stroke="#252c1f" stroke-width="26" />
-                                <!-- Activas ~69% -->
-                                <circle cx="90" cy="90" r="64" fill="none" stroke="#75865d" stroke-width="26"
-                                    stroke-dasharray="282 402.12" stroke-dashoffset="0"
-                                    transform="rotate(-90 90 90)" />
-                                <!-- Finalizadas ~13% -->
-                                <circle cx="90" cy="90" r="64" fill="none" stroke="#4c91a3" stroke-width="26"
-                                    stroke-dasharray="52 402.12" stroke-dashoffset="-282"
-                                    transform="rotate(-90 90 90)" />
-                                <!-- Canceladas ~17% -->
-                                <circle cx="90" cy="90" r="64" fill="none" stroke="#c8c45e" stroke-width="26"
-                                    stroke-dasharray="68.12 402.12" stroke-dashoffset="-334"
-                                    transform="rotate(-90 90 90)" />
-                            </svg>
-
-                            <ul class="adm-donut-legend">
-                                <li>
-                                    <span class="adm-legend-label">
-                                        <span class="adm-legend-dot" style="background:#75865d;"></span> Activas
-                                    </span>
-                                    <strong>67%</strong>
-                                </li>
-                                <li>
-                                    <span class="adm-legend-label">
-                                        <span class="adm-legend-dot" style="background:#4c91a3;"></span> Finalizadas
-                                    </span>
-                                    <strong>11%</strong>
-                                </li>
-                                <li>
-                                    <span class="adm-legend-label">
-                                        <span class="adm-legend-dot" style="background:#c8c45e;"></span> Canceladas
-                                    </span>
-                                    <strong>16%</strong>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <?php include __DIR__ . '/partials/graficos-inicio.php'; ?>
 
             <!-- Bottom Row: Usuarios recientes & Subastas destacadas -->
             <div class="adm-bottom-row">
@@ -1566,6 +1499,7 @@ $transacciones_demo = [
 
     <script>
         window.ADM_BASE_URL = <?= json_encode($base_url, JSON_UNESCAPED_SLASHES) ?>;
+        window.ADM_GRAFICOS_INICIO = <?= json_encode($graficosInicio, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
         window.ADM_CATEGORIES_DEMO = {
             baseUrl: <?= json_encode($base_url, JSON_UNESCAPED_SLASHES) ?>,
             categorias: <?= json_encode($categorias_admin, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
@@ -1574,6 +1508,7 @@ $transacciones_demo = [
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= $base_url ?>assets/js/toast-ppi.js?v=2"></script>
     <script src="<?= $base_url ?>assets/js/admin-kpis.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-kpis.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/admin-graficos.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-graficos.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-dashboard.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-dashboard.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-dashboard-referencia.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-dashboard-referencia.js') ?>"></script>
 </body>

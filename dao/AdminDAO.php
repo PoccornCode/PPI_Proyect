@@ -204,4 +204,120 @@ class AdminDAO
 
         return $serie;
     }
+
+    public function obtenerActividadPlataforma(string $rango = '7d'): array
+    {
+        $rangoValido = in_array($rango, ['7d', '30d', '90d'], true) ? $rango : '7d';
+        $diasMapa = ['7d' => 7, '30d' => 30, '90d' => 90];
+        $dias = $diasMapa[$rangoValido];
+
+        $diasCortos = ['Dom.', 'Lun.', 'Mar.', 'Mié.', 'Jue.', 'Vie.', 'Sáb.'];
+        $mesesCortos = [1 => 'ene.', 2 => 'feb.', 3 => 'mar.', 4 => 'abr.', 5 => 'may.', 6 => 'jun.', 7 => 'jul.', 8 => 'ago.', 9 => 'sep.', 10 => 'oct.', 11 => 'nov.', 12 => 'dic.'];
+
+        $labels = [];
+        $values = array_fill(0, 7, 0);
+
+        if ($rangoValido === '7d') {
+            $inicioTs = strtotime('today -6 days');
+            for ($i = 0; $i < 7; $i++) {
+                $ts = strtotime("+{$i} days", $inicioTs);
+                $labels[] = $diasCortos[(int)date('w', $ts)];
+            }
+            $duracionTramo = 86400;
+        } else {
+            $ahora = time();
+            $inicioTs = strtotime('today -' . ($dias - 1) . ' days');
+            $duracionTramo = max(1, ($ahora - $inicioTs) / 7);
+            for ($i = 0; $i < 7; $i++) {
+                $finTramoTs = (int)round($inicioTs + (($i + 1) * $duracionTramo));
+                $labels[] = (int)date('j', $finTramoTs) . ' ' . ($mesesCortos[(int)date('n', $finTramoTs)] ?? '');
+            }
+        }
+
+        if (!$this->conexion || $this->conexion->connect_errno) {
+            return ['rango' => $rangoValido, 'labels' => $labels, 'values' => $values];
+        }
+
+        $inicioSql = date('Y-m-d 00:00:00', $inicioTs);
+        $sql = "SELECT fecha_registro AS fecha_evento FROM sb_usuario WHERE fecha_registro >= '{$inicioSql}'
+                UNION ALL
+                SELECT fecha_inicial AS fecha_evento FROM sb_subasta WHERE fecha_inicial >= '{$inicioSql}'
+                UNION ALL
+                SELECT fecha AS fecha_evento FROM sb_puja WHERE fecha >= '{$inicioSql}'";
+
+        if ($res = $this->conexion->query($sql)) {
+            while ($row = $res->fetch_assoc()) {
+                $ts = strtotime((string)$row['fecha_evento']);
+                if ($ts === false || $ts < $inicioTs) {
+                    continue;
+                }
+                $idx = (int)floor(($ts - $inicioTs) / $duracionTramo);
+                if ($idx >= 7) {
+                    $idx = 6;
+                } elseif ($idx < 0) {
+                    $idx = 0;
+                }
+                $values[$idx]++;
+            }
+        }
+
+        return [
+            'rango'  => $rangoValido,
+            'labels' => $labels,
+            'values' => $values,
+        ];
+    }
+
+    public function obtenerDistribucionSubastas(): array
+    {
+        $conteos = [
+            'activas'     => 0,
+            'pendientes'  => 0,
+            'finalizadas' => 0,
+            'canceladas'  => 0,
+        ];
+
+        if ($this->conexion && !$this->conexion->connect_errno) {
+            $sql = "SELECT
+                        SUM(CASE WHEN LOWER(estado) = 'activa' AND fecha_final > NOW() THEN 1 ELSE 0 END) AS activas,
+                        SUM(CASE WHEN LOWER(estado) = 'pendiente' THEN 1 ELSE 0 END) AS pendientes,
+                        SUM(CASE WHEN LOWER(estado) IN ('finalizada', 'sin_ofertas') THEN 1 ELSE 0 END) AS finalizadas,
+                        SUM(CASE WHEN LOWER(estado) IN ('cancelada', 'rechazada') THEN 1 ELSE 0 END) AS canceladas
+                    FROM sb_subasta";
+            if ($res = $this->conexion->query($sql)) {
+                if ($row = $res->fetch_assoc()) {
+                    $conteos['activas']     = (int)($row['activas'] ?? 0);
+                    $conteos['pendientes']  = (int)($row['pendientes'] ?? 0);
+                    $conteos['finalizadas'] = (int)($row['finalizadas'] ?? 0);
+                    $conteos['canceladas']  = (int)($row['canceladas'] ?? 0);
+                }
+            }
+        }
+
+        $total = array_sum($conteos);
+        $definicion = [
+            ['key' => 'activas',     'label' => 'Activas',     'color' => '#75865d'],
+            ['key' => 'pendientes',  'label' => 'Pendientes',  'color' => '#e29b8e'],
+            ['key' => 'finalizadas', 'label' => 'Finalizadas', 'color' => '#4c91a3'],
+            ['key' => 'canceladas',  'label' => 'Canceladas',  'color' => '#c8c45e'],
+        ];
+
+        $items = [];
+        foreach ($definicion as $def) {
+            $count = $conteos[$def['key']];
+            $pct = $total > 0 ? (int)round(($count / $total) * 100) : 0;
+            $items[] = [
+                'key'        => $def['key'],
+                'label'      => $def['label'],
+                'count'      => $count,
+                'porcentaje' => $pct,
+                'color'      => $def['color'],
+            ];
+        }
+
+        return [
+            'total' => $total,
+            'items' => $items,
+        ];
+    }
 }

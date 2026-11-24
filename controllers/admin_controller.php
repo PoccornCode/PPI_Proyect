@@ -134,6 +134,18 @@ function obtenerKpisAdmin(string $rango = '30d'): array
     ];
 }
 
+function obtenerGraficosInicioAdmin(string $rangoActividad = '7d'): array
+{
+    $modDao = new ModeradorDAO();
+    $modDao->inactivarSubastasVencidas();
+
+    $dao = new AdminDAO();
+    return [
+        'actividad'    => $dao->obtenerActividadPlataforma($rangoActividad),
+        'distribucion' => $dao->obtenerDistribucionSubastas(),
+    ];
+}
+
 if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -163,6 +175,15 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
         echo json_encode([
             'estado' => true,
             'kpis'   => obtenerKpisAdmin($rango),
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    if ($opcion === 'graficos') {
+        $rango = (string)($_GET['rango'] ?? $_POST['rango'] ?? '7d');
+        echo json_encode([
+            'estado'   => true,
+            'graficos' => obtenerGraficosInicioAdmin($rango),
         ], JSON_UNESCAPED_UNICODE);
         exit;
     }
