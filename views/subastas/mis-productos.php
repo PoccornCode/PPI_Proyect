@@ -114,7 +114,11 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                                             </span>
                                         <?php elseif (strtolower($estadoSubasta) === 'activa' || strtolower($estadoSubasta) === 'abierta'): ?>
                                             <span class="status-badge status-activa">
-                                                <span class="status-dot"></span> Activa
+                                                <span class="status-dot"></span> En subasta
+                                            </span>
+                                        <?php elseif (strtolower($estadoSubasta) === 'sin_ofertas'): ?>
+                                            <span class="status-badge status-finalizada">
+                                                <span class="status-dot"></span> Sin ofertas
                                             </span>
                                         <?php else: ?>
                                             <span class="status-badge status-finalizada">
