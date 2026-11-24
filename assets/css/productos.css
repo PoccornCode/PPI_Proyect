@@ -25,14 +25,25 @@ main {
   height: 72px;
   padding: 0px;
   display: flex;
+  position: relative;
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  border: 2px solid rgb(148, 170, 52);
+  border: 2px solid rgb(72, 83, 26);
   background: rgb(19, 22, 17);
   color: rgb(79, 86, 70);
   cursor: pointer;
 }
+.btn-miniaturas :hover{
+  border: 2px solid rgb(148, 170, 52);
+}
+
+/* .btn-miniaturas img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+} */
 
 
 .detalle-categoria {

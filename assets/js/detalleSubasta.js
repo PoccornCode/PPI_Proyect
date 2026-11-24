@@ -11,9 +11,10 @@ const montoInicial = document.getElementById("dato-monto-inicial"),
     descripcion = document.getElementById("subasta-descripcion"),
     vendedorName = document.getElementById("vendedor-nombre"),
     vendedorAvatar = document.getElementById("vendedor-avatar"),
-    imagenPrincipal = document.getElementById("foto-principal")
-
-let rutasImagenes = ""
+    imagenPrincipal = document.getElementById("foto-principal"),
+    datoPostores = document.getElementById("dato-postores"),
+    imagenesMiniaturas = document.getElementById("miniaturas"),
+    chatFeed = document.getElementById("chat-feed")
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {
@@ -56,14 +57,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             },
             estadoDato = resultado.datos.estado
-            
+
         let estadoClass = new Map()
-        estadoClass.set("activa",{class:"status-activa",text:"Subasta Activa"})
-        estadoClass.set("pendiente",{class:"status-none",text:"Pendiente"})
-        estadoClass.set("rechazada",{class:"status-none",text:"Rechazada"})
-        estadoClass.set("finalizada",{class:"status-none",text:"Finalizada"})
-        estadoClass.set("sin-ofertas",{class:"status-none",text:"Sin Ofertas"})
-        estadoClass.set("cancelada",{class:"status-none",text:"Cancelada"})
+        estadoClass.set("activa", { class: "status-activa", text: "Subasta Activa" })
+        estadoClass.set("pendiente", { class: "status-none", text: "Pendiente" })
+        estadoClass.set("rechazada", { class: "status-none", text: "Rechazada" })
+        estadoClass.set("finalizada", { class: "status-none", text: "Finalizada" })
+        estadoClass.set("sin-ofertas", { class: "status-none", text: "Sin Ofertas" })
+        estadoClass.set("cancelada", { class: "status-none", text: "Cancelada" })
 
         montoInicial.textContent = "$ " + resultado.datos.precio_inicial
         datoIncremento.textContent = "$ " + resultado.datos.dato_incremento
@@ -86,11 +87,64 @@ document.addEventListener("DOMContentLoaded", async () => {
         condicion.textContent = resultado.datos.condicion
         descripcion.textContent = resultado.datos.descripcion
         vendedorName.textContent = resultado.datos.nombreU
-        vendedorAvatar.textContent = String(resultado.datos.nombreU).slice(0,2)
-
-        alert(ruta_base_img+resultado.rutasImg[0])
+        vendedorAvatar.textContent = String(resultado.datos.nombreU).slice(0, 2)
         // posicionamiento de fotografias
-        imagenPrincipal.src = ruta_base_img+resultado.rutasImg[0]
+        imagenPrincipal.src = ruta_base_img + resultado.rutasImg[0]
+        datoPostores.textContent = resultado.datos.datoPostores
+        rutasImagenes = resultado.rutasImg
+
+        if (resultado.rutasImg.length > 1) {
+            resultado.rutasImg.forEach((i, index) => {
+
+                const item = document.createElement("button"),
+                    itemImage = document.createElement("img")
+                item.classList.add("btn-miniaturas")
+                item.style.backgroundImage = `url(${(ruta_base_img + i)})`
+                item.style.backgroundSize = "cover"
+                item.style.backgroundPosition = "center"
+                item.style.opacity = 0.8
+                imagenesMiniaturas.append(item)
+
+                item.addEventListener("click", () => {
+                    imagenPrincipal.src = ruta_base_img + resultado.rutasImg[index]
+                })
+
+            })
+
+        }
+
+        alert(resultado.pujas.length)
+        alert(chatFeed.id)
+        if (resultado.pujas.length > 0) {
+
+            resultado.pujas.forEach(puja => {
+
+                const msg_card = document.createElement("div"),
+                    avatar = document.createElement("div")
+                msg_card.classList.add("chat-msg")
+                avatar.classList.add(["avatar-ppi","avatar-char"])
+                msg_card.append(avatar)
+
+                chatFeed.append(msg_card)
+                // let msg = document.createElement("div"),
+                //     user = document.createElement("div")
+                // msg.classList.add(["chat-msg","chat-burbuja"])
+                // user.style.margin = "10px"
+                // msg.append(user)
+
+                // <div class="chat-msg">
+                //     <div class="avatar-ppi avatar-chat">MA</div>
+                //     <div class="chat-burbuja">
+                //         <div class="chat-meta">
+                //             <span class="chat-usuario">maria_sv</span>
+                //             <span class="chat-hora">15:02</span>
+                //         </div>
+                //         <span class="chat-monto">$ 185.00</span>
+                //     </div>
+                // </div>
+
+            })
+        }
     } catch (error) {
         // Swal.close();
     }

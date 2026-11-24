@@ -72,15 +72,13 @@ if (!function_exists('e')) {
 
                         <div id="miniaturas" class="mt-4 m-2"
                             style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px;">
-                            <button class="btn-miniaturas">
+                            
+                            <!-- <button class="btn-miniaturas">
                                 <i class="bi bi-image d-block" style="font-size: 1.5rem;"></i>
                             </button>
                             <button class="btn-miniaturas">
                                 <i class="bi bi-image d-block" style="font-size: 1.5rem;"></i>
-                            </button>
-                            <button class="btn-miniaturas">
-                                <i class="bi bi-image d-block" style="font-size: 1.5rem;"></i>
-                            </button>
+                            </button> -->
                         </div>
 
 
@@ -154,7 +152,7 @@ if (!function_exists('e')) {
                                 <div class="detalle-dato">
                                     <div class="detalle-dato-label"><i class="fas fa-users"></i>Postores</div>
                                     <div id="dato-postores" class="detalle-dato-valor">—</div>
-                                    <div id="dato-total-pujas" class="detalle-dato-sub">—</div>
+                                    <div id="dato-total-pujas" class="detalle-dato-sub">Cantidad de interesados</div>
                                 </div>
                             </div>
                         </div>
@@ -178,7 +176,7 @@ if (!function_exists('e')) {
                         <div id="chat-feed" class="chat-feed" role="log" aria-live="polite"
                             aria-label="Historial de pujas">
 
-                            <div data-dc-tpl="173"
+                            <!-- <div data-dc-tpl="173"
                                 style="display: flex; align-items: flex-end; gap: 10px; max-width: 88%;" class="m-3">
                                 <div data-dc-tpl="174" aria-hidden="true"
                                     style="flex: 0 0 36px; width: 36px; height: 36px; border-radius: 50%; background: rgb(28, 34, 23); color: rgb(148, 170, 52); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">
@@ -278,7 +276,7 @@ if (!function_exists('e')) {
                                         style="font-family: Raleway, sans-serif; font-weight: 800; font-size: 22px; line-height: 1.2; color: rgb(242, 242, 242);"><span
                                             class="sc-interp">$ 140.00</span></span>
                                 </div>
-                            </div>
+                            </div> -->
                             
                             <!-- <div id="chat-feed-inner" class="chat-feed-inner">
                                     <div class="chat-sistema">Cargando pujas…</div>
