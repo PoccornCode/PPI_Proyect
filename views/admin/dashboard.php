@@ -2,6 +2,8 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
 if (!defined('BASE_URL')) {
     require_once dirname(__DIR__, 2) . '/config/env.php';
 }
@@ -1506,7 +1508,7 @@ $transacciones_demo = [
         };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= $base_url ?>assets/js/toast-ppi.js?v=2"></script>
+    <script src="<?= $base_url ?>assets/js/toast-ppi.js?v=3"></script>
     <script src="<?= $base_url ?>assets/js/admin-kpis.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-kpis.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-graficos.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-graficos.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-dashboard.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-dashboard.js') ?>"></script>

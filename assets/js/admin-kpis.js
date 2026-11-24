@@ -102,6 +102,16 @@
                 actualizar();
             }
         });
+
+        window.addEventListener('focus', () => {
+            actualizar();
+        });
+
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                actualizar();
+            }
+        });
     });
 
     window.AdminKpis = { actualizar, renderKpis };

@@ -173,6 +173,16 @@
                 actualizarAlertas();
             }
         });
+
+        window.addEventListener('focus', () => {
+            actualizarAlertas();
+        });
+
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                actualizarAlertas();
+            }
+        });
     });
 
     window.AdminDashboard = {
