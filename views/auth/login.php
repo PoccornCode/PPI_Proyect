@@ -37,7 +37,7 @@ if ($flashToast !== null) {
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/main.css?v=30" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/forms.css?v=42" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/forms.css?v=49" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -89,7 +89,7 @@ if ($flashToast !== null) {
 
                                 <div class="col-12">
                                     <label for="username" class="form-label text-main-ppi fw-bold">Nombre de usuario <span class="req-star">*</span></label>
-                                    <input type="text" class="form-control" id="username" name="username" placeholder="Ingresa tu usuario" maxlength="50" required>
+                                    <input type="text" class="form-control" id="username" name="username" placeholder="Ingresa tu usuario" maxlength="50" spellcheck="false" autocapitalize="off" autocorrect="off" required>
                                 </div>
 
                                 <div class="col-12">

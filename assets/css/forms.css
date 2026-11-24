@@ -1,14 +1,44 @@
 .form-control,
-.form-select,
-.form-control:-webkit-autofill,
-.form-control:-webkit-autofill:hover,
-.form-control:-webkit-autofill:focus,
-.form-control:-webkit-autofill:active {
+.form-select {
+    color-scheme: dark;
     background-color: #121511 !important;
     color: #e2e6dc !important;
     border-color: #2b3323 !important;
+    caret-color: #f0f3ec;
+    font-family: 'Open Sans', sans-serif !important;
+    font-size: 1rem !important;
+    -webkit-text-fill-color: #e2e6dc !important;
+}
+
+.form-control::spelling-error,
+.form-control::grammar-error {
+    color: #e2e6dc;
+}
+
+.form-control:-webkit-autofill::first-line {
+    font-family: 'Open Sans', sans-serif !important;
+    font-size: 1rem !important;
+    color: #e2e6dc !important;
+}
+
+.form-control:-webkit-autofill,
+.form-control:-webkit-autofill:hover,
+.form-control:-webkit-autofill:focus,
+.form-control:-webkit-autofill:active,
+.form-control:autofill,
+.form-control:autofill:hover,
+.form-control:autofill:focus,
+.form-control:autofill:active {
+    color-scheme: dark;
+    background-color: #121511 !important;
+    color: #e2e6dc !important;
+    border-color: #2b3323 !important;
+    caret-color: #f0f3ec;
+    font-family: 'Open Sans', sans-serif !important;
+    font-size: 1rem !important;
     -webkit-text-fill-color: #e2e6dc !important;
     -webkit-box-shadow: 0 0 0 1000px #121511 inset !important;
+    box-shadow: 0 0 0 1000px #121511 inset !important;
     transition: background-color 5000s ease-in-out 0s !important;
 }
 
@@ -16,9 +46,16 @@
 .form-select:focus {
     background-color: #161a15 !important;
     color: #f0f3ec !important;
+    -webkit-text-fill-color: #f0f3ec !important;
+    caret-color: #f0f3ec;
     border-color: #658807 !important;
     box-shadow: 0 0 0 0.25rem rgba(101, 136, 7, 0.25) !important;
     -webkit-box-shadow: 0 0 0 1000px #161a15 inset, 0 0 0 0.25rem rgba(101, 136, 7, 0.25) !important;
+}
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
 }
 
 .form-control:disabled,

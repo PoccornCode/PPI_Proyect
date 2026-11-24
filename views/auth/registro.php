@@ -21,7 +21,7 @@ $pagina = "registro";
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/forms.css?v=47" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/forms.css?v=49" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/main.css?v=30" rel="stylesheet">
 </head>
 
@@ -88,7 +88,7 @@ $pagina = "registro";
 
                                 <div class="col-12">
                                     <label for="username" class="form-label text-main-ppi fw-bold">Nombre de usuario <span class="req-star">*</span></label>
-                                    <input type="text" class="form-control" id="username" name="nuevo_reg_username" placeholder="Elige un usuario único" maxlength="50" autocomplete="off" required>
+                                    <input type="text" class="form-control" id="username" name="nuevo_reg_username" placeholder="Elige un usuario único" maxlength="50" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" required>
                                 </div>
 
                                 <div class="col-md-6">
