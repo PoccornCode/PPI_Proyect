@@ -14,6 +14,7 @@ $perfilAdmin = requerirAdministradorAutenticado(false);
 $alertasTopbar = obtenerAlertasTopbarAdmin();
 $kpisAdmin = obtenerKpisAdmin('30d');
 $graficosInicio = obtenerGraficosInicioAdmin('7d');
+$resumenInferiorInicio = obtenerResumenInferiorInicioAdmin($base_url);
 
 $adm_nombre_completo = $perfilAdmin['nombre_completo'];
 $adm_primer_nombre = $perfilAdmin['primer_nombre'];
@@ -305,111 +306,7 @@ $transacciones_demo = [
             <?php include __DIR__ . '/partials/graficos-inicio.php'; ?>
 
             <!-- Bottom Row: Usuarios recientes & Subastas destacadas -->
-            <div class="adm-bottom-row">
-                <div class="adm-panel">
-                    <div class="adm-panel-header">
-                        <h2 class="adm-panel-title">
-                            <i class="fa-solid fa-users"></i> Usuarios recientes
-                        </h2>
-                        <button type="button" class="adm-panel-link" data-adm-tab="usuarios">
-                            Ver todos <i class="fa-solid fa-arrow-right"></i>
-                        </button>
-                    </div>
-                    <div class="adm-panel-body py-2">
-                        <div class="adm-recent-list">
-                            <div class="adm-recent-item">
-                                <div class="adm-user-avatar"><i class="fa-solid fa-user"></i></div>
-                                <div class="adm-recent-email">usuariotal1@gmail.com</div>
-                                <span class="adm-badge adm-badge--vendedor">Vendedor</span>
-                            </div>
-                            <div class="adm-recent-item">
-                                <div class="adm-user-avatar"><i class="fa-solid fa-user"></i></div>
-                                <div class="adm-recent-email">usuariotal2@gmail.com</div>
-                                <span class="adm-badge adm-badge--postor">Postor</span>
-                            </div>
-                            <div class="adm-recent-item">
-                                <div class="adm-user-avatar"><i class="fa-solid fa-user"></i></div>
-                                <div class="adm-recent-email">usuariotal3@gmail.com</div>
-                                <span class="adm-badge adm-badge--vendedor">Vendedor</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="adm-panel">
-                    <div class="adm-panel-header">
-                        <h2 class="adm-panel-title">
-                            <i class="fa-solid fa-star"></i> Subastas destacadas
-                        </h2>
-                        <button type="button" class="adm-panel-link" data-adm-tab="subastas">
-                            Ver todas <i class="fa-solid fa-arrow-right"></i>
-                        </button>
-                    </div>
-                    <div class="adm-panel-body py-2">
-                        <div class="adm-featured-list">
-                            <article class="adm-featured-row" data-adm-tab="subastas" role="button" tabindex="0">
-                                <div class="adm-featured-thumb">
-                                    <img src="<?= $base_url ?>assets/img/cat-coleccionables.jpg" alt="Pokémon Charizard Holo">
-                                </div>
-                                <div class="adm-featured-info">
-                                    <div class="adm-featured-title">1999 Pokémon 1st Edition Base Set Charizard Holo</div>
-                                    <div class="adm-featured-meta">
-                                        <span>Coleccionables</span>
-                                        <span class="adm-meta-dot" aria-hidden="true">·</span>
-                                        <span>18 pujas</span>
-                                        <span class="adm-meta-dot" aria-hidden="true">·</span>
-                                        <span class="adm-featured-time"><i class="fa-regular fa-clock"></i> 02:15:30</span>
-                                    </div>
-                                </div>
-                                <div class="adm-featured-aside">
-                                    <div class="adm-featured-price">$8,750.00</div>
-                                    <div class="adm-featured-sub">Puja actual</div>
-                                </div>
-                            </article>
-
-                            <article class="adm-featured-row" data-adm-tab="subastas" role="button" tabindex="0">
-                                <div class="adm-featured-thumb">
-                                    <img src="<?= $base_url ?>assets/img/cat-tecnologia.jpg" alt="Cámara Sony ZV-E10 II">
-                                </div>
-                                <div class="adm-featured-info">
-                                    <div class="adm-featured-title">Cámara digital Sony ZV-E10 II con Lente Intercambiable</div>
-                                    <div class="adm-featured-meta">
-                                        <span>Tecnología</span>
-                                        <span class="adm-meta-dot" aria-hidden="true">·</span>
-                                        <span>11 pujas</span>
-                                        <span class="adm-meta-dot" aria-hidden="true">·</span>
-                                        <span class="adm-featured-time"><i class="fa-regular fa-clock"></i> 05:45:20</span>
-                                    </div>
-                                </div>
-                                <div class="adm-featured-aside">
-                                    <div class="adm-featured-price">$950.00</div>
-                                    <div class="adm-featured-sub">Puja actual</div>
-                                </div>
-                            </article>
-
-                            <article class="adm-featured-row" data-adm-tab="subastas" role="button" tabindex="0">
-                                <div class="adm-featured-thumb">
-                                    <img src="<?= $base_url ?>assets/img/cat-arte.jpg" alt="Zelda Ocarina of Time Gold">
-                                </div>
-                                <div class="adm-featured-info">
-                                    <div class="adm-featured-title">Zelda: Ocarina of Time Gold Cartridge (Nintendo 64)</div>
-                                    <div class="adm-featured-meta">
-                                        <span>Videojuegos</span>
-                                        <span class="adm-meta-dot" aria-hidden="true">·</span>
-                                        <span>9 pujas</span>
-                                        <span class="adm-meta-dot" aria-hidden="true">·</span>
-                                        <span class="adm-featured-time"><i class="fa-regular fa-clock"></i> 03:10:40</span>
-                                    </div>
-                                </div>
-                                <div class="adm-featured-aside">
-                                    <div class="adm-featured-price">$500.00</div>
-                                    <div class="adm-featured-sub">Puja actual</div>
-                                </div>
-                            </article>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <?php include __DIR__ . '/partials/resumen-inferior-inicio.php'; ?>
         </section>
 
         <!-- ===============================================================
@@ -1498,6 +1395,7 @@ $transacciones_demo = [
     </div>
 
     <?php include dirname(__DIR__) . '/moderador/partials/modal-logout.php'; ?>
+    <?php include dirname(__DIR__, 2) . '/includes/modal-sesion-inactiva.php'; ?>
 
     <script>
         window.ADM_BASE_URL = <?= json_encode($base_url, JSON_UNESCAPED_SLASHES) ?>;
@@ -1508,9 +1406,11 @@ $transacciones_demo = [
         };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= $base_url ?>assets/js/toast-ppi.js?v=3"></script>
+    <script src="<?= $base_url ?>assets/js/sesion-inactividad.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/sesion-inactividad.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/toast-ppi.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/toast-ppi.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-kpis.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-kpis.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-graficos.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-graficos.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/admin-resumen-inicio.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-resumen-inicio.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-dashboard.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-dashboard.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-dashboard-referencia.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-dashboard-referencia.js') ?>"></script>
 </body>

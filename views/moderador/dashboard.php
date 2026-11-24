@@ -277,11 +277,13 @@ $mod_inicial = $perfilMod['inicial'];
     <?php include __DIR__ . '/partials/modal-confirmar-decision.php'; ?>
     <?php include __DIR__ . '/partials/modal-administrar-estado.php'; ?>
     <?php include __DIR__ . '/partials/modal-logout.php'; ?>
+    <?php include dirname(__DIR__, 2) . '/includes/modal-sesion-inactiva.php'; ?>
 
     <script>
         window.MOD_BASE_URL = <?= json_encode($base_url, JSON_UNESCAPED_SLASHES) ?>;
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= $base_url ?>assets/js/sesion-inactividad.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/sesion-inactividad.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/toast-ppi.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/toast-ppi.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/moderador-kpis.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/moderador-kpis.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/moderador-paginacion.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/moderador-paginacion.js') ?>"></script>

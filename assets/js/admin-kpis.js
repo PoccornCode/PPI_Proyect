@@ -60,10 +60,11 @@
         });
     }
 
-    async function actualizar() {
+    async function actualizar(esFondo = false) {
         try {
             const rango = encodeURIComponent(rangeSelect?.value || '30d');
-            const url = `${baseUrl}controllers/admin_controller.php?opcion=kpis&rango=${rango}&_t=${Date.now()}`;
+            const bgParam = esFondo === true ? '&bg=1' : '';
+            const url = `${baseUrl}controllers/admin_controller.php?opcion=kpis&rango=${rango}${bgParam}&_t=${Date.now()}`;
             const response = await fetch(url, {
                 headers: { Accept: 'application/json' },
                 cache: 'no-store'
@@ -87,14 +88,14 @@
         return null;
     }
 
-    rangeSelect?.addEventListener('change', actualizar);
+    rangeSelect?.addEventListener('change', () => actualizar(false));
 
     document.addEventListener('DOMContentLoaded', () => {
         let enCurso = false;
         setInterval(async () => {
             if (document.hidden || enCurso) return;
             enCurso = true;
-            try { await actualizar(); } finally { enCurso = false; }
+            try { await actualizar(true); } finally { enCurso = false; }
         }, REFRESH_INTERVAL_MS);
 
         document.addEventListener('visibilitychange', () => {
