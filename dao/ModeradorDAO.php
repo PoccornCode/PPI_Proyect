@@ -132,40 +132,31 @@ class ModeradorDAO
         return array_values($fechas);
     }
 
-    public function obtenerPerfilModerador(int $idUsuario = 0): ?array
+    public function obtenerPerfilModerador(int $idUsuario): ?array
     {
-        if (!$this->conexion || $this->conexion->connect_errno) {
+        if ($idUsuario <= 0 || !$this->conexion || $this->conexion->connect_errno) {
             return null;
         }
 
-        if ($idUsuario > 0) {
-            $sql = "SELECT u.id_usuario, u.nombre, u.apellido, u.username, u.id_rol,
-                           COALESCE(r.nombre, '') AS rol_nombre
-                    FROM sb_usuario u
-                    LEFT JOIN sb_rol r ON u.id_rol = r.id_rol
-                    WHERE u.id_usuario = ? AND u.estado = 1
-                    LIMIT 1";
-            $stmt = $this->conexion->prepare($sql);
-            if ($stmt) {
-                $stmt->bind_param('i', $idUsuario);
-                $stmt->execute();
-                $row = $stmt->get_result()->fetch_assoc();
-                $stmt->close();
-                if ($row) {
-                    return $row;
-                }
-            }
+        $sql = "SELECT u.id_usuario, u.nombre, u.apellido, u.username, u.id_rol,
+                       COALESCE(r.nombre, '') AS rol_nombre
+                FROM sb_usuario u
+                INNER JOIN sb_rol r ON u.id_rol = r.id_rol
+                WHERE u.id_usuario = ?
+                  AND u.estado = 1
+                  AND u.id_rol IN (1, 3)
+                LIMIT 1";
+        $stmt = $this->conexion->prepare($sql);
+        if (!$stmt) {
+            return null;
         }
 
-        $sqlFallback = "SELECT u.id_usuario, u.nombre, u.apellido, u.username, u.id_rol,
-                               COALESCE(r.nombre, '') AS rol_nombre
-                        FROM sb_usuario u
-                        INNER JOIN sb_rol r ON u.id_rol = r.id_rol
-                        WHERE u.id_rol IN (3, 1) AND u.estado = 1
-                        ORDER BY (u.id_rol = 3) DESC, u.id_usuario ASC
-                        LIMIT 1";
-        $res = $this->conexion->query($sqlFallback);
-        return ($res && ($row = $res->fetch_assoc())) ? $row : null;
+        $stmt->bind_param('i', $idUsuario);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        return $row ?: null;
     }
 
     public function listarSubastasPendientes(): array

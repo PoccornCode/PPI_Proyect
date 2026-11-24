@@ -8,12 +8,13 @@ if (!defined('BASE_URL')) {
 require_once dirname(__DIR__, 2) . '/controllers/moderador_controller.php';
 
 $base_url = BASE_URL;
+$perfilMod = requerirModeradorAutenticado(false);
+
 $kpisModerador = obtenerKpisModerador();
 $categoriasModerador = obtenerCategoriasModerador();
 $subastasPendientes = obtenerColaSubastasPendientes($base_url);
 $todasSubastas = obtenerTodasSubastasModerador($base_url);
 $totalPendientesKpi = (int)($kpisModerador['pendientes'] ?? count($subastasPendientes));
-$perfilMod = obtenerPerfilModeradorActual();
 
 $mod_nombre_completo = $perfilMod['nombre_completo'];
 $mod_primer_nombre = $perfilMod['primer_nombre'];
@@ -274,11 +275,11 @@ $mod_inicial = $perfilMod['inicial'];
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= $base_url ?>assets/js/toast-ppi.js?v=2"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-kpis.js?v=4"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-kpis.js?v=5"></script>
     <script src="<?= $base_url ?>assets/js/moderador-paginacion.js?v=1"></script>
     <script src="<?= $base_url ?>assets/js/moderador-filtros.js?v=7"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-cola.js?v=5"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-administrar.js?v=9"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-cola.js?v=6"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-administrar.js?v=10"></script>
     <script src="<?= $base_url ?>assets/js/moderador-dashboard.js?v=8"></script>
 </body>
 

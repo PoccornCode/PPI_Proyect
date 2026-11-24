@@ -27,16 +27,18 @@ if ($opcion === "login") {
         session_regenerate_id(true);
 
         $u = $resultado['usuario'];
-        $_SESSION['id_usuario'] = $u['id_usuario'];
+        $_SESSION['id_usuario'] = (int)$u['id_usuario'];
         $_SESSION['nombre'] = $u['nombre'];
         $_SESSION['apellido'] = $u['apellido'];
         $_SESSION['username'] = $u['username'];
-        $_SESSION['id_rol'] = $u['id_rol'];
+        $_SESSION['id_rol'] = (int)$u['id_rol'];
         $_SESSION['last_activity'] = time();
 
         if (!empty($_SESSION['redirect_after_login'])) {
             $redirect = $_SESSION['redirect_after_login'];
             unset($_SESSION['redirect_after_login']);
+        } elseif ((int)$u['id_rol'] === 3) {
+            $redirect = BASE_URL . "views/moderador/dashboard.php";
         } else {
             $redirect = BASE_URL . "index.php";
         }

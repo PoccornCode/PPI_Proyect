@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../dao/ModeradorDAO.php';
 require_once __DIR__ . '/../dao/CategoriaDAO.php';
+require_once __DIR__ . '/../helpers/sesion_inactividad.php';
 
 function formatearFechaKpiEs(?string $fecha): string
 {
@@ -135,25 +136,88 @@ function obtenerCategoriasModerador(): array
     return $dao->listarCategorias();
 }
 
-function obtenerPerfilModeradorActual(): array
+function obtenerPerfilModeradorActual(): ?array
 {
     $idSesion = (int)($_SESSION['id_usuario'] ?? 0);
+    if ($idSesion <= 0) {
+        return null;
+    }
+
     $dao = new ModeradorDAO();
     $perfil = $dao->obtenerPerfilModerador($idSesion);
+    if (!$perfil) {
+        return null;
+    }
 
-    $nombreCompleto = trim(($perfil['nombre'] ?? ($_SESSION['nombre'] ?? '')) . ' ' . ($perfil['apellido'] ?? ($_SESSION['apellido'] ?? '')));
+    $nombreCompleto = trim(($perfil['nombre'] ?? '') . ' ' . ($perfil['apellido'] ?? ''));
     $primerNombre = explode(' ', $nombreCompleto)[0] ?: ($perfil['username'] ?? '');
     $inicial = $nombreCompleto !== '' ? strtoupper(mb_substr($nombreCompleto, 0, 1, 'UTF-8')) : '';
 
     return [
-        'id_usuario'      => (int)($perfil['id_usuario'] ?? $idSesion),
+        'id_usuario'      => (int)$perfil['id_usuario'],
         'nombre_completo' => $nombreCompleto,
         'primer_nombre'   => $primerNombre,
-        'username'        => (string)($perfil['username'] ?? ($_SESSION['username'] ?? '')),
+        'username'        => (string)($perfil['username'] ?? ''),
         'rol_nombre'      => (string)($perfil['rol_nombre'] ?? ''),
-        'id_rol'          => (int)($perfil['id_rol'] ?? ($_SESSION['id_rol'] ?? 0)),
+        'id_rol'          => (int)$perfil['id_rol'],
         'inicial'         => $inicial,
     ];
+}
+
+function requerirModeradorAutenticado(bool $esApiJson = false): array
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    if (!defined('BASE_URL')) {
+        require_once __DIR__ . '/../config/env.php';
+    }
+
+    verificarInactividadSesion($esApiJson);
+
+    $idSesion = (int)($_SESSION['id_usuario'] ?? 0);
+    if ($idSesion <= 0) {
+        if ($esApiJson) {
+            http_response_code(401);
+            header('Content-Type: application/json; charset=UTF-8');
+            echo json_encode([
+                'estado'        => false,
+                'auth_required' => true,
+                'redirect'      => BASE_URL . 'views/auth/login.php',
+                'mensaje'       => 'Debes iniciar sesión para acceder al panel de moderación.',
+            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            exit;
+        }
+
+        $_SESSION['redirect_after_login'] = BASE_URL . 'views/moderador/dashboard.php';
+        $_SESSION['flash_toast'] = [
+            'tipo'    => 'warning',
+            'titulo'  => 'Acceso restringido',
+            'mensaje' => 'Inicia sesión con una cuenta de moderador para acceder al panel.',
+        ];
+        header('Location: ' . BASE_URL . 'views/auth/login.php');
+        exit;
+    }
+
+    $perfil = obtenerPerfilModeradorActual();
+    if (!$perfil) {
+        if ($esApiJson) {
+            http_response_code(403);
+            header('Content-Type: application/json; charset=UTF-8');
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'No tienes permisos para acceder al panel de moderación.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        header('Location: ' . BASE_URL . 'index.php');
+        exit;
+    }
+
+    $_SESSION['id_rol'] = $perfil['id_rol'];
+    return $perfil;
 }
 
 function normalizarRutaImagenModerador(string $ruta, string $baseUrl = ''): string
@@ -271,6 +335,9 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     header('Content-Type: application/json; charset=UTF-8');
     header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
     header('Pragma: no-cache');
+
+    requerirModeradorAutenticado(true);
+
     $opcion = $_POST['opcion'] ?? $_GET['opcion'] ?? 'kpis';
 
     if ($opcion === 'kpis') {

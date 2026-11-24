@@ -190,7 +190,12 @@
                 body: body.toString()
             });
 
-            const data = await resp.json();
+            const data = await resp.json().catch(() => ({}));
+
+            if (resp.status === 401 || data?.expired || data?.auth_required) {
+                window.location.href = data?.redirect || `${baseUrl}views/auth/login.php${data?.expired ? '?reason=inactivity' : ''}`;
+                return { ok: false };
+            }
 
             if (data.kpis && window.ModeradorKpis && typeof window.ModeradorKpis.renderKpis === 'function') {
                 window.ModeradorKpis.renderKpis(data.kpis);

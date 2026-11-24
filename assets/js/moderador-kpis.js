@@ -89,6 +89,11 @@
                 headers: { Accept: 'application/json' },
                 cache: 'no-store',
             });
+            if (response.status === 401) {
+                const errData = await response.json().catch(() => ({}));
+                window.location.href = errData.redirect || `${baseUrl}views/auth/login.php${errData.expired ? '?reason=inactivity' : ''}`;
+                return null;
+            }
             if (!response.ok) return null;
 
             const data = await response.json();

@@ -66,7 +66,12 @@
                 headers: { Accept: 'application/json' },
             });
 
-            const data = await response.json();
+            const data = await response.json().catch(() => ({}));
+
+            if (response.status === 401 || data?.expired || data?.auth_required) {
+                window.location.href = data?.redirect || `${baseUrl}views/auth/login.php${data?.expired ? '?reason=inactivity' : ''}`;
+                return;
+            }
 
             if (!response.ok || !data || !data.estado) {
                 showToast('error', 'No se pudo procesar', data?.mensaje || 'Intenta nuevamente.');

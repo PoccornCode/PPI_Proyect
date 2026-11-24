@@ -6,8 +6,16 @@ $titulo = "Iniciar Sesión";
 $pagina = "login";
 
 if (!empty($_SESSION['id_usuario'])) {
-    header("Location: " . BASE_URL . "index.php");
+    $destino = ((int)($_SESSION['id_rol'] ?? 0) === 3)
+        ? (BASE_URL . "views/moderador/dashboard.php")
+        : (BASE_URL . "index.php");
+    header("Location: " . $destino);
     exit;
+}
+
+$flashToast = $_SESSION['flash_toast'] ?? null;
+if ($flashToast !== null) {
+    unset($_SESSION['flash_toast']);
 }
 ?>
 <!DOCTYPE html>
@@ -161,6 +169,18 @@ if (!empty($_SESSION['id_usuario'])) {
             document.addEventListener("DOMContentLoaded", function() {
                 mostrarToast("warning", "Sesión expirada", "Tu sesión se cerró automáticamente por inactividad. Inicia sesión nuevamente para continuar.", 6000);
                 window.history.replaceState({}, document.title, window.location.pathname);
+            });
+        </script>
+    <?php endif; ?>
+    <?php if (is_array($flashToast) && !empty($flashToast['mensaje'])): ?>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                mostrarToast(
+                    <?= json_encode((string)($flashToast['tipo'] ?? 'warning'), JSON_UNESCAPED_UNICODE) ?>,
+                    <?= json_encode((string)($flashToast['titulo'] ?? 'Aviso'), JSON_UNESCAPED_UNICODE) ?>,
+                    <?= json_encode((string)$flashToast['mensaje'], JSON_UNESCAPED_UNICODE) ?>,
+                    5000
+                );
             });
         </script>
     <?php endif; ?>
