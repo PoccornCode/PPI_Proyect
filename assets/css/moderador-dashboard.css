@@ -1140,6 +1140,30 @@ body.admin-body {
     width: auto;
 }
 
+.adm-table.mod-table.mod-table--manage th:nth-child(3),
+.adm-table.mod-table.mod-table--manage td:nth-child(3) {
+    width: 160px;
+}
+
+.adm-table.mod-table.mod-table--manage th:nth-child(4),
+.adm-table.mod-table.mod-table--manage td:nth-child(4) {
+    width: 195px;
+    overflow-wrap: normal;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.adm-table.mod-table.mod-table--manage th:nth-child(5),
+.adm-table.mod-table.mod-table--manage td:nth-child(5) {
+    width: 105px;
+}
+
+.adm-table.mod-table.mod-table--manage th:nth-child(6),
+.adm-table.mod-table.mod-table--manage td:nth-child(6) {
+    width: 105px;
+}
+
 /* Footer y paginación compacta */
 .mod-table-footer {
     display: flex;
