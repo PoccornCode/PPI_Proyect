@@ -96,6 +96,7 @@ if (empty($_SESSION['csrf_perfil'])) {
 $csrf = $_SESSION['csrf_perfil'];
 
 $urlPanelModeracion = BASE_URL . 'views/moderador/dashboard.php';
+$urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -266,7 +267,7 @@ $urlPanelModeracion = BASE_URL . 'views/moderador/dashboard.php';
                         </div>
                     </div>
                     <div class="mt-3">
-                        <a href="#" class="btn btn-outline-publish px-4 py-2 fw-semibold" data-proximamente="Panel de administración">
+                        <a href="<?= e($urlPanelAdmin) ?>" class="btn btn-outline-publish px-4 py-2 fw-semibold">
                             <i class="fas fa-crown me-2"></i>Panel de administración
                         </a>
                     </div>
