@@ -136,9 +136,10 @@
     }
 
     // Sincroniza contadores del menú de alertas y detecta expiración de sesión (401)
-    async function actualizarAlertas() {
+    async function actualizarAlertas(esFondo = false) {
         try {
-            const response = await fetch(`${alertasEndpoint}&_t=${Date.now()}`, {
+            const bgParam = esFondo ? '&bg=1' : '';
+            const response = await fetch(`${alertasEndpoint}${bgParam}&_t=${Date.now()}`, {
                 headers: { Accept: 'application/json' },
                 cache: 'no-store'
             });
@@ -164,7 +165,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         setInterval(() => {
             if (!document.hidden) {
-                actualizarAlertas();
+                actualizarAlertas(true);
             }
         }, ALERTAS_REFRESH_MS);
 

@@ -57,7 +57,7 @@ function obtenerPerfilModeradorActual(): ?array
     ];
 }
 
-function requerirModeradorAutenticado(bool $esApiJson = false): array
+function requerirModeradorAutenticado(bool $esApiJson = false, bool $renovarActividad = true): array
 {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -67,7 +67,7 @@ function requerirModeradorAutenticado(bool $esApiJson = false): array
         require_once __DIR__ . '/../config/env.php';
     }
 
-    verificarInactividadSesion($esApiJson);
+    verificarInactividadSesion($esApiJson, $renovarActividad);
 
     $idSesion = (int)($_SESSION['id_usuario'] ?? 0);
     if ($idSesion <= 0) {
@@ -229,7 +229,8 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
     header('Pragma: no-cache');
 
-    requerirModeradorAutenticado(true);
+    $esPollFondo = (($_GET['bg'] ?? '') === '1');
+    requerirModeradorAutenticado(true, !$esPollFondo);
 
     $opcion = $_POST['opcion'] ?? $_GET['opcion'] ?? 'kpis';
 

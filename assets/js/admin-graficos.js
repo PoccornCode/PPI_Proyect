@@ -128,10 +128,11 @@
         `).join('');
     }
 
-    async function actualizar() {
+    async function actualizar(esFondo = false) {
         try {
             const rango = encodeURIComponent(rangeSelect?.value || '7d');
-            const url = `${baseUrl}controllers/admin_controller.php?opcion=graficos&rango=${rango}&_t=${Date.now()}`;
+            const bgParam = esFondo === true ? '&bg=1' : '';
+            const url = `${baseUrl}controllers/admin_controller.php?opcion=graficos&rango=${rango}${bgParam}&_t=${Date.now()}`;
             const response = await fetch(url, {
                 headers: { Accept: 'application/json' },
                 cache: 'no-store'
@@ -160,12 +161,12 @@
         renderActivityChart(window.ADM_GRAFICOS_INICIO.actividad);
     }
 
-    rangeSelect?.addEventListener('change', actualizar);
+    rangeSelect?.addEventListener('change', () => actualizar(false));
 
     document.addEventListener('DOMContentLoaded', () => {
         setInterval(() => {
             if (!document.hidden) {
-                actualizar();
+                actualizar(true);
             }
         }, REFRESH_INTERVAL_MS);
 

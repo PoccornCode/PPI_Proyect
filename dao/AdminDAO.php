@@ -320,4 +320,168 @@ class AdminDAO
             'items' => $items,
         ];
     }
+
+    public function obtenerUsuariosRecientes(int $limite = 3): array
+    {
+        $usuarios = [];
+        if (!$this->conexion || $this->conexion->connect_errno) {
+            return $usuarios;
+        }
+
+        $limite = max(1, min(10, $limite));
+        $sql = "SELECT u.id_usuario,
+                       u.nombre,
+                       u.apellido,
+                       u.username,
+                       u.fecha_registro,
+                       u.id_rol,
+                       COALESCE(r.nombre, 'Usuario') AS rol_nombre,
+                       (SELECT cu.correo
+                        FROM sb_correo_usuario cu
+                        WHERE cu.id_usuario = u.id_usuario
+                        ORDER BY cu.correo ASC
+                        LIMIT 1) AS correo
+                FROM sb_usuario u
+                LEFT JOIN sb_rol r ON u.id_rol = r.id_rol
+                ORDER BY u.fecha_registro DESC, u.id_usuario DESC
+                LIMIT {$limite}";
+
+        $res = $this->conexion->query($sql);
+        if (!$res) {
+            return $usuarios;
+        }
+
+        while ($row = $res->fetch_assoc()) {
+            $rolNombre = trim((string)($row['rol_nombre'] ?? 'Usuario'));
+            $rolLower = mb_strtolower($rolNombre, 'UTF-8');
+            if ($rolLower === 'administrador' || (int)($row['id_rol'] ?? 0) === 1) {
+                $rolEtiqueta = 'Administrador';
+                $rolClass = 'administrador';
+            } elseif ($rolLower === 'moderador' || (int)($row['id_rol'] ?? 0) === 3) {
+                $rolEtiqueta = 'Moderador';
+                $rolClass = 'moderador';
+            } elseif ($rolLower === 'vendedor') {
+                $rolEtiqueta = 'Subastador';
+                $rolClass = 'vendedor';
+            } elseif ($rolLower === 'postor') {
+                $rolEtiqueta = 'Pujador';
+                $rolClass = 'postor';
+            } else {
+                $rolEtiqueta = 'Pujador / Subastador';
+                $rolClass = 'usuario';
+            }
+
+            $correo = trim((string)($row['correo'] ?? ''));
+            $username = trim((string)($row['username'] ?? ''));
+            $etiqueta = $correo !== '' ? $correo : ($username !== '' ? '@' . ltrim($username, '@') : 'Usuario #' . (int)$row['id_usuario']);
+
+            $usuarios[] = [
+                'id_usuario'      => (int)$row['id_usuario'],
+                'etiqueta'        => $etiqueta,
+                'correo'          => $correo,
+                'username'        => $username,
+                'nombre_completo' => trim(($row['nombre'] ?? '') . ' ' . ($row['apellido'] ?? '')),
+                'rol'             => $rolEtiqueta,
+                'rol_class'       => $rolClass,
+                'fecha_registro'  => (string)($row['fecha_registro'] ?? ''),
+            ];
+        }
+
+        return $usuarios;
+    }
+
+    public function obtenerSubastasDestacadas(int $limite = 3, string $baseUrl = ''): array
+    {
+        $subastas = [];
+        if (!$this->conexion || $this->conexion->connect_errno) {
+            return $subastas;
+        }
+
+        $limite = max(1, min(10, $limite));
+        $sql = "SELECT s.id_subasta,
+                       s.precio_inicial,
+                       s.fecha_inicial,
+                       s.fecha_final,
+                       TIMESTAMPDIFF(SECOND, NOW(), s.fecha_final) AS segundos_restantes,
+                       p.id_producto,
+                       p.nombre AS titulo,
+                       COALESCE(c.nombre, 'General') AS categoria,
+                       c.imagen AS categoria_imagen,
+                       (SELECT img.ruta
+                        FROM sb_imagen_producto img
+                        WHERE img.id_producto = p.id_producto
+                        ORDER BY img.principal DESC, img.id_imagen_producto ASC
+                        LIMIT 1) AS imagen_ruta,
+                       COUNT(pu.id_puja) AS total_pujas,
+                       COALESCE(MAX(pu.monto), s.precio_inicial) AS precio_actual
+                FROM sb_subasta s
+                INNER JOIN sb_producto p ON s.id_producto = p.id_producto
+                LEFT JOIN sb_categoria c ON p.id_categoria = c.id_categoria
+                LEFT JOIN sb_puja pu ON s.id_subasta = pu.id_subasta
+                WHERE LOWER(s.estado) = 'activa'
+                  AND s.fecha_final > NOW()
+                GROUP BY s.id_subasta, s.precio_inicial, s.fecha_inicial, s.fecha_final,
+                         p.id_producto, p.nombre, c.nombre, c.imagen
+                ORDER BY total_pujas DESC, precio_actual DESC, s.fecha_final ASC
+                LIMIT {$limite}";
+
+        $res = $this->conexion->query($sql);
+        if (!$res) {
+            return $subastas;
+        }
+
+        while ($row = $res->fetch_assoc()) {
+            $segundos = max(0, (int)($row['segundos_restantes'] ?? 0));
+            $totalPujas = (int)($row['total_pujas'] ?? 0);
+            $precioActual = (float)($row['precio_actual'] ?? 0);
+
+            $rutaImagen = trim((string)($row['imagen_ruta'] ?? ''));
+            if ($rutaImagen === '') {
+                $rutaImagen = trim((string)($row['categoria_imagen'] ?? ''));
+            }
+            if ($rutaImagen === '') {
+                $rutaImagen = 'assets/img/cat-coleccionables.jpg';
+            }
+
+            if (strpos($rutaImagen, 'http://') === 0 || strpos($rutaImagen, 'https://') === 0) {
+                $imagenUrl = $rutaImagen;
+            } elseif (strpos($rutaImagen, 'uploads/') === 0 || strpos($rutaImagen, 'assets/') === 0) {
+                $imagenUrl = $baseUrl . ltrim($rutaImagen, '/');
+            } else {
+                $imagenUrl = $baseUrl . 'uploads/productos/' . ltrim($rutaImagen, '/');
+            }
+
+            $subastas[] = [
+                'id_subasta'      => (int)$row['id_subasta'],
+                'titulo'          => (string)($row['titulo'] ?? ''),
+                'categoria'       => (string)($row['categoria'] ?? 'General'),
+                'total_pujas'     => $totalPujas,
+                'precio'          => '$' . number_format($precioActual, 2, '.', ','),
+                'precio_label'    => $totalPujas > 0 ? 'Puja actual' : 'Precio inicial',
+                'tiempo'          => $this->formatearTiempoRestante($segundos),
+                'fecha_final_iso' => date('c', time() + $segundos),
+                'imagen'          => $imagenUrl,
+            ];
+        }
+
+        return $subastas;
+    }
+
+    private function formatearTiempoRestante(int $segundos): string
+    {
+        if ($segundos <= 0) {
+            return 'Finalizada';
+        }
+
+        $dias = intdiv($segundos, 86400);
+        $horas = intdiv($segundos % 86400, 3600);
+        $minutos = intdiv($segundos % 3600, 60);
+        $segs = $segundos % 60;
+
+        if ($dias > 0) {
+            return sprintf('%d d %02d h', $dias, $horas);
+        }
+
+        return sprintf('%02d:%02d:%02d', $horas, $minutos, $segs);
+    }
 }

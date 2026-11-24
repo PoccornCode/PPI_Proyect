@@ -82,9 +82,10 @@
         }
     }
 
-    async function actualizar() {
+    async function actualizar(esFondo = false) {
         try {
-            const url = `${endpoint}&_t=${Date.now()}`;
+            const bgParam = esFondo === true ? '&bg=1' : '';
+            const url = `${endpoint}${bgParam}&_t=${Date.now()}`;
             const response = await fetch(url, {
                 headers: { Accept: 'application/json' },
                 cache: 'no-store',
@@ -114,7 +115,7 @@
         setInterval(async () => {
             if (document.hidden || enCurso) return;
             enCurso = true;
-            try { await actualizar(); } finally { enCurso = false; }
+            try { await actualizar(true); } finally { enCurso = false; }
         }, REFRESH_INTERVAL_MS);
 
         document.addEventListener('visibilitychange', () => {

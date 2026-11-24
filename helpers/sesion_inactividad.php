@@ -42,7 +42,7 @@ if (!function_exists('verificarInactividadSesion')) {
      * Verifica si la sesión del usuario autenticado ha expirado por inactividad.
      * Si expiró, destruye la sesión y redirige al login .
      */
-    function verificarInactividadSesion(bool $esApiJson = false): void
+    function verificarInactividadSesion(bool $esApiJson = false, bool $renovarActividad = true): void
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -77,6 +77,8 @@ if (!function_exists('verificarInactividadSesion')) {
             return;
         }
 
-        $_SESSION['last_activity'] = $ahora;
+        if ($renovarActividad) {
+            $_SESSION['last_activity'] = $ahora;
+        }
     }
 }

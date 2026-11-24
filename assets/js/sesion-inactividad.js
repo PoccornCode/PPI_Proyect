@@ -136,6 +136,14 @@
     function tick() {
         if (isLoggingOut) return;
 
+        try {
+            const storedTs = Number(localStorage.getItem(STORAGE_KEY_ACTIVITY) || 0);
+            if (!Number.isNaN(storedTs) && storedTs > lastActivityTs) {
+                lastActivityTs = storedTs;
+            }
+        } catch (e) {
+        }
+
         const now = Date.now();
         const remaining = TIMEOUT_MS - (now - lastActivityTs);
 

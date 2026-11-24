@@ -34,7 +34,7 @@ function obtenerPerfilAdministradorActual(): ?array
     ];
 }
 
-function requerirAdministradorAutenticado(bool $esApiJson = false): array
+function requerirAdministradorAutenticado(bool $esApiJson = false, bool $renovarActividad = true): array
 {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -44,7 +44,7 @@ function requerirAdministradorAutenticado(bool $esApiJson = false): array
         require_once __DIR__ . '/../config/env.php';
     }
 
-    verificarInactividadSesion($esApiJson);
+    verificarInactividadSesion($esApiJson, $renovarActividad);
 
     $idSesion = (int)($_SESSION['id_usuario'] ?? 0);
     if ($idSesion <= 0) {
@@ -146,6 +146,18 @@ function obtenerGraficosInicioAdmin(string $rangoActividad = '7d'): array
     ];
 }
 
+function obtenerResumenInferiorInicioAdmin(string $baseUrl = '', int $limiteUsuarios = 3, int $limiteSubastas = 3): array
+{
+    $modDao = new ModeradorDAO();
+    $modDao->inactivarSubastasVencidas();
+
+    $dao = new AdminDAO();
+    return [
+        'usuarios_recientes'  => $dao->obtenerUsuariosRecientes($limiteUsuarios),
+        'subastas_destacadas' => $dao->obtenerSubastasDestacadas($limiteSubastas, $baseUrl),
+    ];
+}
+
 if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -158,7 +170,8 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
     header('Pragma: no-cache');
 
-    requerirAdministradorAutenticado(true);
+    $esPollFondo = (($_GET['bg'] ?? '') === '1');
+    requerirAdministradorAutenticado(true, !$esPollFondo);
 
     $opcion = $_POST['opcion'] ?? $_GET['opcion'] ?? 'alertas';
 
@@ -185,6 +198,14 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
             'estado'   => true,
             'graficos' => obtenerGraficosInicioAdmin($rango),
         ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    if ($opcion === 'resumen_inicio') {
+        echo json_encode([
+            'estado'  => true,
+            'resumen' => obtenerResumenInferiorInicioAdmin(BASE_URL),
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
 

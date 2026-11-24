@@ -151,6 +151,7 @@ if (isset($_SESSION['id_usuario'])) {
     if (file_exists($modal_sesion_inactiva)) {
         include $modal_sesion_inactiva;
     }
-    echo '<script src="' . $base_url . 'assets/js/sesion-inactividad.js"></script>';
+    $ver_inactividad = filemtime(dirname(__DIR__, 2) . '/assets/js/sesion-inactividad.js');
+    echo '<script src="' . $base_url . 'assets/js/sesion-inactividad.js?v=' . $ver_inactividad . '"></script>';
 }
 ?>
