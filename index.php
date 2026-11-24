@@ -38,7 +38,6 @@ unset($catItem);
 // Categorías desde el controlador/DAO en orden alfabético para el select del buscador
 $categoriasSelect = obtenerCategoriasCatalogo();
 
-// Subastas reales desde la BD
 $destacada = obtenerSubastaDestacadaHome();
 $pronto    = obtenerSubastasTerminanProntoHome(5, $destacada['id'] ?? null);
 $nuevas    = obtenerNuevasSubastasHome(4);
@@ -63,7 +62,7 @@ $urlSubasta = 'views/subasta.php?id=';
 
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
-    <link href="assets/css/main.css?v=41" rel="stylesheet">
+    <link href="assets/css/main.css?v=45" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -134,33 +133,33 @@ $urlSubasta = 'views/subasta.php?id=';
 
                     <div class="col-lg-8" id="contenedor-destacada">
                         <?php if ($destacada): ?>
-                        <article class="card h-100 overflow-hidden">
-                            <img src="<?= e($destacada['imagen']) ?>" class="foto-lote foto-lote-destacada" alt="<?= e($destacada['titulo']) ?>">
-                            <div class="p-4">
-                                <div class="row g-4 align-items-center">
-                                    <div class="col-md-7">
-                                        <p class="mb-1 small text-uppercase text-second-ppi">
-                                            <span class="text-third-ppi fw-bold">Destacada</span> &middot; <?= e($destacada['categoria']) ?>
-                                        </p>
-                                        <h2 id="titulo-destacada" class="fs-3 fw-bold text-main-ppi"><?= e($destacada['titulo']) ?></h2>
-                                        <p class="mb-0 text-second-ppi"><?= e($destacada['descripcion']) ?></p>
-                                    </div>
-                                    <div class="col-md-5">
-                                        <span class="d-block small text-second-ppi">Puja actual</span>
-                                        <span class="d-block display-6 precio-ppi">$<?= e($destacada['precio']) ?></span>
-                                        <span class="d-block mb-3 tiempo-ppi"><i class="far fa-clock me-2"></i><span data-countdown="<?= e($destacada['fecha_final_iso']) ?>" data-countdown-prefix="Termina en ">Termina en <?= e($destacada['tiempo']) ?></span></span>
-                                        <a href="<?= e($urlSubasta . $destacada['id']) ?>" class="w-100 btn btn-primary py-2 fw-bold">Pujar ahora</a>
+                            <article class="card h-100 overflow-hidden">
+                                <img src="<?= e($destacada['imagen']) ?>" class="foto-lote foto-lote-destacada" alt="<?= e($destacada['titulo']) ?>">
+                                <div class="p-4">
+                                    <div class="row g-4 align-items-center">
+                                        <div class="col-md-7">
+                                            <p class="mb-1 small text-uppercase text-second-ppi">
+                                                <span class="text-third-ppi fw-bold">Destacada</span> &middot; <?= e($destacada['categoria']) ?>
+                                            </p>
+                                            <h2 id="titulo-destacada" class="fs-3 fw-bold text-main-ppi"><?= e($destacada['titulo']) ?></h2>
+                                            <p class="mb-0 text-second-ppi"><?= e($destacada['descripcion']) ?></p>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <span class="d-block small text-second-ppi">Puja actual</span>
+                                            <span class="d-block display-6 precio-ppi">$<?= e($destacada['precio']) ?></span>
+                                            <span class="d-block mb-3 tiempo-ppi"><i class="far fa-clock me-2"></i><span data-countdown="<?= e($destacada['fecha_final_iso']) ?>" data-countdown-prefix="Termina en ">Termina en <?= e($destacada['tiempo']) ?></span></span>
+                                            <a href="<?= e($urlSubasta . $destacada['id']) ?>" class="w-100 btn btn-primary py-2 fw-bold">Pujar ahora</a>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </article>
+                            </article>
                         <?php else: ?>
-                        <article class="card h-100 p-5 d-flex flex-column justify-content-center align-items-center text-center">
-                            <i class="fas fa-gavel fa-2x text-second-ppi mb-3"></i>
-                            <h2 id="titulo-destacada" class="fs-4 fw-bold text-main-ppi mb-2">No hay subastas activas en este momento</h2>
-                            <p class="text-second-ppi mb-4" style="max-width: 420px;">Sé el primero en publicar un producto y abrir una nueva subasta en la plataforma.</p>
-                            <a href="views/subastas/registro-producto.php" class="btn btn-primary px-4 py-2 fw-bold">Publicar producto</a>
-                        </article>
+                            <article class="card h-100 p-5 d-flex flex-column justify-content-center align-items-center text-center">
+                                <i class="fas fa-gavel fa-2x text-second-ppi mb-3"></i>
+                                <h2 id="titulo-destacada" class="fs-4 fw-bold text-main-ppi mb-2">No hay subastas activas en este momento</h2>
+                                <p class="text-second-ppi mb-4" style="max-width: 420px;">Sé el primero en publicar un producto y abrir una nueva subasta en la plataforma.</p>
+                                <a href="views/subastas/registro-producto.php" class="btn btn-primary px-4 py-2 fw-bold">Publicar producto</a>
+                            </article>
                         <?php endif; ?>
                     </div>
 
@@ -197,61 +196,61 @@ $urlSubasta = 'views/subasta.php?id=';
                     <a href="views/catalogo.php" class="link-ppi d-inline p-0 fw-bold small">Ver catálogo completo &rarr;</a>
                 </div>
                 <div id="contenedor-nuevas">
-                <?php if (!empty($nuevas)): ?>
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
-                    <?php foreach ($nuevas as $item) { ?>
-                        <div class="col">
-                            <article class="card h-100 overflow-hidden">
-                                <img src="<?= e($item['imagen']) ?>" class="foto-lote" alt="<?= e($item['titulo']) ?>">
-                                <div class="p-3 d-flex flex-column flex-grow-1">
-                                    <span class="small text-uppercase text-second-ppi"><?= e($item['categoria']) ?></span>
-                                    <h3 class="fs-6 fw-bold text-main-ppi mt-1"><?= e($item['titulo']) ?></h3>
-                                    <div class="d-flex justify-content-between align-items-center mt-auto pt-2 mb-3">
-                                        <span class="h5 mb-0 precio-ppi">$<?= e($item['precio']) ?></span>
-                                        <span class="small tiempo-ppi" data-countdown="<?= e($item['fecha_final_iso']) ?>"><?= e($item['tiempo']) ?></span>
-                                    </div>
-                                    <a href="<?= e($urlSubasta . $item['id']) ?>" class="btn btn-contorno-ppi fw-bold">Ver subasta</a>
+                    <?php if (!empty($nuevas)): ?>
+                        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
+                            <?php foreach ($nuevas as $item) { ?>
+                                <div class="col">
+                                    <article class="card h-100 overflow-hidden">
+                                        <img src="<?= e($item['imagen']) ?>" class="foto-lote" alt="<?= e($item['titulo']) ?>">
+                                        <div class="p-3 d-flex flex-column flex-grow-1">
+                                            <span class="small text-uppercase text-second-ppi"><?= e($item['categoria']) ?></span>
+                                            <h3 class="fs-6 fw-bold text-main-ppi mt-1"><?= e($item['titulo']) ?></h3>
+                                            <div class="d-flex justify-content-between align-items-center mt-auto pt-2 mb-3">
+                                                <span class="h5 mb-0 precio-ppi">$<?= e($item['precio']) ?></span>
+                                                <span class="small tiempo-ppi" data-countdown="<?= e($item['fecha_final_iso']) ?>"><?= e($item['tiempo']) ?></span>
+                                            </div>
+                                            <a href="<?= e($urlSubasta . $item['id']) ?>" class="btn btn-contorno-ppi fw-bold">Ver subasta</a>
+                                        </div>
+                                    </article>
                                 </div>
-                            </article>
+                            <?php } ?>
                         </div>
-                    <?php } ?>
-                </div>
-                <?php else: ?>
-                <div class="card p-4 text-center">
-                    <p class="text-second-ppi mb-0">Aún no hay nuevas subastas activas.</p>
-                </div>
-                <?php endif; ?>
+                    <?php else: ?>
+                        <div class="card p-4 text-center">
+                            <p class="text-second-ppi mb-0">Aún no hay nuevas subastas activas.</p>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </section>
 
         <?php if (!empty($categorias)): ?>
-        <section class="pt-5 pb-6" aria-labelledby="titulo-categorias" style="border-top: 1px solid #191c17; padding-bottom: 5rem !important;">
-            <div class="container-fluid px-4 px-lg-5">
-                <div class="d-flex justify-content-between align-items-baseline mb-4 flex-wrap gap-2">
-                    <div>
-                        <span class="hero-label d-inline-block mb-1">Explorar por rubro</span>
-                        <h2 id="titulo-categorias" class="fw-bold text-main-ppi mb-0">Categorías populares</h2>
-                    </div>
-                    <a href="views/categorias.php" class="link-ppi d-inline p-0 fw-bold small">Ver todas las categorías &rarr;</a>
-                </div>
-
-                <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-6 g-3 g-lg-4">
-                    <?php foreach ($categorias as $cat) { ?>
-                        <div class="col">
-                            <a href="views/catalogo.php?categoria=<?= urlencode($cat['nombre']) ?>" class="card h-100 overflow-hidden text-decoration-none cat-card-ppi border-0 position-relative">
-                                <div class="cat-img-wrapper position-relative">
-                                    <img src="<?= e($cat['imagen']) ?>" class="cat-card-img w-100" alt="<?= e($cat['nombre']) ?>" loading="lazy" decoding="async">
-                                    <div class="cat-card-overlay d-flex flex-column justify-content-end p-3">
-                                        <h3 class="fs-6 fw-bold text-white mb-0"><?= e($cat['nombre']) ?></h3>
-                                    </div>
-                                </div>
-                            </a>
+            <section class="pt-5 pb-6" aria-labelledby="titulo-categorias" style="border-top: 1px solid #191c17; padding-bottom: 5rem !important;">
+                <div class="container-fluid px-4 px-lg-5">
+                    <div class="d-flex justify-content-between align-items-baseline mb-4 flex-wrap gap-2">
+                        <div>
+                            <span class="hero-label d-inline-block mb-1">Explorar por rubro</span>
+                            <h2 id="titulo-categorias" class="fw-bold text-main-ppi mb-0">Categorías populares</h2>
                         </div>
-                    <?php } ?>
+                        <a href="views/categorias.php" class="link-ppi d-inline p-0 fw-bold small">Ver todas las categorías &rarr;</a>
+                    </div>
+
+                    <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-6 g-3 g-lg-4">
+                        <?php foreach ($categorias as $cat) { ?>
+                            <div class="col">
+                                <a href="views/catalogo.php?categoria=<?= urlencode($cat['nombre']) ?>" class="card h-100 overflow-hidden text-decoration-none cat-card-ppi border-0 position-relative">
+                                    <div class="cat-img-wrapper position-relative">
+                                        <img src="<?= e($cat['imagen']) ?>" class="cat-card-img w-100" alt="<?= e($cat['nombre']) ?>" loading="lazy" decoding="async">
+                                        <div class="cat-card-overlay d-flex flex-column justify-content-end p-3">
+                                            <h3 class="fs-6 fw-bold text-white mb-0"><?= e($cat['nombre']) ?></h3>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        <?php } ?>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
         <?php endif; ?>
 
     </main>

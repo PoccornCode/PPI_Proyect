@@ -18,11 +18,11 @@ $categorias_nav = obtenerCategoriasPopularesNav(6);
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Raleway:wght@600;700;800&display=swap" rel="stylesheet">
-<link href="<?php echo $base_url; ?>assets/css/main.css?v=43" rel="stylesheet">
+<link href="<?php echo $base_url; ?>assets/css/main.css?v=45" rel="stylesheet">
 
 <header class="sticky-top navbar-ppi-wrapper" style="background-color: #0c0f0a !important; border-bottom: 2px solid #658807 !important; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7) !important;">
     <nav class="navbar navbar-expand-xl navbar-dark py-2 py-lg-3" style="background-color: transparent !important;">
-        <div class="container-fluid px-3 px-lg-5">
+        <div class="container-fluid px-3">
 
             <a href="<?php echo $base_url; ?>index.php" class="navbar-brand d-flex align-items-center gap-2 gavel-brand py-0 me-3 me-xl-4">
                 <i class="fas fa-gavel brand-icon text-third-ppi" style="font-size: 1.55rem; line-height: 1;" aria-hidden="true"></i>
@@ -86,7 +86,7 @@ $categorias_nav = obtenerCategoriasPopularesNav(6);
                         $nav_inicial = strtoupper(mb_substr($nav_primer_nombre !== '' ? $nav_primer_nombre : 'U', 0, 1, 'UTF-8'));
                         ?>
                         <div class="dropdown">
-                            <button class="btn-nav-profile-pill d-inline-flex align-items-center border-0" type="button" id="dropdownPerfil" data-bs-toggle="dropdown" aria-expanded="false" title="Mi Cuenta" aria-label="Menú de cuenta de usuario">
+                            <button class="btn-nav-profile-pill d-inline-flex align-items-center" type="button" id="dropdownPerfil" data-bs-toggle="dropdown" aria-expanded="false" title="Mi Cuenta" aria-label="Menú de cuenta de usuario">
                                 <span class="nav-avatar-circle"><?= htmlspecialchars($nav_inicial) ?></span>
                                 <span class="nav-profile-name"><?= htmlspecialchars($nav_primer_nombre) ?></span>
                                 <i class="fas fa-chevron-down nav-profile-caret"></i>

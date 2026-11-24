@@ -125,39 +125,42 @@ html {
 
 .btn-nav-profile-pill {
     background: transparent;
-    color: #d6ddd0;
+    border: 1px solid transparent;
+    color: #f1f3ee;
     gap: 10px;
     padding: 4px 10px 4px 4px;
     border-radius: 999px;
     cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .btn-nav-profile-pill:hover,
 .btn-nav-profile-pill[aria-expanded="true"] {
-    background-color: #161915;
+    background-color: #1a2016;
+    border-color: #2c3326;
     color: #ffffff;
 }
 
 .nav-avatar-circle {
-    width: 34px;
-    height: 34px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
-    background-color: #2f3c20;
-    color: #a7cc3b;
-    font-weight: 700;
-    font-size: 0.95rem;
+    background-color: #2f3825;
+    border: 1px solid #485637;
+    color: #789844;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 0 3px #1e211d;
     flex-shrink: 0;
 }
 
 .nav-profile-name {
-    font-size: 0.92rem;
+    font-size: 0.95rem;
     font-weight: 600;
-    color: #d6ddd0;
+    color: #f1f3ee;
     max-width: 120px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -165,7 +168,7 @@ html {
 }
 
 .nav-profile-caret {
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     color: #9aa392;
     transition: transform 0.2s ease;
 }
