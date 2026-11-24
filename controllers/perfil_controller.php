@@ -1,0 +1,105 @@
+<?php
+session_start();
+header("Content-Type: application/json; charset=UTF-8");
+
+require_once __DIR__ . '/../config/env.php';
+require_once __DIR__ . '/../helpers/sesion_inactividad.php';
+require_once __DIR__ . '/../dao/PerfilDAO.php';
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(["estado" => false, "mensaje" => "Método no permitido."]);
+    exit;
+}
+
+//sesion vencio por inactividad responde con JSON (no redirige)
+verificarInactividadSesion(true);
+
+if (empty($_SESSION['id_usuario'])) {
+    http_response_code(401);
+    echo json_encode([
+        "estado" => false,
+        "auth_required" => true,
+        "redirect" => BASE_URL . "views/auth/login.php",
+        "mensaje" => "Debes iniciar sesión para continuar."
+    ]);
+    exit;
+}
+
+$opcion = $_POST['opcion'] ?? '';
+$id_usuario = (int)$_SESSION['id_usuario'];
+
+if ($opcion === "cambiarContrasenia") {
+    // Token de la página de perfil: evita que otro sitio envíe este formulario por el usuario
+    $tokenSesion = $_SESSION['csrf_perfil'] ?? '';
+    $tokenEnviado = $_POST['csrf'] ?? '';
+    if ($tokenSesion === '' || !is_string($tokenEnviado) || !hash_equals($tokenSesion, $tokenEnviado)) {
+        http_response_code(403);
+        echo json_encode([
+            "estado" => false,
+            "mensaje" => "Tu sesión de formulario venció. Recarga la página e inténtalo de nuevo."
+        ]);
+        exit;
+    }
+
+    // Freno a los intentos con contraseña actual incorrecta: 5 fallos = 5 minutos de espera
+    $maxIntentos = 5;
+    $esperaSegundos = 300;
+    $bloqueadoHasta = (int)($_SESSION['clave_bloqueo_hasta'] ?? 0);
+    if ($bloqueadoHasta > time()) {
+        $minutos = (int)ceil(($bloqueadoHasta - time()) / 60);
+        echo json_encode([
+            "estado" => false,
+            "mensaje" => "Demasiados intentos fallidos. Espera {$minutos} minuto(s) antes de intentar de nuevo."
+        ]);
+        exit;
+    }
+
+    $actual = $_POST['contrasenia_actual'] ?? '';
+    $nueva = $_POST['nueva_contrasenia'] ?? '';
+    $confirmar = $_POST['confirmar_contrasenia'] ?? '';
+
+    if ($actual === '' || $nueva === '' || $confirmar === '') {
+        echo json_encode(["estado" => false, "mensaje" => "Por favor completa los tres campos."]);
+        exit;
+    }
+
+    // Misma regla que el registro y la recuperación de contraseña
+    $regexContrasenia = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9\s]).{8,}$/';
+    if (!preg_match($regexContrasenia, $nueva)) {
+        echo json_encode([
+            "estado" => false,
+            "campo" => "nueva",
+            "mensaje" => "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo."
+        ]);
+        exit;
+    }
+
+    if ($nueva !== $confirmar) {
+        echo json_encode(["estado" => false, "campo" => "confirmar", "mensaje" => "Las contraseñas no coinciden."]);
+        exit;
+    }
+
+    $dao = new PerfilDAO();
+    $resultado = $dao->cambiarContrasenia($id_usuario, $actual, $nueva);
+
+    if (!empty($resultado['estado'])) {
+        unset($_SESSION['clave_intentos'], $_SESSION['clave_bloqueo_hasta']);
+        // La contraseña cambió: se renueva el identificador de sesión
+        session_regenerate_id(true);
+        $_SESSION['last_activity'] = time();
+    } elseif (($resultado['campo'] ?? '') === 'actual') {
+        $_SESSION['clave_intentos'] = (int)($_SESSION['clave_intentos'] ?? 0) + 1;
+        if ($_SESSION['clave_intentos'] >= $maxIntentos) {
+            $_SESSION['clave_bloqueo_hasta'] = time() + $esperaSegundos;
+            $_SESSION['clave_intentos'] = 0;
+            $resultado['mensaje'] = "Demasiados intentos fallidos. Espera 5 minutos antes de intentar de nuevo.";
+        }
+    }
+
+    echo json_encode($resultado);
+    exit;
+}
+
+echo json_encode(["estado" => false, "mensaje" => "Opción no válida o no especificada."]);
+exit;
