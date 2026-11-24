@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/../dao/AdminDAO.php';
+require_once __DIR__ . '/../dao/ModeradorDAO.php';
 require_once __DIR__ . '/../helpers/sesion_inactividad.php';
+require_once __DIR__ . '/../helpers/kpi_helper.php';
 
 function obtenerPerfilAdministradorActual(): ?array
 {
@@ -101,6 +103,37 @@ function obtenerAlertasTopbarAdmin(): array
     return $dao->obtenerResumenAlertasTopbar();
 }
 
+function obtenerKpisAdmin(string $rango = '30d'): array
+{
+    $rangoValido = in_array($rango, ['7d', '30d', '90d'], true) ? $rango : '30d';
+
+    $modDao = new ModeradorDAO();
+    $modDao->inactivarSubastasVencidas();
+
+    $dao = new AdminDAO();
+    $resumen = $dao->obtenerResumenKpis($rangoValido);
+
+    return [
+        'rango'                => $rangoValido,
+        'usuarios'             => $resumen['usuarios'],
+        'pujas'                => $resumen['pujas'],
+        'activas'              => $resumen['activas'],
+        'pendientes'           => $resumen['pendientes'],
+        'ultimo_usuario'       => formatearFechaKpiEs($resumen['ultimo_usuario']),
+        'ultima_puja'          => formatearFechaKpiEs($resumen['ultima_puja']),
+        'ultima_activa'        => formatearFechaKpiEs($resumen['ultima_activa']),
+        'ultima_pendiente'     => formatearFechaKpiEs($resumen['ultima_pendiente']),
+        'tendencia_usuarios'   => calcularTendenciaKpi($resumen['usuarios_actual'], $resumen['usuarios_anterior']),
+        'tendencia_pujas'      => calcularTendenciaKpi($resumen['pujas_actual'], $resumen['pujas_anterior']),
+        'tendencia_activas'    => calcularTendenciaKpi($resumen['activas_actual'], $resumen['activas_anterior']),
+        'tendencia_pendientes' => calcularTendenciaKpi($resumen['pendientes_actual'], $resumen['pendientes_anterior']),
+        'barras_usuarios'      => construirBarrasSparkline($resumen['serie_usuarios']),
+        'barras_pujas'         => construirBarrasSparkline($resumen['serie_pujas']),
+        'barras_activas'       => construirBarrasSparkline($resumen['serie_activas']),
+        'barras_pendientes'    => construirBarrasSparkline($resumen['serie_pendientes']),
+    ];
+}
+
 if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -121,6 +154,15 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
         echo json_encode([
             'estado'  => true,
             'alertas' => obtenerAlertasTopbarAdmin(),
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    if ($opcion === 'kpis') {
+        $rango = (string)($_GET['rango'] ?? $_POST['rango'] ?? '30d');
+        echo json_encode([
+            'estado' => true,
+            'kpis'   => obtenerKpisAdmin($rango),
         ], JSON_UNESCAPED_UNICODE);
         exit;
     }

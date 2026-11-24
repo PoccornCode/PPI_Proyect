@@ -10,6 +10,7 @@ require_once dirname(__DIR__, 2) . '/controllers/admin_controller.php';
 $base_url = BASE_URL;
 $perfilAdmin = requerirAdministradorAutenticado(false);
 $alertasTopbar = obtenerAlertasTopbarAdmin();
+$kpisAdmin = obtenerKpisAdmin('30d');
 
 $adm_nombre_completo = $perfilAdmin['nombre_completo'];
 $adm_primer_nombre = $perfilAdmin['primer_nombre'];
@@ -284,7 +285,7 @@ $transacciones_demo = [
                 </div>
                 <label class="adm-pill-select">
                     <i class="fa-regular fa-calendar"></i>
-                    <select aria-label="Rango de fechas del resumen">
+                    <select id="admKpiRange" aria-label="Rango de fechas del resumen">
                         <option value="30d" selected>Últimos 30 días</option>
                         <option value="7d">Últimos 7 días</option>
                         <option value="90d">Últimos 90 días</option>
@@ -292,100 +293,7 @@ $transacciones_demo = [
                 </label>
             </div>
 
-            <!-- 4 KPI Cards -->
-            <div class="adm-kpi-grid">
-                <article class="adm-kpi-card">
-                    <div class="adm-kpi-top">
-                        <div class="adm-kpi-icon"><i class="fa-solid fa-users"></i></div>
-                        <div>
-                            <div class="adm-kpi-value">616,123</div>
-                            <div class="adm-kpi-label">Usuarios registrados</div>
-                            <div class="adm-kpi-trend"><i class="fa-solid fa-angles-up"></i> +61%</div>
-                        </div>
-                    </div>
-                    <div class="adm-kpi-footer">
-                        <span class="adm-kpi-time"><i class="fa-regular fa-clock"></i> Viernes 20 nov., 11:11</span>
-                        <svg class="adm-sparkline" viewBox="0 0 68 36" aria-hidden="true">
-                            <rect x="2" y="24" width="6" height="12" fill="#4f5c3d" rx="1" />
-                            <rect x="11" y="21" width="6" height="15" fill="#5a6845" rx="1" />
-                            <rect x="20" y="23" width="6" height="13" fill="#5a6845" rx="1" />
-                            <rect x="29" y="18" width="6" height="18" fill="#65754d" rx="1" />
-                            <rect x="38" y="14" width="6" height="22" fill="#6f8054" rx="1" />
-                            <rect x="47" y="10" width="6" height="26" fill="#7a8d5c" rx="1" />
-                            <rect x="56" y="4" width="6" height="32" fill="#8fa769" rx="1" />
-                        </svg>
-                    </div>
-                </article>
-
-                <article class="adm-kpi-card">
-                    <div class="adm-kpi-top">
-                        <div class="adm-kpi-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
-                        <div>
-                            <div class="adm-kpi-value">1,482</div>
-                            <div class="adm-kpi-label">Pujas registradas</div>
-                            <div class="adm-kpi-trend"><i class="fa-solid fa-angles-up"></i> +24%</div>
-                        </div>
-                    </div>
-                    <div class="adm-kpi-footer">
-                        <span class="adm-kpi-time"><i class="fa-regular fa-clock"></i> Viernes 20 nov., 19:30</span>
-                        <svg class="adm-sparkline" viewBox="0 0 68 36" aria-hidden="true">
-                            <rect x="2" y="25" width="6" height="11" fill="#4f5c3d" rx="1" />
-                            <rect x="11" y="23" width="6" height="13" fill="#5a6845" rx="1" />
-                            <rect x="20" y="19" width="6" height="17" fill="#5a6845" rx="1" />
-                            <rect x="29" y="16" width="6" height="20" fill="#65754d" rx="1" />
-                            <rect x="38" y="13" width="6" height="23" fill="#6f8054" rx="1" />
-                            <rect x="47" y="8" width="6" height="28" fill="#7a8d5c" rx="1" />
-                            <rect x="56" y="3" width="6" height="33" fill="#8fa769" rx="1" />
-                        </svg>
-                    </div>
-                </article>
-
-                <article class="adm-kpi-card">
-                    <div class="adm-kpi-top">
-                        <div class="adm-kpi-icon"><i class="fa-solid fa-gavel"></i></div>
-                        <div>
-                            <div class="adm-kpi-value">67</div>
-                            <div class="adm-kpi-label">Subastas activas</div>
-                            <div class="adm-kpi-trend"><i class="fa-solid fa-angles-up"></i> +7%</div>
-                        </div>
-                    </div>
-                    <div class="adm-kpi-footer">
-                        <span class="adm-kpi-time"><i class="fa-regular fa-clock"></i> Viernes 20 nov., 16:01</span>
-                        <svg class="adm-sparkline" viewBox="0 0 68 36" aria-hidden="true">
-                            <rect x="2" y="26" width="6" height="10" fill="#4f5c3d" rx="1" />
-                            <rect x="11" y="22" width="6" height="14" fill="#5a6845" rx="1" />
-                            <rect x="20" y="20" width="6" height="16" fill="#5a6845" rx="1" />
-                            <rect x="29" y="17" width="6" height="19" fill="#65754d" rx="1" />
-                            <rect x="38" y="15" width="6" height="21" fill="#6f8054" rx="1" />
-                            <rect x="47" y="11" width="6" height="25" fill="#7a8d5c" rx="1" />
-                            <rect x="56" y="5" width="6" height="31" fill="#8fa769" rx="1" />
-                        </svg>
-                    </div>
-                </article>
-
-                <article class="adm-kpi-card">
-                    <div class="adm-kpi-top">
-                        <div class="adm-kpi-icon"><i class="fa-solid fa-stopwatch"></i></div>
-                        <div>
-                            <div class="adm-kpi-value">127</div>
-                            <div class="adm-kpi-label">Subastas pendientes</div>
-                            <div class="adm-kpi-trend"><i class="fa-solid fa-angles-up"></i> +5%</div>
-                        </div>
-                    </div>
-                    <div class="adm-kpi-footer">
-                        <span class="adm-kpi-time"><i class="fa-regular fa-clock"></i> Viernes 20 nov., 18:04</span>
-                        <svg class="adm-sparkline" viewBox="0 0 68 36" aria-hidden="true">
-                            <rect x="2" y="27" width="6" height="9" fill="#4f5c3d" rx="1" />
-                            <rect x="11" y="24" width="6" height="12" fill="#5a6845" rx="1" />
-                            <rect x="20" y="21" width="6" height="15" fill="#5a6845" rx="1" />
-                            <rect x="29" y="19" width="6" height="17" fill="#65754d" rx="1" />
-                            <rect x="38" y="14" width="6" height="22" fill="#6f8054" rx="1" />
-                            <rect x="47" y="9" width="6" height="27" fill="#7a8d5c" rx="1" />
-                            <rect x="56" y="4" width="6" height="32" fill="#8fa769" rx="1" />
-                        </svg>
-                    </div>
-                </article>
-            </div>
+            <?php include __DIR__ . '/partials/kpi-resumen.php'; ?>
 
             <!-- Charts Row -->
             <div class="adm-charts-row">
@@ -1665,6 +1573,7 @@ $transacciones_demo = [
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= $base_url ?>assets/js/toast-ppi.js?v=2"></script>
+    <script src="<?= $base_url ?>assets/js/admin-kpis.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-kpis.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-dashboard.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-dashboard.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-dashboard-referencia.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-dashboard-referencia.js') ?>"></script>
 </body>
