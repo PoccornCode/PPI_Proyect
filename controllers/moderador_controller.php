@@ -253,10 +253,10 @@ function obtenerTodasSubastasModerador(string $baseUrl = ''): array
     return $lista;
 }
 
-function cambiarEstadoSubastaModerador(int $idSubasta, string $nuevoEstado): array
+function cambiarEstadoSubastaModerador(int $idSubasta, string $nuevoEstado, ?string $estadoEsperado = null): array
 {
     $dao = new ModeradorDAO();
-    return $dao->cambiarEstadoSubasta($idSubasta, $nuevoEstado);
+    return $dao->cambiarEstadoSubasta($idSubasta, $nuevoEstado, $estadoEsperado);
 }
 
 if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
@@ -320,11 +320,12 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     }
 
     if ($opcion === 'cambiar_estado') {
-        $idSubasta   = (int)($_POST['id_subasta'] ?? 0);
-        $nuevoEstado = (string)($_POST['nuevo_estado'] ?? '');
-        $resultado   = cambiarEstadoSubastaModerador($idSubasta, $nuevoEstado);
+        $idSubasta      = (int)($_POST['id_subasta'] ?? 0);
+        $nuevoEstado    = (string)($_POST['nuevo_estado'] ?? '');
+        $estadoEsperado = isset($_POST['estado_esperado']) ? (string)$_POST['estado_esperado'] : null;
+        $resultado      = cambiarEstadoSubastaModerador($idSubasta, $nuevoEstado, $estadoEsperado);
 
-        if ($resultado['estado']) {
+        if ($resultado['estado'] || !empty($resultado['conflicto'])) {
             $resultado['kpis'] = obtenerKpisModerador();
         }
 

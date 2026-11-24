@@ -359,17 +359,27 @@ class ModeradorDAO
         return $subastas;
     }
 
-    public function cambiarEstadoSubasta(int $idSubasta, string $nuevoEstado): array
+    public function cambiarEstadoSubasta(int $idSubasta, string $nuevoEstado, ?string $estadoEsperado = null): array
     {
         if (!$this->conexion || $this->conexion->connect_errno) {
             return ['estado' => false, 'mensaje' => 'Error de conexión con la base de datos.'];
         }
 
         $nuevoEstado = strtolower(trim($nuevoEstado));
+        $estadoEsperadoNorm = $estadoEsperado !== null ? strtolower(trim($estadoEsperado)) : '';
         $estadosPermitidos = ['pendiente', 'activa', 'rechazada', 'cancelada'];
         if ($idSubasta <= 0 || !in_array($nuevoEstado, $estadosPermitidos, true)) {
             return ['estado' => false, 'mensaje' => 'Estado o subasta no válidos.'];
         }
+
+        $etiquetasEstado = [
+            'pendiente'   => 'Pendiente',
+            'activa'      => 'Activa',
+            'finalizada'  => 'Finalizada',
+            'sin_ofertas' => 'Sin ofertas',
+            'rechazada'   => 'Rechazada',
+            'cancelada'   => 'Cancelada',
+        ];
 
         try {
             $this->conexion->begin_transaction();
@@ -390,9 +400,37 @@ class ModeradorDAO
                 return ['estado' => false, 'mensaje' => 'La subasta seleccionada no existe.'];
             }
 
-            if (strtolower((string)$subasta['estado']) === 'finalizada') {
+            $estadoActual = strtolower((string)$subasta['estado']);
+
+            if ($estadoActual === 'finalizada') {
                 $this->conexion->rollback();
-                return ['estado' => false, 'mensaje' => 'Una subasta finalizada no puede cambiar de estado.'];
+                return [
+                    'estado'        => false,
+                    'conflicto'     => true,
+                    'estado_actual' => $estadoActual,
+                    'mensaje'       => 'Esta subasta ya finalizó y no puede cambiar de estado.',
+                ];
+            }
+
+            if ($estadoEsperadoNorm !== '' && $estadoActual !== $estadoEsperadoNorm) {
+                $this->conexion->rollback();
+                $nombreActual = $etiquetasEstado[$estadoActual] ?? ucfirst($estadoActual);
+                return [
+                    'estado'        => false,
+                    'conflicto'     => true,
+                    'estado_actual' => $estadoActual,
+                    'mensaje'       => "Otro moderador ya cambió esta subasta a \"{$nombreActual}\". Se actualizó la vista.",
+                ];
+            }
+
+            if ($estadoActual === $nuevoEstado) {
+                $this->conexion->rollback();
+                return [
+                    'estado'        => false,
+                    'conflicto'     => false,
+                    'estado_actual' => $estadoActual,
+                    'mensaje'       => 'La subasta ya se encuentra en ese estado.',
+                ];
             }
 
             if ($nuevoEstado === 'activa') {
@@ -408,10 +446,20 @@ class ModeradorDAO
                     $stmtUp = $this->conexion->prepare($sqlUpdate);
                     $stmtUp->bind_param('ii', $duracionSeg, $idSubasta);
                 } else {
-                    $sqlUpdate = "UPDATE sb_subasta SET estado = 'activa' WHERE id_subasta = ?";
+                    $sqlUpdate = "UPDATE sb_subasta
+                                  SET estado = 'activa',
+                                      fecha_inicial = NOW()
+                                  WHERE id_subasta = ?";
                     $stmtUp = $this->conexion->prepare($sqlUpdate);
                     $stmtUp->bind_param('i', $idSubasta);
                 }
+            } elseif ($nuevoEstado === 'pendiente') {
+                $sqlUpdate = "UPDATE sb_subasta
+                              SET estado = 'pendiente',
+                                  fecha_inicial = NOW()
+                              WHERE id_subasta = ?";
+                $stmtUp = $this->conexion->prepare($sqlUpdate);
+                $stmtUp->bind_param('i', $idSubasta);
             } else {
                 $sqlUpdate = "UPDATE sb_subasta SET estado = ? WHERE id_subasta = ?";
                 $stmtUp = $this->conexion->prepare($sqlUpdate);

@@ -136,15 +136,35 @@
         actualizarEstadoVacio(rows.length, totalMatching, hayFiltros);
     }
 
-    function notificar(mensaje, tipo = 'success') {
-        if (typeof window.showToastPpi === 'function') {
-            window.showToastPpi(mensaje, tipo);
+    function notificar(tipo, titulo, mensaje) {
+        if (typeof window.mostrarToast === 'function') {
+            window.mostrarToast(tipo, titulo, mensaje, 3800);
         }
     }
 
-    async function actualizarEstadoSubasta(idSubasta, nuevoEstado, triggerBtn) {
+    function aplicarEstadoVisualFila(row, estado) {
+        const estadoNorm = String(estado || '').toLowerCase();
+        row.dataset.status = estadoNorm;
+
+        const editBtn = row.querySelector('.mod-btn-edit-status');
+        if (editBtn) {
+            editBtn.dataset.currentStatus = estadoNorm;
+            const esFinalizada = estadoNorm === 'finalizada';
+            editBtn.disabled = esFinalizada;
+            editBtn.title = esFinalizada ? 'Las subastas finalizadas no se pueden modificar' : 'Cambiar estado';
+        }
+
+        const badge = row.querySelector('.mod-manage-badge');
+        const info = BADGE_MAP[estadoNorm] || { clase: 'adm-badge--pendiente', texto: estadoNorm };
+        if (badge) {
+            badge.className = `adm-badge ${info.clase} mod-manage-badge`;
+            badge.textContent = info.texto;
+        }
+    }
+
+    async function actualizarEstadoSubasta(idSubasta, nuevoEstado, estadoEsperado, triggerBtn) {
         const row = tbody.querySelector(`tr[data-subasta-id="${idSubasta}"]`);
-        if (!row || !idSubasta || !nuevoEstado) return false;
+        if (!row || !idSubasta || !nuevoEstado) return { ok: false };
 
         if (triggerBtn) triggerBtn.disabled = true;
 
@@ -152,7 +172,8 @@
             const body = new URLSearchParams({
                 opcion: 'cambiar_estado',
                 id_subasta: String(idSubasta),
-                nuevo_estado: nuevoEstado
+                nuevo_estado: nuevoEstado,
+                estado_esperado: String(estadoEsperado || '')
             });
 
             const resp = await fetch(`${baseUrl}controllers/moderador_controller.php`, {
@@ -162,32 +183,29 @@
             });
 
             const data = await resp.json();
+
+            if (data.kpis && window.ModeradorKpis && typeof window.ModeradorKpis.renderKpis === 'function') {
+                window.ModeradorKpis.renderKpis(data.kpis);
+            }
+
             if (!data.estado) {
-                notificar(data.mensaje || 'No se pudo actualizar el estado.', 'danger');
-                return false;
+                if (data.conflicto && data.estado_actual) {
+                    aplicarEstadoVisualFila(row, data.estado_actual);
+                    filtrar(false);
+                    notificar('warning', 'Conflicto de edición', data.mensaje || 'Otro moderador ya modificó esta subasta.');
+                    return { ok: false, conflicto: true, estadoActual: data.estado_actual };
+                }
+                notificar('error', 'No se pudo actualizar', data.mensaje || 'Intenta nuevamente.');
+                return { ok: false };
             }
 
-            row.dataset.status = nuevoEstado;
-            const editBtn = row.querySelector('.mod-btn-edit-status');
-            if (editBtn) editBtn.dataset.currentStatus = nuevoEstado;
-
-            const badge = row.querySelector('.mod-manage-badge');
-            const info = BADGE_MAP[nuevoEstado] || { clase: 'adm-badge--pendiente', texto: nuevoEstado };
-            if (badge) {
-                badge.className = `adm-badge ${info.clase} mod-manage-badge`;
-                badge.textContent = info.texto;
-            }
-
-            if (data.kpis && window.modKpis && typeof window.modKpis.actualizar === 'function') {
-                window.modKpis.actualizar(data.kpis);
-            }
-
-            notificar(data.mensaje || 'Estado actualizado correctamente.', 'success');
+            aplicarEstadoVisualFila(row, nuevoEstado);
+            notificar('success', 'Estado actualizado', data.mensaje || 'El estado se actualizó correctamente.');
             filtrar(false);
-            return true;
+            return { ok: true };
         } catch (err) {
-            notificar('Error de comunicación al actualizar la subasta.', 'danger');
-            return false;
+            notificar('error', 'Error de conexión', 'Error de comunicación al actualizar la subasta.');
+            return { ok: false };
         } finally {
             if (triggerBtn) triggerBtn.disabled = false;
         }
@@ -240,9 +258,19 @@
     modalSaveBtn?.addEventListener('click', async () => {
         const nuevoEstado = obtenerEstadoSeleccionadoModal();
         if (!activeSubastaId || !nuevoEstado || nuevoEstado === activeCurrentStatus) return;
-        const ok = await actualizarEstadoSubasta(activeSubastaId, nuevoEstado, modalSaveBtn);
-        if (ok && modalInstance) {
+        const res = await actualizarEstadoSubasta(activeSubastaId, nuevoEstado, activeCurrentStatus, modalSaveBtn);
+        if (res.ok && modalInstance) {
             modalInstance.hide();
+        } else if (res.conflicto && res.estadoActual) {
+            activeCurrentStatus = res.estadoActual;
+            if (res.estadoActual === 'finalizada') {
+                modalInstance?.hide();
+            } else {
+                modalList?.querySelectorAll('input[name="modManageStatusRadio"]').forEach((input) => {
+                    input.checked = input.value === activeCurrentStatus;
+                });
+                sincronizarEstadoModal();
+            }
         }
     });
 

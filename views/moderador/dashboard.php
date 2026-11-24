@@ -275,7 +275,7 @@ $mod_inicial = $perfilMod['inicial'];
     <script src="<?= $base_url ?>assets/js/moderador-paginacion.js?v=1"></script>
     <script src="<?= $base_url ?>assets/js/moderador-filtros.js?v=6"></script>
     <script src="<?= $base_url ?>assets/js/moderador-cola.js?v=3"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-administrar.js?v=6"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-administrar.js?v=8"></script>
     <script src="<?= $base_url ?>assets/js/moderador-dashboard.js?v=6"></script>
 </body>
 
