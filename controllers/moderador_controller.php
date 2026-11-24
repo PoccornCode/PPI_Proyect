@@ -241,6 +241,7 @@ function moderarSubastaPendiente(int $idSubasta, string $decision): array
 function obtenerTodasSubastasModerador(string $baseUrl = ''): array
 {
     $dao = new ModeradorDAO();
+    $dao->inactivarSubastasVencidas();
     $filas = $dao->listarTodasSubastas();
     $lista = [];
 

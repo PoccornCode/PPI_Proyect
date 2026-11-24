@@ -2,6 +2,8 @@
     'use strict';
 
     const baseUrl = window.MOD_BASE_URL || '';
+    const manageSection = document.getElementById('sec-administrar');
+    const globalSearch = document.getElementById('modGlobalSearch');
     const searchInput = document.getElementById('modManageSearch');
     const catFilter = document.getElementById('modManageCatFilter');
     const statusFilter = document.getElementById('modManageStatusFilter');
@@ -15,6 +17,8 @@
     const clearBtn = document.getElementById('modManageClearFiltersBtn');
 
     if (!tbody) return;
+
+    let activeSearchEl = searchInput || globalSearch;
 
     const BADGE_MAP = {
         pendiente: { clase: 'adm-badge--pendiente', texto: 'Pendiente' },
@@ -77,7 +81,7 @@
     function filtrar(resetPage = true) {
         if (resetPage) currentPage = 1;
 
-        const term = normalizarTexto(searchInput?.value || '');
+        const term = normalizarTexto(activeSearchEl?.value || '');
         const tokens = term ? term.split(/\s+/).filter(Boolean) : [];
         const selectedCat = normalizarTexto(catFilter?.value || '');
         const selectedStatus = normalizarTexto(statusFilter?.value || '');
@@ -87,12 +91,16 @@
         const matchingRows = [];
 
         rows.forEach((row) => {
+            const rawStatus = row.dataset.status || '';
+            const statusLabel = BADGE_MAP[rawStatus]?.texto || rawStatus.replace(/_/g, ' ');
             const searchable = normalizarTexto([
                 row.dataset.id,
+                row.dataset.subastaId,
                 row.dataset.title,
                 row.dataset.vendor,
                 row.dataset.category,
-                row.dataset.status
+                rawStatus,
+                statusLabel
             ].join(' '));
 
             const rowCat = normalizarTexto(row.dataset.category || '');
@@ -274,7 +282,39 @@
         }
     });
 
-    searchInput?.addEventListener('input', () => filtrar(true));
+    function manejarBusqueda(origen, otro) {
+        activeSearchEl = origen;
+        if (otro && origen.value && otro.value) {
+            otro.value = '';
+        }
+        filtrar(true);
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', () => manejarBusqueda(searchInput, globalSearch));
+        searchInput.addEventListener('search', () => manejarBusqueda(searchInput, globalSearch));
+    }
+
+    if (globalSearch) {
+        const onGlobalManageSearch = () => {
+            if (!manageSection?.classList.contains('active')) return;
+            manejarBusqueda(globalSearch, searchInput);
+        };
+        globalSearch.addEventListener('input', onGlobalManageSearch);
+        globalSearch.addEventListener('search', onGlobalManageSearch);
+        globalSearch.addEventListener('keydown', (e) => {
+            if (!manageSection?.classList.contains('active')) return;
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                onGlobalManageSearch();
+                tbody.closest('.adm-table-card')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else if (e.key === 'Escape') {
+                globalSearch.value = '';
+                onGlobalManageSearch();
+            }
+        });
+    }
+
     catFilter?.addEventListener('change', () => filtrar(true));
     statusFilter?.addEventListener('change', () => filtrar(true));
     pageSizeSelect?.addEventListener('change', () => {
@@ -284,8 +324,10 @@
 
     clearBtn?.addEventListener('click', () => {
         if (searchInput) searchInput.value = '';
+        if (globalSearch && manageSection?.classList.contains('active')) globalSearch.value = '';
         if (catFilter) catFilter.value = '';
         if (statusFilter) statusFilter.value = '';
+        activeSearchEl = searchInput || globalSearch;
         filtrar(true);
     });
 

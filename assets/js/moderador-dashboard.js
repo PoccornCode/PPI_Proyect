@@ -52,6 +52,18 @@
             sec.classList.toggle('active', sec.id === `sec-${target}`);
         });
 
+        const globalSearch = document.getElementById('modGlobalSearch');
+        if (globalSearch) {
+            const ph = target === 'administrar'
+                ? 'Buscar subasta, vendedor o ID...'
+                : 'Buscar subastas pendientes...';
+            globalSearch.placeholder = ph;
+            globalSearch.setAttribute('aria-label', ph);
+            if (globalSearch.value.trim() !== '') {
+                globalSearch.dispatchEvent(new Event('input'));
+            }
+        }
+
         if (pushHash && window.location.hash !== `#${target}`) {
             history.replaceState(null, '', `#${target}`);
         }

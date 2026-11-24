@@ -188,7 +188,8 @@
     function abrirModalDetalle(btn) {
         if (!detailModalEl || typeof bootstrap === 'undefined') return;
         activeDetailRow = btn.closest('tr');
-        const isPending = Boolean(activeDetailRow && activeDetailRow.dataset.status === 'Pendiente');
+        const esFilaAprobacion = Boolean(activeDetailRow && approvalTbody && approvalTbody.contains(activeDetailRow));
+        const isPending = Boolean(esFilaAprobacion && activeDetailRow.dataset.status === 'Pendiente');
 
         if (modalApprovalActions) {
             modalApprovalActions.classList.toggle('d-none', !isPending);
@@ -305,15 +306,16 @@
             if (decisionBtn) {
                 const row = decisionBtn.closest('tr');
                 abrirModalConfirmar(row, decisionBtn.dataset.modDecision);
-                return;
-            }
-
-            const detailBtn = e.target.closest('[data-mod-detail]');
-            if (detailBtn) {
-                abrirModalDetalle(detailBtn);
             }
         });
     }
+
+    document.addEventListener('click', (e) => {
+        const detailBtn = e.target.closest('[data-mod-detail]');
+        if (detailBtn) {
+            abrirModalDetalle(detailBtn);
+        }
+    });
 
     if (galleryPrev) {
         galleryPrev.addEventListener('click', () => renderGalleryImage(galleryIndex - 1));
@@ -325,8 +327,12 @@
     function triggerModalDecision(decision) {
         if (!activeDetailRow) return;
         const row = activeDetailRow;
-        if (detailModalEl && typeof bootstrap !== 'undefined') {
+        if (detailModalEl && typeof bootstrap !== 'undefined' && detailModalEl.classList.contains('show')) {
+            detailModalEl.addEventListener('hidden.bs.modal', () => {
+                abrirModalConfirmar(row, decision);
+            }, { once: true });
             bootstrap.Modal.getOrCreateInstance(detailModalEl).hide();
+            return;
         }
         abrirModalConfirmar(row, decision);
     }

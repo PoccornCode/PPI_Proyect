@@ -19,6 +19,7 @@ $mod_nombre_completo = $perfilMod['nombre_completo'];
 $mod_primer_nombre = $perfilMod['primer_nombre'];
 $mod_username = $perfilMod['username'];
 $mod_rol_nombre = $perfilMod['rol_nombre'];
+$mod_id_rol = (int)($perfilMod['id_rol'] ?? 0);
 $mod_inicial = $perfilMod['inicial'];
 ?>
 <!DOCTYPE html>
@@ -35,7 +36,7 @@ $mod_inicial = $perfilMod['inicial'];
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="<?= $base_url ?>assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="<?= $base_url ?>assets/css/admin-dashboard.css?v=1">
-    <link rel="stylesheet" href="<?= $base_url ?>assets/css/moderador-dashboard.css?v=31">
+    <link rel="stylesheet" href="<?= $base_url ?>assets/css/moderador-dashboard.css?v=32">
 </head>
 
 <body class="admin-body">
@@ -111,11 +112,13 @@ $mod_inicial = $perfilMod['inicial'];
                             <i class="fa-solid fa-arrow-up-right-from-square"></i> Ir al sitio público
                         </a>
                     </li>
-                    <li>
-                        <a class="dropdown-item" href="<?= $base_url ?>views/admin/dashboard.php">
-                            <i class="fa-solid fa-crown"></i> Panel de Administración
-                        </a>
-                    </li>
+                    <?php if ($mod_id_rol === 1): ?>
+                        <li>
+                            <a class="dropdown-item" href="<?= $base_url ?>views/admin/dashboard.php">
+                                <i class="fa-solid fa-crown"></i> Panel de Administración
+                            </a>
+                        </li>
+                    <?php endif; ?>
                     <li>
                         <hr class="dropdown-divider">
                     </li>
@@ -273,10 +276,10 @@ $mod_inicial = $perfilMod['inicial'];
     <script src="<?= $base_url ?>assets/js/toast-ppi.js?v=2"></script>
     <script src="<?= $base_url ?>assets/js/moderador-kpis.js?v=4"></script>
     <script src="<?= $base_url ?>assets/js/moderador-paginacion.js?v=1"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-filtros.js?v=6"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-cola.js?v=3"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-administrar.js?v=8"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-dashboard.js?v=6"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-filtros.js?v=7"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-cola.js?v=5"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-administrar.js?v=9"></script>
+    <script src="<?= $base_url ?>assets/js/moderador-dashboard.js?v=8"></script>
 </body>
 
 </html>

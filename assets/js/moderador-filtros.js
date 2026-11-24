@@ -152,17 +152,24 @@
         approvalSearch.addEventListener('search', () => manejarBusqueda(approvalSearch, globalSearch));
     }
 
+    const approvalSection = document.getElementById('sec-aprobar');
+
     if (globalSearch) {
-        globalSearch.addEventListener('input', () => manejarBusqueda(globalSearch, approvalSearch));
-        globalSearch.addEventListener('search', () => manejarBusqueda(globalSearch, approvalSearch));
+        const onGlobalApprovalSearch = () => {
+            if (approvalSection && !approvalSection.classList.contains('active')) return;
+            manejarBusqueda(globalSearch, approvalSearch);
+        };
+        globalSearch.addEventListener('input', onGlobalApprovalSearch);
+        globalSearch.addEventListener('search', onGlobalApprovalSearch);
         globalSearch.addEventListener('keydown', (e) => {
+            if (approvalSection && !approvalSection.classList.contains('active')) return;
             if (e.key === 'Enter') {
                 e.preventDefault();
-                manejarBusqueda(globalSearch, approvalSearch);
+                onGlobalApprovalSearch();
                 approvalTbody?.closest('.adm-table-card')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             } else if (e.key === 'Escape') {
                 globalSearch.value = '';
-                manejarBusqueda(globalSearch, approvalSearch);
+                onGlobalApprovalSearch();
             }
         });
     }

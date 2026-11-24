@@ -1405,13 +1405,19 @@ body.admin-body {
     cursor: not-allowed;
 }
 
-/* Evitar saltos de tamaño/layout al abrir modales o al salir filas */
+/* Evitar saltos de tamaño/layout al abrir o encadenar modales */
 html {
     scrollbar-gutter: stable;
+    overflow-y: scroll;
 }
 
+body.admin-body,
 body.admin-body.modal-open {
     padding-right: 0 !important;
+}
+
+body.admin-body .adm-topbar {
+    padding-right: 18px !important;
 }
 
 .adm-table.mod-table tbody tr.mod-row-leaving {
