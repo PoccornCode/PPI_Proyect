@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 1000);
     }
 
-    // Envio del formulario de verificacion
+    // envio del formulario de verificacion
     if (form) {
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Botón de reenvío
+    // btn reevio
     if (btnReenviar) {
         btnReenviar.addEventListener("click", async () => {
             const correo = inputCorreo ? inputCorreo.value.trim() : "";

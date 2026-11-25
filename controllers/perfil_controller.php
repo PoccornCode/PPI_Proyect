@@ -42,7 +42,7 @@ if ($opcion === "cambiarContrasenia") {
         exit;
     }
 
-    // Freno a los intentos con contraseña actual incorrecta: 5 fallos = 5 minutos de espera
+    // 5 fallos = 5 minutos de espera
     $maxIntentos = 5;
     $esperaSegundos = 300;
     $bloqueadoHasta = (int)($_SESSION['clave_bloqueo_hasta'] ?? 0);
@@ -64,7 +64,7 @@ if ($opcion === "cambiarContrasenia") {
         exit;
     }
 
-    // Misma regla que el registro y la recuperación de contraseña
+    // contra
     $regexContrasenia = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9\s]).{8,}$/';
     if (!preg_match($regexContrasenia, $nueva)) {
         echo json_encode([
