@@ -895,11 +895,9 @@ h6.text-main-ppi {
         display: flex;
         align-items: center;
         gap: 0.65rem;
-        padding: 0.55rem 0.65rem;
-        border-radius: 10px;
-        background: #12160f;
-        border: 1px solid #232b1c;
-        margin-bottom: 0.5rem;
+        padding: 0.25rem 0.25rem 0.65rem;
+        border-bottom: 1px solid #1c2217;
+        margin-bottom: 0.45rem;
     }
 
     .nav-drawer-user-links {
