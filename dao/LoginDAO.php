@@ -46,7 +46,7 @@ class LoginDAO
                 ];
             }
 
-            // Actualiza el hash si el algoritmo por defecto cambió
+            //  hash si el algoritmo por defecto cambio
             if (password_needs_rehash($usuario['contrasenia'], PASSWORD_DEFAULT)) {
                 $nuevoHash = password_hash($contrasenia, PASSWORD_DEFAULT);
                 $sql = "UPDATE sb_usuario SET contrasenia = ? WHERE id_usuario = ?";

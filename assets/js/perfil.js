@@ -3,7 +3,7 @@ const REGEX_PASSWORD = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9\s]).{8,}
 const MSG_PASSWORD = "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.";
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Secciones que todavía no existen: aviso en lugar de un enlace roto
+    // para borradores de prueba gg
     document.querySelectorAll("[data-proximamente]").forEach((enlace) => {
         enlace.addEventListener("click", (evento) => {
             evento.preventDefault();
@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // ---- Cambiar contraseña ----
+    // cambiar contra
     const modalEl = document.getElementById("modalCambiarClave");
     const form = document.getElementById("formCambiarClave");
     const btnGuardar = document.getElementById("btnGuardarClave");
@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const nueva = document.getElementById("nueva_contrasenia");
     const confirmar = document.getElementById("confirmar_contrasenia");
 
-    // Ojito para mostrar/ocultar cada campo
+    // ojito d los campos
     modalEl.querySelectorAll(".btn-toggle-eye").forEach((btn) => {
         btn.addEventListener("click", () => {
             const objetivo = document.getElementById(btn.getAttribute("data-target"));
@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Al cerrar el modal se limpia todo (no se deja ninguna contraseña escrita)
+    // limpiar cajas de contras
     modalEl.addEventListener("hidden.bs.modal", () => {
         form.reset();
         [actual, nueva, confirmar].forEach((campo) => {

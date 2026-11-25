@@ -39,11 +39,13 @@ if ($opcion === "login") {
             unset($_SESSION['redirect_after_login']);
         } elseif ((int)$u['id_rol'] === 3) {
             $redirect = BASE_URL . "views/moderador/dashboard.php";
-        } else {
+        }  elseif ((int)$u['id_rol'] === 1) {
+            $redirect = BASE_URL . "views/admin/dashboard.php";
+        }  else {
             $redirect = BASE_URL . "index.php";
         }
 
-        // Redirige a la raíz del proyecto;
+        // Redirige a la raz del proyecto
         if (!empty($redirect_param)) {
             if (strpos($redirect_param, 'http://') === false && strpos($redirect_param, 'https://') === false) {
                 $redirect = (strpos($redirect_param, BASE_URL) === 0) ? $redirect_param : BASE_URL . ltrim($redirect_param, '/');
