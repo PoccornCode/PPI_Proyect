@@ -158,6 +158,18 @@ function obtenerResumenInferiorInicioAdmin(string $baseUrl = '', int $limiteUsua
     ];
 }
 
+function obtenerRolesAdmin(): array
+{
+    $dao = new AdminDAO();
+    return $dao->obtenerRolesFiltro();
+}
+
+function obtenerUsuariosAdmin(string $busqueda = '', int $idRol = 0, int $pagina = 1, int $porPagina = 10): array
+{
+    $dao = new AdminDAO();
+    return $dao->listarUsuariosAdmin($busqueda, $idRol, $pagina, $porPagina);
+}
+
 if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -205,6 +217,18 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
         echo json_encode([
             'estado'  => true,
             'resumen' => obtenerResumenInferiorInicioAdmin(BASE_URL),
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'usuarios') {
+        $busqueda = trim((string)($_GET['q'] ?? $_POST['q'] ?? ''));
+        $idRol = (int)($_GET['id_rol'] ?? $_POST['id_rol'] ?? 0);
+        $pagina = (int)($_GET['pagina'] ?? $_POST['pagina'] ?? 1);
+        $porPagina = (int)($_GET['por_pagina'] ?? $_POST['por_pagina'] ?? 10);
+        echo json_encode([
+            'estado' => true,
+            'data'   => obtenerUsuariosAdmin($busqueda, $idRol, $pagina, $porPagina),
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }

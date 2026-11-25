@@ -73,6 +73,10 @@
             history.replaceState(null, '', `#${target}`);
         }
 
+        if (pushHash && target === 'usuarios') {
+            window.AdminUsuarios?.recargar();
+        }
+
         closeMobileSidebar();
         window.scrollTo(0, 0);
     }

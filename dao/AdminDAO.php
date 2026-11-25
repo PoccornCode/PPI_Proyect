@@ -352,24 +352,7 @@ class AdminDAO
         }
 
         while ($row = $res->fetch_assoc()) {
-            $rolNombre = trim((string)($row['rol_nombre'] ?? 'Usuario'));
-            $rolLower = mb_strtolower($rolNombre, 'UTF-8');
-            if ($rolLower === 'administrador' || (int)($row['id_rol'] ?? 0) === 1) {
-                $rolEtiqueta = 'Administrador';
-                $rolClass = 'administrador';
-            } elseif ($rolLower === 'moderador' || (int)($row['id_rol'] ?? 0) === 3) {
-                $rolEtiqueta = 'Moderador';
-                $rolClass = 'moderador';
-            } elseif ($rolLower === 'vendedor') {
-                $rolEtiqueta = 'Subastador';
-                $rolClass = 'vendedor';
-            } elseif ($rolLower === 'postor') {
-                $rolEtiqueta = 'Pujador';
-                $rolClass = 'postor';
-            } else {
-                $rolEtiqueta = 'Pujador / Subastador';
-                $rolClass = 'usuario';
-            }
+            $rolMapeado = $this->mapearRolUsuario((int)($row['id_rol'] ?? 0), (string)($row['rol_nombre'] ?? 'Usuario'));
 
             $correo = trim((string)($row['correo'] ?? ''));
             $username = trim((string)($row['username'] ?? ''));
@@ -381,13 +364,202 @@ class AdminDAO
                 'correo'          => $correo,
                 'username'        => $username,
                 'nombre_completo' => trim(($row['nombre'] ?? '') . ' ' . ($row['apellido'] ?? '')),
-                'rol'             => $rolEtiqueta,
-                'rol_class'       => $rolClass,
+                'rol'             => $rolMapeado['etiqueta'],
+                'rol_class'       => $rolMapeado['clase'],
                 'fecha_registro'  => (string)($row['fecha_registro'] ?? ''),
             ];
         }
 
         return $usuarios;
+    }
+
+    private function mapearRolUsuario(int $idRol, string $rolNombre): array
+    {
+        $rolLower = mb_strtolower(trim($rolNombre), 'UTF-8');
+        if ($rolLower === 'administrador' || $idRol === 1) {
+            return ['etiqueta' => 'Administrador', 'clase' => 'administrador'];
+        }
+        if ($rolLower === 'moderador' || $idRol === 3) {
+            return ['etiqueta' => 'Moderador', 'clase' => 'moderador'];
+        }
+        if ($rolLower === 'vendedor') {
+            return ['etiqueta' => 'Subastador', 'clase' => 'vendedor'];
+        }
+        if ($rolLower === 'postor') {
+            return ['etiqueta' => 'Pujador', 'clase' => 'postor'];
+        }
+
+        return ['etiqueta' => 'Pujador / Subastador', 'clase' => 'usuario'];
+    }
+
+    public function obtenerRolesFiltro(): array
+    {
+        $roles = [];
+        if (!$this->conexion || $this->conexion->connect_errno) {
+            return $roles;
+        }
+
+        $sql = "SELECT id_rol, nombre FROM sb_rol ORDER BY id_rol ASC";
+        $res = $this->conexion->query($sql);
+        if (!$res) {
+            return $roles;
+        }
+
+        while ($row = $res->fetch_assoc()) {
+            $idRol = (int)$row['id_rol'];
+            $nombre = trim((string)($row['nombre'] ?? ''));
+            $mapeado = $this->mapearRolUsuario($idRol, $nombre);
+            $roles[] = [
+                'id_rol'   => $idRol,
+                'nombre'   => $nombre,
+                'etiqueta' => $mapeado['etiqueta'],
+                'clase'    => $mapeado['clase'],
+            ];
+        }
+
+        return $roles;
+    }
+
+    public function listarUsuariosAdmin(string $busqueda = '', int $idRol = 0, int $pagina = 1, int $porPagina = 10): array
+    {
+        $pagina = max(1, $pagina);
+        $porPagina = max(1, min(50, $porPagina));
+
+        $resultado = [
+            'usuarios'      => [],
+            'total'         => 0,
+            'pagina'        => $pagina,
+            'por_pagina'    => $porPagina,
+            'total_paginas' => 1,
+            'desde'         => 0,
+            'hasta'         => 0,
+        ];
+
+        if (!$this->conexion || $this->conexion->connect_errno) {
+            return $resultado;
+        }
+
+        $where = [];
+        $types = '';
+        $params = [];
+
+        if ($idRol > 0) {
+            $where[] = 'u.id_rol = ?';
+            $types .= 'i';
+            $params[] = $idRol;
+        }
+
+        $busquedaLimpia = trim($busqueda);
+        if ($busquedaLimpia !== '') {
+            $like = '%' . $busquedaLimpia . '%';
+            $where[] = "(u.nombre LIKE ?
+                         OR u.apellido LIKE ?
+                         OR CONCAT(u.nombre, ' ', u.apellido) LIKE ?
+                         OR u.username LIKE ?
+                         OR CAST(u.id_usuario AS CHAR) LIKE ?
+                         OR EXISTS (
+                             SELECT 1
+                             FROM sb_correo_usuario cu2
+                             WHERE cu2.id_usuario = u.id_usuario
+                               AND cu2.correo LIKE ?
+                         ))";
+            $types .= 'ssssss';
+            array_push($params, $like, $like, $like, $like, $like, $like);
+        }
+
+        $whereSql = !empty($where) ? ('WHERE ' . implode(' AND ', $where)) : '';
+
+        $sqlCount = "SELECT COUNT(*) AS total FROM sb_usuario u {$whereSql}";
+        $stmtCount = $this->conexion->prepare($sqlCount);
+        if (!$stmtCount) {
+            return $resultado;
+        }
+        if ($types !== '') {
+            $stmtCount->bind_param($types, ...$params);
+        }
+        $stmtCount->execute();
+        $rowCount = $stmtCount->get_result()->fetch_assoc();
+        $stmtCount->close();
+
+        $total = (int)($rowCount['total'] ?? 0);
+        $totalPaginas = max(1, (int)ceil($total / $porPagina));
+        if ($pagina > $totalPaginas) {
+            $pagina = $totalPaginas;
+        }
+
+        $resultado['total'] = $total;
+        $resultado['pagina'] = $pagina;
+        $resultado['total_paginas'] = $totalPaginas;
+
+        if ($total === 0) {
+            return $resultado;
+        }
+
+        $offset = ($pagina - 1) * $porPagina;
+        $sqlData = "SELECT u.id_usuario,
+                           u.nombre,
+                           u.apellido,
+                           u.username,
+                           u.estado,
+                           u.fecha_registro,
+                           u.id_rol,
+                           COALESCE(r.nombre, 'Usuario') AS rol_nombre,
+                           (SELECT cu.correo
+                            FROM sb_correo_usuario cu
+                            WHERE cu.id_usuario = u.id_usuario
+                            ORDER BY cu.correo ASC
+                            LIMIT 1) AS correo
+                    FROM sb_usuario u
+                    LEFT JOIN sb_rol r ON u.id_rol = r.id_rol
+                    {$whereSql}
+                    ORDER BY u.fecha_registro DESC, u.id_usuario DESC
+                    LIMIT ? OFFSET ?";
+
+        $stmtData = $this->conexion->prepare($sqlData);
+        if (!$stmtData) {
+            return $resultado;
+        }
+
+        $typesData = $types . 'ii';
+        $paramsData = array_merge($params, [$porPagina, $offset]);
+        $stmtData->bind_param($typesData, ...$paramsData);
+        $stmtData->execute();
+        $res = $stmtData->get_result();
+
+        $usuarios = [];
+        while ($row = $res->fetch_assoc()) {
+            $rolMapeado = $this->mapearRolUsuario((int)($row['id_rol'] ?? 0), (string)($row['rol_nombre'] ?? 'Usuario'));
+            $correo = trim((string)($row['correo'] ?? ''));
+            $username = trim((string)($row['username'] ?? ''));
+            $nombreCompleto = trim(($row['nombre'] ?? '') . ' ' . ($row['apellido'] ?? ''));
+            $etiqueta = $correo !== '' ? $correo : ($username !== '' ? '@' . ltrim($username, '@') : 'Usuario #' . (int)$row['id_usuario']);
+            $activo = (int)($row['estado'] ?? 0) === 1;
+            $fechaRaw = (string)($row['fecha_registro'] ?? '');
+            $ts = $fechaRaw !== '' ? strtotime($fechaRaw) : false;
+            $registroFmt = $ts !== false ? date('d/m/y', $ts) : '—';
+
+            $usuarios[] = [
+                'id_usuario'      => (int)$row['id_usuario'],
+                'etiqueta'        => $etiqueta,
+                'correo'          => $correo,
+                'username'        => $username,
+                'nombre_completo' => $nombreCompleto,
+                'id_rol'          => (int)$row['id_rol'],
+                'rol'             => $rolMapeado['etiqueta'],
+                'rol_class'       => $rolMapeado['clase'],
+                'activo'          => $activo,
+                'estado'          => $activo ? 'Activo' : 'Suspendido',
+                'registro'        => $registroFmt,
+                'fecha_registro'  => $fechaRaw,
+            ];
+        }
+        $stmtData->close();
+
+        $resultado['usuarios'] = $usuarios;
+        $resultado['desde'] = $offset + 1;
+        $resultado['hasta'] = $offset + count($usuarios);
+
+        return $resultado;
     }
 
     public function obtenerSubastasDestacadas(int $limite = 3, string $baseUrl = ''): array

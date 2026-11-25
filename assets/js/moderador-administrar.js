@@ -45,8 +45,8 @@
     }
 
     function renderPaginacion(totalPages) {
-        if (!paginationEl || !window.ModPaginacion) return;
-        window.ModPaginacion.render(paginationEl, {
+        if (!paginationEl || !window.Paginacion) return;
+        window.Paginacion.render(paginationEl, {
             currentPage,
             totalPages,
             maxVisible: 5,

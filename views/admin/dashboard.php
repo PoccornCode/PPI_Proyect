@@ -15,6 +15,8 @@ $alertasTopbar = obtenerAlertasTopbarAdmin();
 $kpisAdmin = obtenerKpisAdmin('30d');
 $graficosInicio = obtenerGraficosInicioAdmin('7d');
 $resumenInferiorInicio = obtenerResumenInferiorInicioAdmin($base_url);
+$rolesAdmin = obtenerRolesAdmin();
+$usuariosAdminInicial = obtenerUsuariosAdmin('', 0, 1, 10);
 
 $adm_nombre_completo = $perfilAdmin['nombre_completo'];
 $adm_primer_nombre = $perfilAdmin['primer_nombre'];
@@ -23,14 +25,6 @@ $adm_rol_nombre = $perfilAdmin['rol_nombre'];
 $adm_inicial = $perfilAdmin['inicial'];
 
 // Datos de referencia visual (mockup del panel Admin)
-$usuarios_demo = [
-    ['email' => 'ricardo.villalta@gmail.com', 'rol' => 'Moderador', 'rol_class' => 'moderador', 'estado' => 'Activo', 'activo' => true, 'registro' => '12/10/25'],
-    ['email' => 'usuariotal1@gmail.com',      'rol' => 'Postor',    'rol_class' => 'postor',    'estado' => 'Activo', 'activo' => true, 'registro' => '12/10/25'],
-    ['email' => 'jhonatan.perdomo@gmail.com', 'rol' => 'Postor',    'rol_class' => 'postor',    'estado' => 'Suspendido', 'activo' => false, 'registro' => '12/10/25'],
-    ['email' => 'usuariotal2@gmail.com',      'rol' => 'Vendedor',  'rol_class' => 'vendedor',  'estado' => 'Activo', 'activo' => true, 'registro' => '12/10/25'],
-    ['email' => 'nathaly.nose@gmail.com',     'rol' => 'Postor',    'rol_class' => 'postor',    'estado' => 'Activo', 'activo' => true, 'registro' => '12/10/25'],
-];
-
 $subastas_demo = [
     [
         'titulo'      => 'Charizard 1st Edition Base Set',
@@ -309,103 +303,7 @@ $transacciones_demo = [
             <?php include __DIR__ . '/partials/resumen-inferior-inicio.php'; ?>
         </section>
 
-        <!-- ===============================================================
-             SECCIÓN 2: GESTIÓN DE USUARIOS
-             =============================================================== -->
-        <section class="adm-section" id="sec-usuarios">
-            <div class="adm-section-head">
-                <div class="adm-title-group">
-                    <span class="adm-title-accent" aria-hidden="true"></span>
-                    <div>
-                        <h1>Gestión de usuarios</h1>
-                        <p>Administra los usuarios registrados en la plataforma.</p>
-                    </div>
-                </div>
-            </div>
-            <hr class="adm-section-divider">
-
-            <div class="adm-toolbar">
-                <div class="adm-toolbar-left">
-                    <div class="adm-input-search">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <span class="adm-search-divider" aria-hidden="true"></span>
-                        <input type="search" id="admUserSearch" placeholder="Buscar usuario..." aria-label="Buscar usuario">
-                    </div>
-                    <select class="adm-select-filter" id="admUserRoleFilter" aria-label="Filtrar por rol">
-                        <option value="">Todos los roles</option>
-                        <option value="Moderador">Moderador</option>
-                        <option value="Postor">Postor</option>
-                        <option value="Vendedor">Vendedor</option>
-                    </select>
-                </div>
-                <button type="button" class="adm-btn-primary" data-bs-toggle="modal" data-bs-target="#modalAgregarUsuario">
-                    <i class="fa-solid fa-plus"></i> Agregar usuario
-                </button>
-            </div>
-
-            <div class="adm-table-card">
-                <div class="adm-table-responsive">
-                    <table class="adm-table">
-                        <thead>
-                            <tr>
-                                <th><i class="fa-solid fa-users"></i> Usuarios</th>
-                                <th>Rol</th>
-                                <th>Estado</th>
-                                <th>Registro</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admUsersTbody">
-                            <?php foreach ($usuarios_demo as $u): ?>
-                                <tr data-email="<?= htmlspecialchars($u['email']) ?>" data-role="<?= htmlspecialchars($u['rol']) ?>">
-                                    <td>
-                                        <div class="adm-cell-user">
-                                            <div class="adm-user-avatar"><i class="fa-solid fa-user"></i></div>
-                                            <span><?= htmlspecialchars($u['email']) ?></span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="adm-badge adm-badge--<?= $u['rol_class'] ?>">
-                                            <?= htmlspecialchars($u['rol']) ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="adm-status">
-                                            <span class="adm-status-dot <?= $u['activo'] ? 'adm-status-dot--active' : 'adm-status-dot--suspended' ?>"></span>
-                                            <?= htmlspecialchars($u['estado']) ?>
-                                        </span>
-                                    </td>
-                                    <td><?= htmlspecialchars($u['registro']) ?></td>
-                                    <td>
-                                        <div class="adm-action-group">
-                                            <button type="button" class="adm-action-btn adm-action-btn--edit" title="Ver detalles"
-                                                data-adm-demo-action="Ver detalles: <?= htmlspecialchars($u['email']) ?> (referencia)">
-                                                <i class="fa-regular fa-eye"></i>
-                                            </button>
-                                            <button type="button" class="adm-action-btn adm-action-btn--edit" title="Editar usuario"
-                                                data-adm-demo-action="Editar <?= htmlspecialchars($u['email']) ?> (referencia)">
-                                                <i class="fa-solid fa-pen-to-square"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="adm-table-footer">
-                    <span class="adm-table-count" id="admUsersCount">Mostrando <?= count($usuarios_demo) ?> usuarios</span>
-                    <nav class="adm-pagination" aria-label="Paginación de usuarios">
-                        <button type="button" class="adm-page-btn active">1</button>
-                        <button type="button" class="adm-page-btn" data-adm-demo-action="Página 2 (datos de referencia)">2</button>
-                        <button type="button" class="adm-page-btn" data-adm-demo-action="Página 3 (datos de referencia)">3</button>
-                        <button type="button" class="adm-page-btn" aria-label="Siguiente" data-adm-demo-action="Siguiente página (referencia)">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </button>
-                    </nav>
-                </div>
-            </div>
-        </section>
+        <?php include __DIR__ . '/partials/gestion-usuarios.php'; ?>
 
         <!-- ===============================================================
              SECCIÓN 3: GESTIÓN DE SUBASTAS
@@ -1400,6 +1298,7 @@ $transacciones_demo = [
     <script>
         window.ADM_BASE_URL = <?= json_encode($base_url, JSON_UNESCAPED_SLASHES) ?>;
         window.ADM_GRAFICOS_INICIO = <?= json_encode($graficosInicio, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+        window.ADM_USUARIOS_INICIAL = <?= json_encode($usuariosAdminInicial, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
         window.ADM_CATEGORIES_DEMO = {
             baseUrl: <?= json_encode($base_url, JSON_UNESCAPED_SLASHES) ?>,
             categorias: <?= json_encode($categorias_admin, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
@@ -1411,6 +1310,8 @@ $transacciones_demo = [
     <script src="<?= $base_url ?>assets/js/admin-kpis.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-kpis.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-graficos.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-graficos.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-resumen-inicio.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-resumen-inicio.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/paginacion.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/paginacion.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/admin-usuarios.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-usuarios.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-dashboard.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-dashboard.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-dashboard-referencia.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-dashboard-referencia.js') ?>"></script>
 </body>

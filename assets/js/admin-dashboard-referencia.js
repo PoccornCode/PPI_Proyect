@@ -8,37 +8,8 @@
     const showToast = (msg) => window.AdminDashboard?.notify(msg);
 
     // =========================================================================
-    // FILTROS EN VIVO — USUARIOS Y SUBASTAS
+    // FILTROS EN VIVO — SUBASTAS (REFERENCIA)
     // =========================================================================
-    const userSearchInput = document.getElementById('admUserSearch');
-    const userRoleFilter = document.getElementById('admUserRoleFilter');
-    const usersTableBody = document.getElementById('admUsersTbody');
-    const usersCountLabel = document.getElementById('admUsersCount');
-
-    function filterUsersTable() {
-        if (!usersTableBody) return;
-        const q = (userSearchInput?.value || '').trim().toLowerCase();
-        const role = (userRoleFilter?.value || '').toLowerCase();
-        let visible = 0;
-
-        usersTableBody.querySelectorAll('tr').forEach((row) => {
-            const email = (row.dataset.email || '').toLowerCase();
-            const rowRole = (row.dataset.role || '').toLowerCase();
-            const matchText = !q || email.includes(q);
-            const matchRole = !role || rowRole === role;
-            const show = matchText && matchRole;
-            row.style.display = show ? '' : 'none';
-            if (show) visible++;
-        });
-
-        if (usersCountLabel) {
-            usersCountLabel.textContent = `Mostrando ${visible} usuario${visible === 1 ? '' : 's'}`;
-        }
-    }
-
-    userSearchInput?.addEventListener('input', filterUsersTable);
-    userRoleFilter?.addEventListener('change', filterUsersTable);
-
     const auctionSearchInput = document.getElementById('admAuctionSearch');
     const auctionCatFilter = document.getElementById('admAuctionCatFilter');
     const auctionsTableBody = document.getElementById('admAuctionsTbody');
@@ -67,31 +38,6 @@
 
     auctionSearchInput?.addEventListener('input', filterAuctionsTable);
     auctionCatFilter?.addEventListener('change', filterAuctionsTable);
-
-    // Global topbar search jumps to Usuarios or Subastas if user presses Enter
-    const globalSearch = document.getElementById('admGlobalSearch');
-    if (globalSearch) {
-        globalSearch.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const term = globalSearch.value.trim();
-                if (!term) return;
-                if (term.includes('@')) {
-                    activateTab('usuarios');
-                    if (userSearchInput) {
-                        userSearchInput.value = term;
-                        filterUsersTable();
-                    }
-                } else {
-                    activateTab('subastas');
-                    if (auctionSearchInput) {
-                        auctionSearchInput.value = term;
-                        filterAuctionsTable();
-                    }
-                }
-            }
-        });
-    }
 
     // =========================================================================
     // CATEGORÍAS — INTERACCIONES DE DISEÑO / REFERENCIA (SIN BACKEND)
@@ -901,11 +847,11 @@
         syncDirtyState();
     }
 
-    // Demo action buttons (edit/delete)
-    document.querySelectorAll('[data-adm-demo-action]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-            showToast(btn.dataset.admDemoAction);
-        });
+    // Demo action buttons (edit/delete) — delegated so dynamically rendered rows work too
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-adm-demo-action]');
+        if (!btn) return;
+        showToast(btn.dataset.admDemoAction);
     });
 
     // Demo form submit inside modals

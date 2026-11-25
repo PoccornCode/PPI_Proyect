@@ -1163,6 +1163,42 @@ body.admin-body .adm-badge--finalizada {
     gap: 12px;
 }
 
+.adm-cell-user-meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.adm-cell-user-main {
+    color: var(--adm-text);
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.adm-cell-user-sub {
+    font-size: 0.76rem;
+    color: var(--adm-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.adm-table-empty {
+    text-align: center;
+    padding: 36px 16px !important;
+    color: var(--adm-text-muted);
+    font-size: 0.9rem;
+}
+
+.adm-table-empty i {
+    display: block;
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+    color: var(--adm-text-dim);
+}
+
 .adm-cell-item {
     display: flex;
     align-items: center;
@@ -1263,13 +1299,18 @@ body.admin-body .adm-badge--finalizada {
     justify-content: center;
 }
 
-.adm-page-btn:hover {
+.adm-page-btn:hover:not(:disabled) {
     background-color: #232a1e;
 }
 
 .adm-page-btn.active {
     background-color: var(--adm-accent-btn);
     color: #10150b;
+}
+
+.adm-page-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
 }
 
 /* FINANZAS — TRANSACTIONS */
