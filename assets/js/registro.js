@@ -90,8 +90,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 validarCampo(campo);
             });
             campo.addEventListener("input", function () {
-                if (campo.classList.contains("is-invalid")) {
+                if (campo.classList.contains("is-invalid") || campo.classList.contains("is-valid")) {
                     validarCampo(campo);
+                }
+                if (campo === contrasenia && confirmarContrasenia && confirmarContrasenia.value !== "") {
+                    validarCampo(confirmarContrasenia);
                 }
             });
         }
@@ -195,20 +198,42 @@ document.addEventListener("DOMContentLoaded", () => {
         formulario.addEventListener("submit", async function (e) {
             e.preventDefault();
 
-            let todosValidos = true;
+            let primerVacio = null;
             camposObligatorios.forEach(function (campo) {
-                if (!validarCampo(campo)) {
-                    todosValidos = false;
+                if (!campo) return;
+                const valor = campo.value.trim();
+                if (valor === "" || valor === "0") {
+                    campo.classList.add("is-invalid");
+                    campo.classList.remove("is-valid");
+                    if (!primerVacio) primerVacio = campo;
                 }
             });
 
-            if (!todosValidos) {
+            if (primerVacio) {
                 mostrarModal("warning", "Campos incompletos", "Por favor completa todos los campos obligatorios.");
+                primerVacio.focus();
+                return;
+            }
+
+            if (!REGEX_EMAIL.test(correo.value.trim())) {
+                correo.classList.add("is-invalid");
+                correo.classList.remove("is-valid");
+                mostrarModal("warning", "Correo inválido", "Por favor ingresa un correo electrónico válido (ejemplo: nombre@correo.com).");
+                correo.focus();
+                return;
+            }
+
+            if (!REGEX_TELEFONO.test(telefono.value.trim())) {
+                telefono.classList.add("is-invalid");
+                telefono.classList.remove("is-valid");
+                mostrarModal("warning", "Teléfono inválido", "El teléfono debe tener el formato 0000-0000 (8 dígitos).");
+                telefono.focus();
                 return;
             }
 
             if (!REGEX_PASSWORD.test(contrasenia.value)) {
                 contrasenia.classList.add("is-invalid");
+                contrasenia.classList.remove("is-valid");
                 mostrarModal("warning", "Contraseña débil", "La contraseña debe tener al menos 8 caracteres, incluir mayúscula, minúscula, número y algún símbolo (como ., :, -, _, @, $, etc.).");
                 contrasenia.focus();
                 return;
@@ -216,6 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (contrasenia.value !== confirmarContrasenia.value) {
                 confirmarContrasenia.classList.add("is-invalid");
+                confirmarContrasenia.classList.remove("is-valid");
                 mostrarModal("warning", "Contraseñas no coinciden", "Las contraseñas ingresadas no son iguales. Por favor verifica.");
                 confirmarContrasenia.focus();
                 return;

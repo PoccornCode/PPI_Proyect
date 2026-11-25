@@ -2,8 +2,158 @@
 const REGEX_PASSWORD = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9\s]).{8,}$/;
 const MSG_PASSWORD = "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.";
 
+let modalAlertaInstance = null;
+let callbackModalAlerta = null;
+
+function mostrarModal(tipo, titulo, mensaje, onCerrar = null) {
+    const modalEl = document.getElementById("modalPPI");
+    const tituloEl = document.getElementById("modalPPITitulo");
+    const cuerpoEl = document.getElementById("modalPPICuerpo");
+    const btnAccion = document.getElementById("btnModalPPIAccion");
+
+    if (!modalEl || !tituloEl || !cuerpoEl || !btnAccion) return;
+
+    callbackModalAlerta = onCerrar;
+
+    let icon = "";
+    btnAccion.className = "btn btn-ppi-modal btn-sm";
+
+    if (tipo === "success") {
+        icon = '<i class="fas fa-check-circle fs-5" style="color: #658807;"></i>';
+        btnAccion.textContent = "Continuar";
+    } else if (tipo === "danger" || tipo === "error") {
+        icon = '<i class="fas fa-times-circle fs-5" style="color: #d8685d;"></i>';
+        btnAccion.className = "btn btn-ppi-modal btn-danger btn-sm";
+        btnAccion.textContent = "Entendido";
+    } else {
+        icon = '<i class="fas fa-exclamation-triangle text-warning fs-5"></i>';
+        btnAccion.className = "btn btn-ppi-modal btn-warning btn-sm";
+        btnAccion.textContent = "Entendido";
+    }
+
+    tituloEl.innerHTML = `${icon} <span>${titulo}</span>`;
+    cuerpoEl.innerHTML = `<p class="mb-0 text-second-ppi">${mensaje}</p>`;
+
+    if (!modalAlertaInstance) {
+        modalAlertaInstance = new bootstrap.Modal(modalEl);
+        modalEl.addEventListener("hidden.bs.modal", () => {
+            if (typeof callbackModalAlerta === "function") {
+                const cb = callbackModalAlerta;
+                callbackModalAlerta = null;
+                cb();
+            }
+        });
+    }
+
+    modalAlertaInstance.show();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-    // Secciones que todavía no existen: aviso en lugar de un enlace roto
+    // Temporizador y actualización en vivo para "Mis subastas activas"
+    const contadoresSubasta = Array.from(document.querySelectorAll("[data-segundos-restantes]")).map((el) => {
+        const card = el.closest("[data-subasta-id]");
+        const seg = parseInt(el.dataset.segundosRestantes, 10);
+        return {
+            id: card ? String(card.dataset.subastaId) : null,
+            el,
+            fin: Date.now() + (Number.isFinite(seg) && seg > 0 ? seg * 1000 : 0)
+        };
+    });
+
+    if (contadoresSubasta.length > 0) {
+        const pad = (n) => String(n).padStart(2, "0");
+        const formatearRestante = (seg) => {
+            if (seg <= 0) return "Finalizada";
+            const dias = Math.floor(seg / 86400);
+            const horas = Math.floor((seg % 86400) / 3600);
+            const minutos = Math.floor((seg % 3600) / 60);
+            const segundos = seg % 60;
+            if (dias > 0) return `Termina en ${dias} d ${pad(horas)} h`;
+            if (horas > 0) return `Termina en ${pad(horas)} h ${pad(minutos)} min`;
+            return `Termina en ${pad(minutos)} min ${pad(segundos)} s`;
+        };
+
+        const actualizarContadores = () => {
+            const ahora = Date.now();
+            let activos = 0;
+            contadoresSubasta.forEach((item) => {
+                const rest = Math.max(0, Math.floor((item.fin - ahora) / 1000));
+                item.el.textContent = formatearRestante(rest);
+                if (rest > 0) activos++;
+            });
+            return activos > 0;
+        };
+
+        if (actualizarContadores()) {
+            const timerId = setInterval(() => {
+                if (!actualizarContadores()) {
+                    clearInterval(timerId);
+                }
+            }, 1000);
+        }
+
+        // Refrescar precio y pujas cada 10 segundos sin recargar
+        const seccionSubastas = document.getElementById("seccionMisSubastas");
+        const urlSubastas = seccionSubastas ? seccionSubastas.dataset.subastasUrl : "";
+        if (urlSubastas) {
+            let consultando = false;
+            const refrescarPujas = async () => {
+                if (document.hidden || consultando) return;
+                consultando = true;
+                try {
+                    const fd = new FormData();
+                    fd.append("opcion", "subastasActivas");
+                    const resp = await fetch(urlSubastas, { method: "POST", body: fd });
+                    const data = await resp.json().catch(() => null);
+                    if (!data || data.auth_required) {
+                        clearInterval(pollId);
+                        return;
+                    }
+                    if (!data.estado || !Array.isArray(data.subastas)) return;
+
+                    const ahora = Date.now();
+                    data.subastas.forEach((s) => {
+                        const card = seccionSubastas.querySelector(`[data-subasta-id="${s.id_subasta}"]`);
+                        if (!card) return;
+
+                        const precioEl = card.querySelector("[data-subasta-precio]");
+                        const nuevoPrecio = "$" + Number(s.precio_actual).toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+                        if (precioEl && precioEl.textContent !== nuevoPrecio) {
+                            precioEl.textContent = nuevoPrecio;
+                            if (typeof precioEl.animate === "function") {
+                                precioEl.animate(
+                                    [{ color: "#94aa34", opacity: 0.7 }, { opacity: 1 }],
+                                    { duration: 600, easing: "ease-out" }
+                                );
+                            }
+                        }
+
+                        const pujasEl = card.querySelector("[data-subasta-pujas]");
+                        if (pujasEl) {
+                            const n = Number(s.total_pujas) || 0;
+                            pujasEl.textContent = `${n} ${n === 1 ? "puja" : "pujas"}`;
+                        }
+
+                        const itemTimer = contadoresSubasta.find((t) => t.id === String(s.id_subasta));
+                        if (itemTimer) {
+                            itemTimer.fin = ahora + Math.max(0, Number(s.segundos_restantes) || 0) * 1000;
+                        }
+                    });
+                } catch (_) {
+                    // Silencioso para no interrumpir al usuario si hay un corte momentáneo
+                } finally {
+                    consultando = false;
+                }
+            };
+
+            const pollId = setInterval(refrescarPujas, 10000);
+        }
+    }
+
+    // para borradores de prueba gg
     document.querySelectorAll("[data-proximamente]").forEach((enlace) => {
         enlace.addEventListener("click", (evento) => {
             evento.preventDefault();
@@ -11,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // ---- Cambiar contraseña ----
+    // cambiar contra
     const modalEl = document.getElementById("modalCambiarClave");
     const form = document.getElementById("formCambiarClave");
     const btnGuardar = document.getElementById("btnGuardarClave");
@@ -21,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const nueva = document.getElementById("nueva_contrasenia");
     const confirmar = document.getElementById("confirmar_contrasenia");
 
-    // Ojito para mostrar/ocultar cada campo
+    // ojito d los campos
     modalEl.querySelectorAll(".btn-toggle-eye").forEach((btn) => {
         btn.addEventListener("click", () => {
             const objetivo = document.getElementById(btn.getAttribute("data-target"));
@@ -54,8 +204,26 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Al cerrar el modal se limpia todo (no se deja ninguna contraseña escrita)
+    let pausadoPorAlerta = false;
+    let campoParaEnfocar = null;
+
+    const getModalClave = () => bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+
+    function abrirAlertaSobreModal(tipo, titulo, mensaje, campoFocus = null) {
+        pausadoPorAlerta = true;
+        campoParaEnfocar = campoFocus;
+        const instancia = getModalClave();
+        modalEl.addEventListener("hidden.bs.modal", () => {
+            mostrarModal(tipo, titulo, mensaje, () => {
+                getModalClave().show();
+            });
+        }, { once: true });
+        instancia.hide();
+    }
+
+    // limpiar cajas de contras
     modalEl.addEventListener("hidden.bs.modal", () => {
+        if (pausadoPorAlerta) return;
         form.reset();
         [actual, nueva, confirmar].forEach((campo) => {
             campo.classList.remove("is-valid", "is-invalid");
@@ -67,7 +235,16 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    modalEl.addEventListener("shown.bs.modal", () => actual.focus());
+    modalEl.addEventListener("shown.bs.modal", () => {
+        if (pausadoPorAlerta) {
+            pausadoPorAlerta = false;
+            const objetivo = campoParaEnfocar || actual;
+            campoParaEnfocar = null;
+            objetivo.focus();
+            return;
+        }
+        actual.focus();
+    });
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -78,10 +255,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!okActual || !okNueva || !okConfirmar) {
             let mensaje = "Revisa los campos marcados en rojo.";
-            if (!okActual) mensaje = "Escribe tu contraseña actual.";
-            else if (!okNueva) mensaje = MSG_PASSWORD;
-            else if (!okConfirmar) mensaje = "Las contraseñas nuevas no coinciden.";
-            mostrarToast("warning", "Revisa el formulario", mensaje);
+            let foco = null;
+            if (!okActual) {
+                mensaje = "Escribe tu contraseña actual.";
+                foco = actual;
+            } else if (!okNueva) {
+                mensaje = MSG_PASSWORD;
+                foco = nueva;
+            } else if (!okConfirmar) {
+                mensaje = "Las contraseñas nuevas no coinciden.";
+                foco = confirmar;
+            }
+            abrirAlertaSobreModal("warning", "Revisa el formulario", mensaje, foco);
             return;
         }
 
@@ -105,18 +290,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 bootstrap.Modal.getInstance(modalEl).hide();
                 mostrarToast("success", "Contraseña actualizada", resultado.mensaje);
             } else {
+                let foco = null;
                 if (resultado.campo === "actual") {
                     marcar(actual, false);
-                    actual.focus();
+                    foco = actual;
                 } else if (resultado.campo === "nueva") {
                     marcar(nueva, false);
+                    foco = nueva;
                 } else if (resultado.campo === "confirmar") {
                     marcar(confirmar, false);
+                    foco = confirmar;
                 }
-                mostrarToast("error", "No se pudo cambiar", resultado.mensaje || "Inténtalo de nuevo.");
+                abrirAlertaSobreModal("error", "No se pudo cambiar", resultado.mensaje || "Inténtalo de nuevo.", foco);
             }
         } catch (error) {
-            mostrarToast("error", "Error de conexión", error.message || "No se pudo comunicar con el servidor.");
+            abrirAlertaSobreModal("error", "Error de conexión", error.message || "No se pudo comunicar con el servidor.");
         } finally {
             btnGuardar.disabled = false;
             btnGuardar.textContent = "Guardar contraseña";
