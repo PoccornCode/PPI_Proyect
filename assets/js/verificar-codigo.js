@@ -107,14 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (res.estado) {
                     inputs.forEach(inp => inp.disabled = true);
-
-                    if (typeof mostrarToast === "function") {
-                        mostrarToast("success", "¡Cuenta Verificada!", res.mensaje || "Cuenta activada con éxito.");
-                    }
-
-                    setTimeout(() => {
-                        window.location.href = "login.php?verificado=1";
-                    }, 1200);
+                    window.location.href = "login.php?verificado=1";
                 } else {
                     inputs.forEach(inp => inp.classList.add("is-invalid"));
                     if (typeof mostrarToast === "function") {
