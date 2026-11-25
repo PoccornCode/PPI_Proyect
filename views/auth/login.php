@@ -42,7 +42,7 @@ if ($flashToast !== null) {
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/main.css?v=30" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/forms.css?v=49" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/forms.css?v=50" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
