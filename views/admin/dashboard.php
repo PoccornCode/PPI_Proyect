@@ -171,13 +171,6 @@ $resumen_categorias = [
     'publicadas'   => count(array_filter($categorias_admin, fn($c) => (int)$c['estado'] === 1)),
     'desactivadas' => count(array_filter($categorias_admin, fn($c) => (int)$c['estado'] === 0)),
 ];
-
-$transacciones_demo = [
-    ['titulo' => 'Pago recibido de usuario', 'codigo' => '6D1605', 'monto' => '+$120.00', 'pos' => true,  'hace' => 'Hace 10 min'],
-    ['titulo' => 'Retiro procesado a vendedor', 'codigo' => '6D1605', 'monto' => '-$200.00', 'pos' => false, 'hace' => 'Hace 30 min'],
-    ['titulo' => 'Pago recibido de usuario', 'codigo' => '6D1605', 'monto' => '+$616.00', 'pos' => true,  'hace' => 'Hace 1 h'],
-    ['titulo' => 'Reembolso de puja',        'codigo' => '6D1605', 'monto' => '-$85.00',  'pos' => false, 'hace' => 'Hace 2 h'],
-];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -273,9 +266,7 @@ $transacciones_demo = [
     <!-- MAIN CONTENT -->
     <main class="adm-main">
 
-        <!-- ===============================================================
-             SECCIÓN 1: INICIO (DASHBOARD)
-             =============================================================== -->
+        <!-- Sección: Inicio -->
         <section class="adm-section active" id="sec-inicio">
             <div class="adm-section-head">
                 <div class="adm-title-group">
@@ -305,9 +296,7 @@ $transacciones_demo = [
 
         <?php include __DIR__ . '/partials/gestion-usuarios.php'; ?>
 
-        <!-- ===============================================================
-             SECCIÓN 3: GESTIÓN DE SUBASTAS
-             =============================================================== -->
+        <!-- Sección: Gestión de subastas -->
         <section class="adm-section" id="sec-subastas">
             <div class="adm-section-head">
                 <div class="adm-title-group">
@@ -403,9 +392,7 @@ $transacciones_demo = [
             </div>
         </section>
 
-        <!-- ===============================================================
-             SECCIÓN 5: CATEGORÍAS (CRUD COMPLETO)
-             =============================================================== -->
+        <!-- Sección: Categorías -->
         <section class="adm-section" id="sec-categorias">
             <div class="adm-section-head">
                 <div class="adm-title-group">
@@ -512,9 +499,7 @@ $transacciones_demo = [
             </div>
         </section>
 
-        <!-- ===============================================================
-             SECCIÓN 6: REPORTES Y ESTADÍSTICAS
-             =============================================================== -->
+        <!-- Sección: Reportes y estadísticas -->
         <section class="adm-section" id="sec-reportes">
             <div class="adm-section-head adm-rep-head">
                 <div class="adm-title-group">
@@ -782,9 +767,7 @@ $transacciones_demo = [
             </div>
         </section>
 
-        <!-- ===============================================================
-             SECCIÓN 7: CONFIGURACIÓN DEL SISTEMA
-             =============================================================== -->
+        <!-- Sección: Configuración del sistema -->
         <section class="adm-section" id="sec-configuracion">
             <div class="adm-section-head adm-rep-head">
                 <div class="adm-title-group">
@@ -1133,9 +1116,9 @@ $transacciones_demo = [
                         <div>
                             <label class="form-label small text-secondary">Rol</label>
                             <select class="form-select">
-                                <option value="Postor">Postor</option>
-                                <option value="Vendedor">Vendedor</option>
-                                <option value="Moderador">Moderador</option>
+                                <?php foreach ($rolesAdmin as $rolOpt): ?>
+                                    <option value="<?= (int)$rolOpt['id_rol'] ?>"><?= htmlspecialchars($rolOpt['etiqueta']) ?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
                     </div>
@@ -1292,6 +1275,7 @@ $transacciones_demo = [
         </div>
     </div>
 
+    <?php include __DIR__ . '/partials/modal-detalle-usuario.php'; ?>
     <?php include dirname(__DIR__) . '/moderador/partials/modal-logout.php'; ?>
     <?php include dirname(__DIR__, 2) . '/includes/modal-sesion-inactiva.php'; ?>
 

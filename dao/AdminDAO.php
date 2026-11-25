@@ -562,6 +562,198 @@ class AdminDAO
         return $resultado;
     }
 
+    public function obtenerDetalleUsuarioAdmin(int $idUsuario): ?array
+    {
+        if ($idUsuario <= 0 || !$this->conexion || $this->conexion->connect_errno) {
+            return null;
+        }
+
+        $sql = "SELECT u.id_usuario,
+                       u.nombre,
+                       u.apellido,
+                       u.username,
+                       u.ubicacion,
+                       u.estado,
+                       u.fecha_registro,
+                       u.id_rol,
+                       COALESCE(r.nombre, 'Usuario') AS rol_nombre
+                FROM sb_usuario u
+                LEFT JOIN sb_rol r ON u.id_rol = r.id_rol
+                WHERE u.id_usuario = ?
+                LIMIT 1";
+        $stmt = $this->conexion->prepare($sql);
+        if (!$stmt) {
+            return null;
+        }
+
+        $stmt->bind_param('i', $idUsuario);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        if (!$row) {
+            return null;
+        }
+
+        $correos = [];
+        $stmtCorreo = $this->conexion->prepare("SELECT correo FROM sb_correo_usuario WHERE id_usuario = ? ORDER BY correo ASC");
+        if ($stmtCorreo) {
+            $stmtCorreo->bind_param('i', $idUsuario);
+            $stmtCorreo->execute();
+            $resCorreo = $stmtCorreo->get_result();
+            while ($c = $resCorreo->fetch_assoc()) {
+                $val = trim((string)($c['correo'] ?? ''));
+                if ($val !== '') {
+                    $correos[] = $val;
+                }
+            }
+            $stmtCorreo->close();
+        }
+
+        $telefonos = [];
+        $stmtTel = $this->conexion->prepare("SELECT telefono FROM sb_telefono_usuario WHERE id_usuario = ? ORDER BY telefono ASC");
+        if ($stmtTel) {
+            $stmtTel->bind_param('i', $idUsuario);
+            $stmtTel->execute();
+            $resTel = $stmtTel->get_result();
+            while ($t = $resTel->fetch_assoc()) {
+                $val = trim((string)($t['telefono'] ?? ''));
+                if ($val !== '') {
+                    $telefonos[] = $val;
+                }
+            }
+            $stmtTel->close();
+        }
+
+        $actividad = [
+            'productos'            => 0,
+            'subastas_total'       => 0,
+            'subastas_activas'     => 0,
+            'subastas_pendientes'  => 0,
+            'subastas_finalizadas' => 0,
+            'subastas_sin_ofertas' => 0,
+            'subastas_canceladas'  => 0,
+            'subastas_rechazadas'  => 0,
+            'pujas_total'          => 0,
+            'ultima_puja'          => null,
+        ];
+
+        $sqlSub = "SELECT COUNT(DISTINCT p.id_producto) AS productos,
+                          COUNT(DISTINCT s.id_subasta) AS subastas_total,
+                          COUNT(DISTINCT CASE WHEN LOWER(s.estado) = 'activa' AND s.fecha_final > NOW() THEN s.id_subasta END) AS subastas_activas,
+                          COUNT(DISTINCT CASE WHEN LOWER(s.estado) = 'pendiente' THEN s.id_subasta END) AS subastas_pendientes,
+                          COUNT(DISTINCT CASE WHEN LOWER(s.estado) = 'finalizada' THEN s.id_subasta END) AS subastas_finalizadas,
+                          COUNT(DISTINCT CASE WHEN LOWER(s.estado) = 'sin_ofertas' THEN s.id_subasta END) AS subastas_sin_ofertas,
+                          COUNT(DISTINCT CASE WHEN LOWER(s.estado) = 'cancelada' THEN s.id_subasta END) AS subastas_canceladas,
+                          COUNT(DISTINCT CASE WHEN LOWER(s.estado) = 'rechazada' THEN s.id_subasta END) AS subastas_rechazadas
+                   FROM sb_producto p
+                   LEFT JOIN sb_subasta s ON s.id_producto = p.id_producto
+                   WHERE p.id_usuario = ?";
+        $stmtSub = $this->conexion->prepare($sqlSub);
+        if ($stmtSub) {
+            $stmtSub->bind_param('i', $idUsuario);
+            $stmtSub->execute();
+            $resSub = $stmtSub->get_result()->fetch_assoc();
+            $stmtSub->close();
+            if ($resSub) {
+                $actividad['productos']            = (int)($resSub['productos'] ?? 0);
+                $actividad['subastas_total']       = (int)($resSub['subastas_total'] ?? 0);
+                $actividad['subastas_activas']     = (int)($resSub['subastas_activas'] ?? 0);
+                $actividad['subastas_pendientes']  = (int)($resSub['subastas_pendientes'] ?? 0);
+                $actividad['subastas_finalizadas'] = (int)($resSub['subastas_finalizadas'] ?? 0);
+                $actividad['subastas_sin_ofertas'] = (int)($resSub['subastas_sin_ofertas'] ?? 0);
+                $actividad['subastas_canceladas']  = (int)($resSub['subastas_canceladas'] ?? 0);
+                $actividad['subastas_rechazadas']  = (int)($resSub['subastas_rechazadas'] ?? 0);
+            }
+        }
+
+        $sqlPujas = "SELECT COUNT(*) AS pujas_total, MAX(fecha) AS ultima_puja
+                     FROM sb_puja
+                     WHERE id_usuario = ?";
+        $stmtPujas = $this->conexion->prepare($sqlPujas);
+        if ($stmtPujas) {
+            $stmtPujas->bind_param('i', $idUsuario);
+            $stmtPujas->execute();
+            $resPujas = $stmtPujas->get_result()->fetch_assoc();
+            $stmtPujas->close();
+            if ($resPujas) {
+                $actividad['pujas_total'] = (int)($resPujas['pujas_total'] ?? 0);
+                $actividad['ultima_puja'] = !empty($resPujas['ultima_puja']) ? (string)$resPujas['ultima_puja'] : null;
+            }
+        }
+
+        $rolMapeado = $this->mapearRolUsuario((int)($row['id_rol'] ?? 0), (string)($row['rol_nombre'] ?? 'Usuario'));
+        $nombre = trim((string)($row['nombre'] ?? ''));
+        $apellido = trim((string)($row['apellido'] ?? ''));
+        $nombreCompleto = trim($nombre . ' ' . $apellido);
+        $username = ltrim(trim((string)($row['username'] ?? '')), '@');
+        $ubicacion = trim((string)($row['ubicacion'] ?? ''));
+        $activo = (int)($row['estado'] ?? 0) === 1;
+        $correoPrincipal = $correos[0] ?? '';
+        $telefonoPrincipal = $telefonos[0] ?? '';
+        $inicialBase = $nombreCompleto !== '' ? $nombreCompleto : ($username !== '' ? $username : $correoPrincipal);
+        $inicial = $inicialBase !== '' ? mb_strtoupper(mb_substr($inicialBase, 0, 1, 'UTF-8'), 'UTF-8') : 'U';
+
+        $fechaRegistroRaw = (string)($row['fecha_registro'] ?? '');
+        $fechaRegistroFmt = $this->formatearFechaDetalleEs($fechaRegistroRaw);
+        $ultimaPujaFmt = $actividad['ultima_puja'] ? $this->formatearFechaDetalleEs($actividad['ultima_puja']) : 'Sin pujas';
+
+        return [
+            'id_usuario'           => (int)$row['id_usuario'],
+            'nombre'               => $nombre,
+            'apellido'             => $apellido,
+            'nombre_completo'      => $nombreCompleto !== '' ? $nombreCompleto : ($username !== '' ? '@' . $username : 'Usuario #' . (int)$row['id_usuario']),
+            'username'             => $username,
+            'inicial'              => $inicial,
+            'correo'               => $correoPrincipal,
+            'correos'              => $correos,
+            'telefono'             => $telefonoPrincipal,
+            'telefonos'            => $telefonos,
+            'ubicacion'            => $ubicacion,
+            'id_rol'               => (int)$row['id_rol'],
+            'rol'                  => $rolMapeado['etiqueta'],
+            'rol_class'            => $rolMapeado['clase'],
+            'activo'               => $activo,
+            'estado'               => $activo ? 'Activo' : 'Suspendido',
+            'fecha_registro'       => $fechaRegistroRaw,
+            'fecha_registro_fmt'   => $fechaRegistroFmt,
+            'productos'            => $actividad['productos'],
+            'subastas_total'       => $actividad['subastas_total'],
+            'subastas_activas'     => $actividad['subastas_activas'],
+            'subastas_pendientes'  => $actividad['subastas_pendientes'],
+            'subastas_finalizadas' => $actividad['subastas_finalizadas'],
+            'subastas_sin_ofertas' => $actividad['subastas_sin_ofertas'],
+            'subastas_canceladas'  => $actividad['subastas_canceladas'],
+            'subastas_rechazadas'  => $actividad['subastas_rechazadas'],
+            'pujas_total'          => $actividad['pujas_total'],
+            'ultima_puja'          => $actividad['ultima_puja'],
+            'ultima_puja_fmt'      => $ultimaPujaFmt,
+        ];
+    }
+
+    private function formatearFechaDetalleEs(string $fechaRaw): string
+    {
+        if (trim($fechaRaw) === '') {
+            return '—';
+        }
+        $ts = strtotime($fechaRaw);
+        if ($ts === false) {
+            return $fechaRaw;
+        }
+        $meses = [
+            1 => 'ene.', 2 => 'feb.', 3 => 'mar.', 4 => 'abr.',
+            5 => 'may.', 6 => 'jun.', 7 => 'jul.', 8 => 'ago.',
+            9 => 'sep.', 10 => 'oct.', 11 => 'nov.', 12 => 'dic.',
+        ];
+        $dia = (int)date('j', $ts);
+        $mes = $meses[(int)date('n', $ts)] ?? '';
+        $anio = date('Y', $ts);
+        $hora = date('h:i', $ts);
+        $ampm = date('a', $ts) === 'pm' ? 'p. m.' : 'a. m.';
+
+        return "{$dia} {$mes} {$anio} · {$hora} {$ampm}";
+    }
+
     public function obtenerSubastasDestacadas(int $limite = 3, string $baseUrl = ''): array
     {
         $subastas = [];

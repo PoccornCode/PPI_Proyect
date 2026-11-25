@@ -4,12 +4,9 @@
 (function () {
     'use strict';
 
-    const activateTab = (tab) => window.AdminDashboard?.activateTab(tab);
     const showToast = (msg) => window.AdminDashboard?.notify(msg);
 
-    // =========================================================================
-    // FILTROS EN VIVO — SUBASTAS (REFERENCIA)
-    // =========================================================================
+    // Filtros en vivo de subastas (referencia)
     const auctionSearchInput = document.getElementById('admAuctionSearch');
     const auctionCatFilter = document.getElementById('admAuctionCatFilter');
     const auctionsTableBody = document.getElementById('admAuctionsTbody');
@@ -39,9 +36,7 @@
     auctionSearchInput?.addEventListener('input', filterAuctionsTable);
     auctionCatFilter?.addEventListener('change', filterAuctionsTable);
 
-    // =========================================================================
-    // CATEGORÍAS — INTERACCIONES DE DISEÑO / REFERENCIA (SIN BACKEND)
-    // =========================================================================
+    // Categorías en modo referencia (sin backend)
     const catCfg = window.ADM_CATEGORIES_DEMO;
     if (catCfg && document.getElementById('admCatGrid')) {
         const baseUrl = catCfg.baseUrl || '';
@@ -284,9 +279,7 @@
         inputEstado?.addEventListener('change', syncModalEstado);
     }
 
-    // =========================================================================
-    // REPORTES — DISEÑO INTERACTIVO DE REFERENCIA (SIN BACKEND)
-    // =========================================================================
+    // Reportes en modo referencia (sin backend)
     const repSection = document.getElementById('sec-reportes');
     if (repSection) {
         const repPeriodSelect = document.getElementById('admRepPeriod');
@@ -758,9 +751,7 @@
         refreshReports();
     }
 
-    // =========================================================================
-    // CONFIGURACIÓN — INTERACCIONES DE DISEÑO (SIN BACKEND)
-    // =========================================================================
+    // Configuración en modo referencia (sin backend)
     const cfgSection = document.getElementById('sec-configuracion');
     if (cfgSection) {
         const cfgForm = document.getElementById('admCfgForm');

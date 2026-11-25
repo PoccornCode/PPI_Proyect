@@ -170,6 +170,12 @@ function obtenerUsuariosAdmin(string $busqueda = '', int $idRol = 0, int $pagina
     return $dao->listarUsuariosAdmin($busqueda, $idRol, $pagina, $porPagina);
 }
 
+function obtenerDetalleUsuarioAdmin(int $idUsuario): ?array
+{
+    $dao = new AdminDAO();
+    return $dao->obtenerDetalleUsuarioAdmin($idUsuario);
+}
+
 if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -229,6 +235,34 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
         echo json_encode([
             'estado' => true,
             'data'   => obtenerUsuariosAdmin($busqueda, $idRol, $pagina, $porPagina),
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'usuario_detalle') {
+        $idUsuario = (int)($_GET['id_usuario'] ?? $_POST['id_usuario'] ?? 0);
+        if ($idUsuario <= 0) {
+            http_response_code(400);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'ID de usuario no válido.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $detalle = obtenerDetalleUsuarioAdmin($idUsuario);
+        if (!$detalle) {
+            http_response_code(404);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'No se encontró el usuario solicitado.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        echo json_encode([
+            'estado'  => true,
+            'usuario' => $detalle,
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }

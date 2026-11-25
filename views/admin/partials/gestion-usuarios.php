@@ -102,7 +102,8 @@ if ($totalUsuarios === 0) {
                                 <td>
                                     <div class="adm-action-group">
                                         <button type="button" class="adm-action-btn adm-action-btn--edit" title="Ver detalles"
-                                            data-adm-demo-action="Ver detalles: <?= htmlspecialchars($etiqueta) ?> (referencia)">
+                                            aria-label="Ver detalles de <?= htmlspecialchars($etiqueta) ?>"
+                                            data-adm-user-action="ver" data-user-id="<?= (int)$u['id_usuario'] ?>">
                                             <i class="fa-regular fa-eye"></i>
                                         </button>
                                         <button type="button" class="adm-action-btn adm-action-btn--edit" title="Editar usuario"
