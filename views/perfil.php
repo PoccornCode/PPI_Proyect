@@ -278,7 +278,7 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                     <div class="perfil-card h-100">
                         <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
                             <h2 id="titulo-datos" class="fs-5 fw-bold text-main-ppi mb-0">Datos personales</h2>
-                            <a href="#" class="link-ppi fw-bold d-inline p-0 small" data-proximamente="Editar datos personales">Editar</a>
+                            <a href="#" class="link-ppi fw-bold d-inline p-0 small" data-bs-toggle="modal" data-bs-target="#modalEditarPerfil">Editar</a>
                         </div>
                         <dl class="mb-0">
                             <?php foreach ($datos as $campo => $valor): ?>
@@ -442,11 +442,56 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
         </div>
     </div>
 
+    <!-- modal editar datos -->
+    <div class="modal fade" id="modalEditarPerfil" tabindex="-1" aria-labelledby="modalEditarPerfilTitulo" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-ppi">
+                <div class="modal-header modal-header-ppi">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2" id="modalEditarPerfilTitulo">
+                        <i class="fas fa-user-edit text-warning fs-5"></i>
+                        <span>Editar datos personales</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <form id="formEditarPerfil" method="POST" action="<?= BASE_URL ?>controllers/perfil_controller.php" autocomplete="off" novalidate>
+                        <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="edit_nombre" class="form-label text-main-ppi fw-bold">Nombre <span class="req-star">*</span></label>
+                                <input type="text" class="form-control" id="edit_nombre" name="nombre" maxlength="50" value="<?= e($perfil['nombre']) ?>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="edit_apellido" class="form-label text-main-ppi fw-bold">Apellido <span class="req-star">*</span></label>
+                                <input type="text" class="form-control" id="edit_apellido" name="apellido" maxlength="50" value="<?= e($perfil['apellido']) ?>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="edit_telefono" class="form-label text-main-ppi fw-bold">Teléfono <span class="req-star">*</span></label>
+                                <input type="tel" class="form-control" id="edit_telefono" name="telefono" placeholder="Ej. 7000-0000" maxlength="9" value="<?= e($perfil['telefono']) ?>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="edit_ubicacion" class="form-label text-main-ppi fw-bold">Ubicación <span class="req-star">*</span></label>
+                                <input type="text" class="form-control" id="edit_ubicacion" name="ubicacion" placeholder="Ciudad, Departamento" maxlength="100" value="<?= e($perfil['ubicacion']) ?>" required>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-text text-second-ppi">El correo y el nombre de usuario no se pueden cambiar desde aquí.</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer modal-footer-ppi d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-secondary btn-sm px-3 py-2 fw-semibold" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" form="formEditarPerfil" class="btn btn-primary btn-sm px-3 py-2 fw-semibold" id="btnGuardarDatos">Guardar cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <?php include "Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>assets/js/toast-ppi.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/perfil.js?v=5"></script>
+    <script src="<?= BASE_URL ?>assets/js/perfil.js?v=6"></script>
 </body>
 
 </html>

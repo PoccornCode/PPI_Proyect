@@ -311,3 +311,97 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+// editar datos personales
+const REGEX_TELEFONO = /^\d{4}-\d{4}$/;
+ 
+document.addEventListener("DOMContentLoaded", () => {
+    const modalEl = document.getElementById("modalEditarPerfil");
+    const form = document.getElementById("formEditarPerfil");
+    const btnGuardar = document.getElementById("btnGuardarDatos");
+    if (!modalEl || !form) return;
+ 
+    const nombre = document.getElementById("edit_nombre");
+    const apellido = document.getElementById("edit_apellido");
+    const telefono = document.getElementById("edit_telefono");
+    const ubicacion = document.getElementById("edit_ubicacion");
+    const campos = [nombre, apellido, telefono, ubicacion];
+ 
+    function marcar(campo, ok) {
+        campo.classList.toggle("is-invalid", !ok);
+        campo.classList.toggle("is-valid", ok);
+        return ok;
+    }
+ 
+    function validar(campo) {
+        if (campo === telefono) return marcar(campo, REGEX_TELEFONO.test(campo.value.trim()));
+        return marcar(campo, campo.value.trim() !== "");
+    }
+ 
+    // el telefono se va formateando solo: 7000-0000
+    telefono.addEventListener("input", () => {
+        let valor = telefono.value.replace(/\D/g, "").substring(0, 8);
+        if (valor.length > 4) valor = valor.substring(0, 4) + "-" + valor.substring(4);
+        telefono.value = valor;
+    });
+ 
+    campos.forEach((campo) => {
+        campo.addEventListener("blur", () => validar(campo));
+        campo.addEventListener("input", () => {
+            if (campo.classList.contains("is-invalid")) validar(campo);
+        });
+    });
+ 
+    modalEl.addEventListener("hidden.bs.modal", () => {
+        form.reset();
+        campos.forEach((campo) => campo.classList.remove("is-valid", "is-invalid"));
+    });
+ 
+    modalEl.addEventListener("shown.bs.modal", () => nombre.focus());
+ 
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+ 
+        let todoOk = true;
+        campos.forEach((campo) => {
+            if (!validar(campo)) todoOk = false;
+        });
+        if (!todoOk) {
+            mostrarToast("warning", "Revisa el formulario", "Completa los campos marcados en rojo.");
+            return;
+        }
+ 
+        try {
+            btnGuardar.disabled = true;
+            btnGuardar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
+ 
+            const datos = new FormData(form);
+            datos.append("opcion", "actualizarDatos");
+ 
+            const respuesta = await fetch(form.action, { method: "POST", body: datos });
+            const resultado = await respuesta.json().catch(() => null);
+ 
+            if (resultado && resultado.auth_required) {
+                window.location.href = resultado.redirect;
+                return;
+            }
+            if (!resultado) throw new Error("Respuesta inesperada del servidor (" + respuesta.status + ").");
+ 
+            if (resultado.estado) {
+                bootstrap.Modal.getInstance(modalEl).hide();
+                mostrarToast("success", "Datos actualizados", resultado.mensaje);
+                // se recarga para que el nombre del perfil y del menu se vean actualizados
+                setTimeout(() => window.location.reload(), 1200);
+            } else {
+                if (resultado.campo === "telefono") marcar(telefono, false);
+                if (resultado.campo === "ubicacion") marcar(ubicacion, false);
+                mostrarToast("error", "No se pudo guardar", resultado.mensaje || "Inténtalo de nuevo.");
+            }
+        } catch (error) {
+            mostrarToast("error", "Error de conexión", error.message || "No se pudo comunicar con el servidor.");
+        } finally {
+            btnGuardar.disabled = false;
+            btnGuardar.textContent = "Guardar cambios";
+        }
+    });
+});
