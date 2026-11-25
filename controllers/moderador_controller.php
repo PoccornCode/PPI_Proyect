@@ -153,26 +153,46 @@ function formatearSubastaPendiente(array $row, string $baseUrl = ''): array
     $imagenMiniatura = $imagenesUrls[0] ?? normalizarRutaImagenModerador((string)($row['categoria_imagen'] ?? ''), $baseUrl);
     $etiquetaFotos = $totalFotos === 1 ? '1 foto' : $totalFotos . ' fotos';
 
+    $tipoSolicitud = strtolower(trim((string)($row['tipo_solicitud'] ?? 'nueva')));
+    $notaVendedor = trim((string)($row['nota_vendedor'] ?? ''));
+    $motivoRechazo = trim((string)($row['motivo_rechazo'] ?? ''));
+
+    $specs = [
+        ['label' => 'Categoría', 'value' => $categoria],
+        ['label' => 'Vendedor', 'value' => $vendedor],
+        ['label' => 'Precio base', 'value' => $precio . ' (inc. ' . $incremento . ')'],
+        ['label' => 'Condición', 'value' => $condicion . ' (' . $etiquetaFotos . ')'],
+    ];
+    if ($tipoSolicitud === 'reenvio') {
+        $specs[] = ['label' => 'Tipo de solicitud', 'value' => 'Reenvío corregido'];
+    } elseif ($tipoSolicitud === 'apelacion') {
+        $specs[] = ['label' => 'Tipo de solicitud', 'value' => 'Apelación'];
+    }
+    if ($notaVendedor !== '') {
+        $specs[] = ['label' => 'Nota del vendedor', 'value' => $notaVendedor];
+    }
+    if ($motivoRechazo !== '') {
+        $specs[] = ['label' => 'Motivo de rechazo', 'value' => $motivoRechazo];
+    }
+
     return [
-        'id_subasta' => $idSubasta,
-        'id'         => $codigo,
-        'titulo'     => $titulo,
-        'condicion'  => $condicion,
-        'fotos'      => $totalFotos,
-        'categoria'  => $categoria,
-        'vendedor'   => $vendedor,
-        'precio'     => $precio,
-        'incremento' => $incremento,
-        'estado'     => ucfirst(strtolower((string)($row['estado'] ?? 'pendiente'))),
-        'img'        => $imagenMiniatura,
-        'imagenes'   => $imagenesUrls,
-        'detalle'    => (string)($row['descripcion'] ?? ''),
-        'specs'      => [
-            ['label' => 'Categoría', 'value' => $categoria],
-            ['label' => 'Vendedor', 'value' => $vendedor],
-            ['label' => 'Precio base', 'value' => $precio . ' (inc. ' . $incremento . ')'],
-            ['label' => 'Condición', 'value' => $condicion . ' (' . $etiquetaFotos . ')'],
-        ],
+        'id_subasta'     => $idSubasta,
+        'id'             => $codigo,
+        'titulo'         => $titulo,
+        'condicion'      => $condicion,
+        'fotos'          => $totalFotos,
+        'categoria'      => $categoria,
+        'vendedor'       => $vendedor,
+        'precio'         => $precio,
+        'incremento'     => $incremento,
+        'estado'         => ucfirst(strtolower((string)($row['estado'] ?? 'pendiente'))),
+        'tipo_solicitud' => $tipoSolicitud,
+        'nota_vendedor'  => $notaVendedor,
+        'motivo_rechazo' => $motivoRechazo,
+        'img'            => $imagenMiniatura,
+        'imagenes'       => $imagenesUrls,
+        'detalle'        => (string)($row['descripcion'] ?? ''),
+        'specs'          => $specs,
     ];
 }
 
@@ -189,10 +209,10 @@ function obtenerColaSubastasPendientes(string $baseUrl = ''): array
     return $lista;
 }
 
-function moderarSubastaPendiente(int $idSubasta, string $decision): array
+function moderarSubastaPendiente(int $idSubasta, string $decision, ?string $motivo = null): array
 {
     $dao = new ModeradorDAO();
-    return $dao->moderarSubasta($idSubasta, $decision);
+    return $dao->moderarSubasta($idSubasta, $decision, $motivo);
 }
 
 function obtenerTodasSubastasModerador(string $baseUrl = ''): array
@@ -211,10 +231,10 @@ function obtenerTodasSubastasModerador(string $baseUrl = ''): array
     return $lista;
 }
 
-function cambiarEstadoSubastaModerador(int $idSubasta, string $nuevoEstado, ?string $estadoEsperado = null): array
+function cambiarEstadoSubastaModerador(int $idSubasta, string $nuevoEstado, ?string $estadoEsperado = null, ?string $motivo = null): array
 {
     $dao = new ModeradorDAO();
-    return $dao->cambiarEstadoSubasta($idSubasta, $nuevoEstado, $estadoEsperado);
+    return $dao->cambiarEstadoSubasta($idSubasta, $nuevoEstado, $estadoEsperado, $motivo);
 }
 
 if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
@@ -262,7 +282,8 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     if ($opcion === 'moderar') {
         $idSubasta = (int)($_POST['id_subasta'] ?? 0);
         $decision  = (string)($_POST['decision'] ?? '');
-        $resultado = moderarSubastaPendiente($idSubasta, $decision);
+        $motivo    = isset($_POST['motivo']) ? (string)$_POST['motivo'] : null;
+        $resultado = moderarSubastaPendiente($idSubasta, $decision, $motivo);
 
         if ($resultado['estado']) {
             $resultado['kpis'] = obtenerKpisModerador();
@@ -285,7 +306,8 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
         $idSubasta      = (int)($_POST['id_subasta'] ?? 0);
         $nuevoEstado    = (string)($_POST['nuevo_estado'] ?? '');
         $estadoEsperado = isset($_POST['estado_esperado']) ? (string)$_POST['estado_esperado'] : null;
-        $resultado      = cambiarEstadoSubastaModerador($idSubasta, $nuevoEstado, $estadoEsperado);
+        $motivo         = isset($_POST['motivo']) ? (string)$_POST['motivo'] : null;
+        $resultado      = cambiarEstadoSubastaModerador($idSubasta, $nuevoEstado, $estadoEsperado, $motivo);
 
         if ($resultado['estado'] || !empty($resultado['conflicto'])) {
             $resultado['kpis'] = obtenerKpisModerador();
