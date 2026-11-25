@@ -169,6 +169,7 @@ class ModeradorDAO
 
         $sql = "SELECT s.id_subasta, s.precio_inicial, s.incremento_minimo,
                        s.fecha_inicial, s.fecha_final, s.estado,
+                       s.tipo_solicitud, s.motivo_rechazo, s.nota_vendedor,
                        p.id_producto, p.nombre AS titulo, p.descripcion, p.condicion,
                        c.nombre AS categoria, c.imagen AS categoria_imagen,
                        u.username, u.nombre AS vendedor_nombre, u.apellido AS vendedor_apellido
@@ -231,7 +232,7 @@ class ModeradorDAO
         return $mapa;
     }
 
-    public function moderarSubasta(int $idSubasta, string $decision): array
+    public function moderarSubasta(int $idSubasta, string $decision, ?string $motivo = null): array
     {
         if (!$this->conexion || $this->conexion->connect_errno) {
             return ['estado' => false, 'mensaje' => 'Error de conexión con la base de datos.'];
@@ -282,9 +283,13 @@ class ModeradorDAO
                 $stmtUp->close();
                 $nuevoEstado = 'Activa';
             } else {
-                $sqlUpdate = "UPDATE sb_subasta SET estado = 'rechazada' WHERE id_subasta = ?";
+                $motivoLimpio = $motivo !== null ? trim($motivo) : null;
+                if ($motivoLimpio === '') {
+                    $motivoLimpio = null;
+                }
+                $sqlUpdate = "UPDATE sb_subasta SET estado = 'rechazada', motivo_rechazo = ? WHERE id_subasta = ?";
                 $stmtUp = $this->conexion->prepare($sqlUpdate);
-                $stmtUp->bind_param('i', $idSubasta);
+                $stmtUp->bind_param('si', $motivoLimpio, $idSubasta);
                 $stmtUp->execute();
                 $stmtUp->close();
                 $nuevoEstado = 'Rechazada';
@@ -317,6 +322,7 @@ class ModeradorDAO
 
         $sql = "SELECT s.id_subasta, s.precio_inicial, s.incremento_minimo,
                        s.fecha_inicial, s.fecha_final, s.estado,
+                       s.tipo_solicitud, s.motivo_rechazo, s.nota_vendedor,
                        p.id_producto, p.nombre AS titulo, p.descripcion, p.condicion,
                        c.nombre AS categoria, c.imagen AS categoria_imagen,
                        u.username, u.nombre AS vendedor_nombre, u.apellido AS vendedor_apellido
@@ -351,7 +357,7 @@ class ModeradorDAO
         return $subastas;
     }
 
-    public function cambiarEstadoSubasta(int $idSubasta, string $nuevoEstado, ?string $estadoEsperado = null): array
+    public function cambiarEstadoSubasta(int $idSubasta, string $nuevoEstado, ?string $estadoEsperado = null, ?string $motivo = null): array
     {
         if (!$this->conexion || $this->conexion->connect_errno) {
             return ['estado' => false, 'mensaje' => 'Error de conexión con la base de datos.'];
@@ -432,6 +438,7 @@ class ModeradorDAO
                     $duracionSeg = max(86400, ($finTs > $inicioTs) ? ($finTs - $inicioTs) : 86400);
                     $sqlUpdate = "UPDATE sb_subasta
                                   SET estado = 'activa',
+                                      motivo_rechazo = NULL,
                                       fecha_inicial = NOW(),
                                       fecha_final = DATE_ADD(NOW(), INTERVAL ? SECOND)
                                   WHERE id_subasta = ?";
@@ -440,6 +447,7 @@ class ModeradorDAO
                 } else {
                     $sqlUpdate = "UPDATE sb_subasta
                                   SET estado = 'activa',
+                                      motivo_rechazo = NULL,
                                       fecha_inicial = NOW()
                                   WHERE id_subasta = ?";
                     $stmtUp = $this->conexion->prepare($sqlUpdate);
@@ -453,9 +461,13 @@ class ModeradorDAO
                 $stmtUp = $this->conexion->prepare($sqlUpdate);
                 $stmtUp->bind_param('i', $idSubasta);
             } else {
-                $sqlUpdate = "UPDATE sb_subasta SET estado = ? WHERE id_subasta = ?";
+                $motivoLimpio = $motivo !== null ? trim($motivo) : null;
+                if ($motivoLimpio === '') {
+                    $motivoLimpio = null;
+                }
+                $sqlUpdate = "UPDATE sb_subasta SET estado = ?, motivo_rechazo = ? WHERE id_subasta = ?";
                 $stmtUp = $this->conexion->prepare($sqlUpdate);
-                $stmtUp->bind_param('si', $nuevoEstado, $idSubasta);
+                $stmtUp->bind_param('ssi', $nuevoEstado, $motivoLimpio, $idSubasta);
             }
 
             $stmtUp->execute();

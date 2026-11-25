@@ -58,6 +58,12 @@
         tr.dataset.category = item.categoria || '';
         tr.dataset.status = 'Pendiente';
 
+        const tipoBadge = item.tipo_solicitud === 'reenvio'
+            ? '<div class="mod-sub-meta mt-1">Reenvío corregido</div>'
+            : (item.tipo_solicitud === 'apelacion'
+                ? '<div class="mod-sub-meta mt-1">Apelación</div>'
+                : '');
+
         tr.innerHTML = `
             <td class="mod-col-eye">
                 <button
@@ -92,6 +98,7 @@
             <td class="fw-semibold">${escHtml(item.precio)}</td>
             <td>
                 <span class="adm-badge adm-badge--pendiente mod-row-status">Pendiente</span>
+                ${tipoBadge}
             </td>
             <td>
                 <div class="adm-action-group">
@@ -187,6 +194,9 @@
             formData.append('opcion', 'moderar');
             formData.append('id_subasta', String(idSubasta));
             formData.append('decision', decision);
+            if (decision === 'rechazar' && confirmMotivoInput) {
+                formData.append('motivo', confirmMotivoInput.value.trim());
+            }
 
             const response = await fetch(endpoint, {
                 method: 'POST',
