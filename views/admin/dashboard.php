@@ -1097,40 +1097,6 @@ $resumen_categorias = [
         </section>
     </main>
 
-    <!-- MODAL DEMO: AGREGAR USUARIO -->
-    <div class="modal fade adm-modal" id="modalAgregarUsuario" tabindex="-1" aria-labelledby="modalAgregarUsuarioLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <form data-adm-demo-form="Usuario de prueba registrado (solo simulación visual).">
-                    <div class="modal-header">
-                        <h5 class="modal-title fw-bold" id="modalAgregarUsuarioLabel">
-                            <i class="fa-solid fa-user-plus me-2" style="color:#a7cc3b;"></i>Agregar usuario
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body d-flex flex-column gap-3">
-                        <div>
-                            <label class="form-label small text-secondary">Correo electrónico</label>
-                            <input type="email" class="form-control" placeholder="nuevo.usuario@gmail.com" required>
-                        </div>
-                        <div>
-                            <label class="form-label small text-secondary">Rol</label>
-                            <select class="form-select">
-                                <?php foreach ($rolesAdmin as $rolOpt): ?>
-                                    <option value="<?= (int)$rolOpt['id_rol'] ?>"><?= htmlspecialchars($rolOpt['etiqueta']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="adm-btn-primary" style="height:36px; font-size:0.86rem;">Guardar (demo)</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <!-- MODAL DEMO: NUEVA SUBASTA -->
     <div class="modal fade adm-modal" id="modalNuevaSubasta" tabindex="-1" aria-labelledby="modalNuevaSubastaLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -1275,6 +1241,7 @@ $resumen_categorias = [
         </div>
     </div>
 
+    <?php include __DIR__ . '/partials/modal-agregar-usuario.php'; ?>
     <?php include __DIR__ . '/partials/modal-detalle-usuario.php'; ?>
     <?php include __DIR__ . '/partials/modal-editar-usuario.php'; ?>
     <?php include dirname(__DIR__) . '/moderador/partials/modal-logout.php'; ?>
@@ -1297,6 +1264,7 @@ $resumen_categorias = [
     <script src="<?= $base_url ?>assets/js/admin-resumen-inicio.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-resumen-inicio.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/paginacion.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/paginacion.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-usuarios.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-usuarios.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/admin-usuario-agregar.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-usuario-agregar.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-dashboard.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-dashboard.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-dashboard-referencia.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-dashboard-referencia.js') ?>"></script>
 </body>

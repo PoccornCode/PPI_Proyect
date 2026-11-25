@@ -343,6 +343,76 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
         exit;
     }
 
+    if ($opcion === 'usuario_validar_creacion') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'Método no permitido.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $dao = new AdminDAO();
+        $res = $dao->validarCreacionUsuarioAdmin([
+            'nombre'                => $_POST['nombre'] ?? '',
+            'apellido'              => $_POST['apellido'] ?? '',
+            'username'              => $_POST['username'] ?? '',
+            'correo'                => $_POST['correo'] ?? '',
+            'telefono'              => $_POST['telefono'] ?? '',
+            'ubicacion'             => $_POST['ubicacion'] ?? '',
+            'id_rol'                => $_POST['id_rol'] ?? 2,
+            'estado'                => $_POST['estado'] ?? 1,
+            'contrasenia'           => $_POST['contrasenia'] ?? '',
+            'confirmar_contrasenia' => $_POST['confirmar_contrasenia'] ?? '',
+        ]);
+
+        if (empty($res['estado'])) {
+            http_response_code(422);
+            echo json_encode([
+                'estado'  => false,
+                'campo'   => $res['campo'] ?? '',
+                'mensaje' => $res['mensaje'] ?? 'Los datos ingresados no son válidos.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        echo json_encode(['estado' => true], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    if ($opcion === 'usuario_crear') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'Método no permitido.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $dao = new AdminDAO();
+        $res = $dao->crearUsuarioAdmin([
+            'nombre'                => $_POST['nombre'] ?? '',
+            'apellido'              => $_POST['apellido'] ?? '',
+            'username'              => $_POST['username'] ?? '',
+            'correo'                => $_POST['correo'] ?? '',
+            'telefono'              => $_POST['telefono'] ?? '',
+            'ubicacion'             => $_POST['ubicacion'] ?? '',
+            'id_rol'                => $_POST['id_rol'] ?? 2,
+            'estado'                => $_POST['estado'] ?? 1,
+            'contrasenia'           => $_POST['contrasenia'] ?? '',
+            'confirmar_contrasenia' => $_POST['confirmar_contrasenia'] ?? '',
+        ], $idAdminActual);
+
+        if (empty($res['estado'])) {
+            http_response_code(422);
+        }
+
+        echo json_encode($res, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
     echo json_encode(['estado' => false, 'mensaje' => 'Opción no válida'], JSON_UNESCAPED_UNICODE);
     exit;
 }

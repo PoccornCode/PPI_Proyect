@@ -979,6 +979,147 @@ class AdminDAO
         }
     }
 
+    public function validarCreacionUsuarioAdmin(array $datos): array
+    {
+        if (!$this->conexion || $this->conexion->connect_errno) {
+            return ['estado' => false, 'mensaje' => 'No hay conexión disponible con la base de datos.'];
+        }
+
+        $nombre = trim((string)($datos['nombre'] ?? ''));
+        $apellido = trim((string)($datos['apellido'] ?? ''));
+        $username = ltrim(trim((string)($datos['username'] ?? '')), '@');
+        $correo = strtolower(trim((string)($datos['correo'] ?? '')));
+        $telefono = trim((string)($datos['telefono'] ?? ''));
+        $ubicacion = trim((string)($datos['ubicacion'] ?? ''));
+        $idRol = (int)($datos['id_rol'] ?? 2);
+        $estado = ((int)($datos['estado'] ?? 1)) === 1 ? 1 : 0;
+        $contrasenia = (string)($datos['contrasenia'] ?? '');
+        $confirmar = (string)($datos['confirmar_contrasenia'] ?? '');
+
+        if ($nombre === '') {
+            return ['estado' => false, 'campo' => 'nombre', 'mensaje' => 'El nombre es obligatorio.'];
+        }
+        if (mb_strlen($nombre, 'UTF-8') < 2 || mb_strlen($nombre, 'UTF-8') > 100 || !preg_match('/^[\p{L}\s\'\-]+$/u', $nombre)) {
+            return ['estado' => false, 'campo' => 'nombre', 'mensaje' => 'Ingresa un nombre válido (solo letras, mínimo 2 caracteres).'];
+        }
+        if ($apellido === '') {
+            return ['estado' => false, 'campo' => 'apellido', 'mensaje' => 'El apellido es obligatorio.'];
+        }
+        if (mb_strlen($apellido, 'UTF-8') < 2 || mb_strlen($apellido, 'UTF-8') > 100 || !preg_match('/^[\p{L}\s\'\-]+$/u', $apellido)) {
+            return ['estado' => false, 'campo' => 'apellido', 'mensaje' => 'Ingresa un apellido válido (solo letras, mínimo 2 caracteres).'];
+        }
+        if ($correo === '' || strlen($correo) > 100 || !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+            return ['estado' => false, 'campo' => 'correo', 'mensaje' => 'Ingresa un correo electrónico válido.'];
+        }
+        if ($telefono !== '' && !preg_match('/^\d{4}-\d{4}$/', $telefono)) {
+            return ['estado' => false, 'campo' => 'telefono', 'mensaje' => 'Usa el formato de 8 dígitos: 0000-0000.'];
+        }
+        if ($ubicacion !== '' && (mb_strlen($ubicacion, 'UTF-8') < 3 || mb_strlen($ubicacion, 'UTF-8') > 150 || !preg_match('/\p{L}/u', $ubicacion))) {
+            return ['estado' => false, 'campo' => 'ubicacion', 'mensaje' => 'Ingresa una ubicación válida (mínimo 3 caracteres).'];
+        }
+        if ($username === '' || strlen($username) < 3 || strlen($username) > 50 || !preg_match('/^[A-Za-z0-9._-]+$/', $username)) {
+            return ['estado' => false, 'campo' => 'username', 'mensaje' => 'Usa entre 3 y 50 caracteres válidos (letras, números, punto o guion).'];
+        }
+        if (!$this->existeRol($idRol)) {
+            return ['estado' => false, 'campo' => 'id_rol', 'mensaje' => 'El rol seleccionado no es válido.'];
+        }
+        if ($contrasenia === '' || !preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9\s]).{8,}$/', $contrasenia)) {
+            return ['estado' => false, 'campo' => 'contrasenia', 'mensaje' => 'Debe tener mínimo 8 caracteres, mayúscula, minúscula, número y símbolo.'];
+        }
+        if ($confirmar === '' || $contrasenia !== $confirmar) {
+            return ['estado' => false, 'campo' => 'confirmar_contrasenia', 'mensaje' => 'Las contraseñas no coinciden.'];
+        }
+        if ($this->existeCorreoEnOtro($correo, 0)) {
+            return ['estado' => false, 'campo' => 'correo', 'mensaje' => 'Ese correo electrónico ya está registrado.'];
+        }
+        if ($this->existeUsernameEnOtro($username, 0)) {
+            return ['estado' => false, 'campo' => 'username', 'mensaje' => 'Ese nombre de usuario ya está en uso.'];
+        }
+
+        return [
+            'estado'      => true,
+            'normalizado' => [
+                'nombre'      => $nombre,
+                'apellido'    => $apellido,
+                'username'    => $username,
+                'correo'      => $correo,
+                'telefono'    => $telefono,
+                'ubicacion'   => $ubicacion,
+                'id_rol'      => $idRol,
+                'estado'      => $estado,
+                'contrasenia' => $contrasenia,
+            ],
+        ];
+    }
+
+    public function crearUsuarioAdmin(array $datos, int $idAdminActual = 0): array
+    {
+        $validacion = $this->validarCreacionUsuarioAdmin($datos);
+        if (empty($validacion['estado'])) {
+            return $validacion;
+        }
+
+        $norm = $validacion['normalizado'];
+        $passHash = password_hash($norm['contrasenia'], PASSWORD_DEFAULT);
+
+        $this->conexion->begin_transaction();
+        try {
+            $sqlUser = "INSERT INTO sb_usuario (nombre, apellido, username, contrasenia, ubicacion, estado, id_rol)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)";
+            $stmtUser = $this->conexion->prepare($sqlUser);
+            if (!$stmtUser) {
+                throw new Exception('No se pudo preparar el registro del usuario.');
+            }
+            $stmtUser->bind_param(
+                'sssssii',
+                $norm['nombre'],
+                $norm['apellido'],
+                $norm['username'],
+                $passHash,
+                $norm['ubicacion'],
+                $norm['estado'],
+                $norm['id_rol']
+            );
+            if (!$stmtUser->execute()) {
+                throw new Exception('Error al registrar el usuario.');
+            }
+            $idUsuario = (int)$this->conexion->insert_id;
+            $stmtUser->close();
+
+            $stmtCorreo = $this->conexion->prepare("INSERT INTO sb_correo_usuario (id_usuario, correo) VALUES (?, ?)");
+            if (!$stmtCorreo) {
+                throw new Exception('No se pudo preparar el registro del correo.');
+            }
+            $stmtCorreo->bind_param('is', $idUsuario, $norm['correo']);
+            if (!$stmtCorreo->execute()) {
+                throw new Exception('Error al guardar el correo electrónico.');
+            }
+            $stmtCorreo->close();
+
+            if ($norm['telefono'] !== '') {
+                $stmtTel = $this->conexion->prepare("INSERT INTO sb_telefono_usuario (id_usuario, telefono) VALUES (?, ?)");
+                if (!$stmtTel) {
+                    throw new Exception('No se pudo preparar el registro del teléfono.');
+                }
+                $stmtTel->bind_param('is', $idUsuario, $norm['telefono']);
+                if (!$stmtTel->execute()) {
+                    throw new Exception('Error al guardar el teléfono.');
+                }
+                $stmtTel->close();
+            }
+
+            $this->conexion->commit();
+            return [
+                'estado'  => true,
+                'mensaje' => 'Usuario creado correctamente.',
+                'usuario' => $this->obtenerDetalleUsuarioAdmin($idUsuario, $idAdminActual),
+            ];
+        } catch (Exception $e) {
+            $this->conexion->rollback();
+            return ['estado' => false, 'mensaje' => $e->getMessage()];
+        }
+    }
+
     private function formatearFechaDetalleEs(string $fechaRaw): string
     {
         if (trim($fechaRaw) === '') {
