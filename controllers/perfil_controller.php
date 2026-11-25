@@ -117,5 +117,69 @@ if ($opcion === "cambiarContrasenia") {
     exit;
 }
 
+if ($opcion === "actualizarDatos") {
+    // mismo token csrf del formulario de la contraseña
+    $tokenSesion = $_SESSION['csrf_perfil'] ?? '';
+    $tokenEnviado = $_POST['csrf'] ?? '';
+    if ($tokenSesion === '' || !is_string($tokenEnviado) || !hash_equals($tokenSesion, $tokenEnviado)) {
+        http_response_code(403);
+        echo json_encode(["estado" => false, "mensaje" => "Tu sesión de formulario venció. Recarga la página e inténtalo de nuevo."]);
+        exit;
+    }
+ 
+    $nombre = trim($_POST['nombre'] ?? '');
+    $apellido = trim($_POST['apellido'] ?? '');
+    $telefono = trim($_POST['telefono'] ?? '');
+    $ubicacion = trim($_POST['ubicacion'] ?? '');
+ 
+    if ($nombre === '' || $apellido === '' || $telefono === '' || $ubicacion === '') {
+        echo json_encode(["estado" => false, "mensaje" => "Por favor completa todos los campos."]);
+        exit;
+    }
+ 
+    if (mb_strlen($nombre) > 50) {
+        echo json_encode(["estado" => false, "campo" => "nombre", "mensaje" => "El nombre puede tener máximo 50 caracteres."]);
+        exit;
+    }
+
+    if (mb_strlen($apellido) > 50) {
+        echo json_encode(["estado" => false, "campo" => "apellido", "mensaje" => "El apellido puede tener máximo 50 caracteres."]);
+        exit;
+    }
+
+    if (!preg_match('/^\p{L}+(?:[\s\'-]\p{L}+)*$/u', $nombre)) {
+        echo json_encode(["estado" => false, "campo" => "nombre", "mensaje" => "El nombre solo puede contener letras y espacios."]);
+        exit;
+    }
+
+    if (!preg_match('/^\p{L}+(?:[\s\'-]\p{L}+)*$/u', $apellido)) {
+        echo json_encode(["estado" => false, "campo" => "apellido", "mensaje" => "El apellido solo puede contener letras y espacios."]);
+        exit;
+    }
+ 
+    if (mb_strlen($ubicacion) > 100) {
+        echo json_encode(["estado" => false, "campo" => "ubicacion", "mensaje" => "La ubicación puede tener máximo 100 caracteres."]);
+        exit;
+    }
+ 
+    // mismo formato del registro: 7000-0000
+    if (!preg_match('/^\d{4}-\d{4}$/', $telefono)) {
+        echo json_encode(["estado" => false, "campo" => "telefono", "mensaje" => "El teléfono debe tener el formato 7000-0000."]);
+        exit;
+    }
+ 
+    $dao = new PerfilDAO();
+    $resultado = $dao->actualizarDatos($id_usuario, $nombre, $apellido, $ubicacion, $telefono);
+ 
+    if (!empty($resultado['estado'])) {
+        // para que el nombre del menu se actualice
+        $_SESSION['nombre'] = $nombre;
+        $_SESSION['apellido'] = $apellido;
+    }
+ 
+    echo json_encode($resultado);
+    exit;
+}
+
 echo json_encode(["estado" => false, "mensaje" => "Opción no válida o no especificada."]);
 exit;

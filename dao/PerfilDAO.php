@@ -131,6 +131,45 @@ class PerfilDAO
         ];
     }
 
+    // actualiza nombre, apellido, ubicacion y telefono del usuario
+    public function actualizarDatos($id_usuario, $nombre, $apellido, $ubicacion, $telefono)
+    {
+        $this->conexion->begin_transaction();
+        try {
+            $sql = "UPDATE sb_usuario SET nombre = ?, apellido = ?, ubicacion = ? WHERE id_usuario = ?";
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bind_param("sssi", $nombre, $apellido, $ubicacion, $id_usuario);
+            $stmt->execute();
+            $stmt->close();
+ 
+            // el telefono esta en otra tabla, si no tenia uno se inserta
+            $sqlTel = "SELECT id_usuario FROM sb_telefono_usuario WHERE id_usuario = ? LIMIT 1";
+            $stmtTel = $this->conexion->prepare($sqlTel);
+            $stmtTel->bind_param("i", $id_usuario);
+            $stmtTel->execute();
+            $existe = $stmtTel->get_result()->fetch_assoc();
+            $stmtTel->close();
+ 
+            if ($existe) {
+                $sqlUp = "UPDATE sb_telefono_usuario SET telefono = ? WHERE id_usuario = ?";
+            } else {
+                $sqlUp = "INSERT INTO sb_telefono_usuario (telefono, id_usuario) VALUES (?, ?)";
+            }
+            $stmtUp = $this->conexion->prepare($sqlUp);
+            $stmtUp->bind_param("si", $telefono, $id_usuario);
+            $stmtUp->execute();
+            $stmtUp->close();
+ 
+            $this->conexion->commit();
+            return ["estado" => true, "mensaje" => "Tus datos se actualizaron correctamente."];
+        } catch (Throwable $e) {
+            $this->conexion->rollback();
+            error_log("[PerfilDAO] Error al actualizar datos: " . $e->getMessage());
+            return ["estado" => false, "mensaje" => "No se pudieron guardar los cambios. Inténtalo de nuevo."];
+        }
+    }
+
+
     //Contra
     public function cambiarContrasenia($id_usuario, $contraseniaActual, $contraseniaNueva)
     {
