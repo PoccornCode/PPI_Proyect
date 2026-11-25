@@ -55,8 +55,8 @@
 
 /* Etiqueta del rol del personal (administrador / moderador) */
 .perfil-chip-rol {
-    color: #e0a944;
-    border-color: #e0a944;
+    color: #c9c9c9;
+    border-color: #2c3326;
 }
 
 /* Botón de cerrar sesión */
@@ -98,16 +98,29 @@ a.perfil-acceso:focus {
 
 /* Acceso que pide atención (p. ej. solicitudes por revisar) */
 .perfil-acceso-alerta {
-    border-color: #e0a944;
+    border-color: rgba(101, 136, 7, 0.45);
+    background-color: #11150e;
 }
 
 .perfil-acceso-alerta .perfil-acceso-titulo {
-    color: #e0a944;
+    color: #a7cc3b;
 }
 
 a.perfil-acceso-alerta:hover,
 a.perfil-acceso-alerta:focus {
-    border-color: #e0a944;
+    border-color: #94aa34;
+}
+
+.perfil-acceso-ir {
+    font-size: .85rem;
+    color: #6f7f57;
+    transition: color .2s ease-in-out, transform .2s ease-in-out;
+}
+
+a.perfil-acceso:hover .perfil-acceso-ir,
+a.perfil-acceso:focus .perfil-acceso-ir {
+    color: #94aa34;
+    transform: translateX(3px);
 }
 
 .perfil-acceso-valor {
@@ -157,6 +170,13 @@ a.perfil-acceso-alerta:focus {
     background-color: #0f110e;
     border: 1px solid #23271f;
     border-radius: 14px;
+    transition: border-color .2s ease-in-out, transform .2s ease-in-out;
+}
+
+a.perfil-subasta:hover,
+a.perfil-subasta:focus {
+    border-color: #658807;
+    transform: translateY(-2px);
 }
 
 .perfil-subasta-img {

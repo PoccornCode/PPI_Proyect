@@ -3,7 +3,6 @@ require_once __DIR__ . '/../config/conexion.php';
 
 class PerfilDAO
 {
-    // Roles de sb_usuario.id_rol
     const ROL_ADMIN = 1;
     const ROL_USUARIO = 2;
     const ROL_MODERADOR = 3;
@@ -37,7 +36,7 @@ class PerfilDAO
     }
 
    
-    //Productos registrados, subastas activas y subastas pendientes de revisión del usuario.
+    //productos registrados-subastas activas-subastas pendientes de revision
     public function obtenerResumenUsuario($id_usuario)
     {
         $sql = "SELECT COUNT(DISTINCT p.id_producto) AS productos,
@@ -59,7 +58,7 @@ class PerfilDAO
         ];
     }
 
-    //Las subastas activas del usuario que terminan primero, con la puja ms alta.
+    //subastas activas del usuario que terminan primero con la puja ms alta
      
     public function obtenerSubastasActivas($id_usuario, $limite = 3)
     {
@@ -93,7 +92,7 @@ class PerfilDAO
 
     // MODERADOR Y ADMINISTRADOR
        
-    //Estado general de las subastas: pendientes de revisar, activas y cerradas.
+    //estado subastas
 
     public function obtenerResumenModeracion()
     {
@@ -112,7 +111,7 @@ class PerfilDAO
         ];
     }
 
-    //Totales de usuarios para el administrador.
+    //users muestra al admin
 
     public function obtenerResumenUsuariosAdmin()
     {
@@ -165,7 +164,7 @@ class PerfilDAO
             return ["estado" => false, "mensaje" => "No se pudo actualizar la contraseña. Inténtalo de nuevo."];
         }
 
-        // Si habia codigos de recuperacion sin usar ya no sirven
+        // codigos no sirven pasado el tiempo
         $sqlCod = "UPDATE sb_codigo_verificacion SET utilizado = 1
                    WHERE id_usuario = ? AND tipo = 'recuperacion' AND utilizado = 0";
         $stmtCod = $this->conexion->prepare($sqlCod);

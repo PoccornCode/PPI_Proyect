@@ -134,6 +134,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (resultado.estado) {
                     window.location.href = resultado.redirect || "../../index.php";
+                } else if (resultado.requiere_verificacion && resultado.correo) {
+                    const emailDestino = encodeURIComponent(resultado.correo);
+                    mostrarModal(
+                        "warning",
+                        "Cuenta sin verificar",
+                        resultado.mensaje || "Tu cuenta aún no está verificada. Te llevaremos a verificar tu código.",
+                        () => {
+                            window.location.href = `verificar-codigo.php?correo=${emailDestino}`;
+                        }
+                    );
                 } else {
                     contrasenia.value = "";
                     contrasenia.classList.remove("is-valid");

@@ -152,7 +152,7 @@ if ($flashToast !== null) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>assets/js/toast-ppi.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/login.js?v=6"></script>
+    <script src="<?= BASE_URL ?>assets/js/login.js?v=7"></script>
     <?php if (isset($_GET['verificado']) && $_GET['verificado'] == '1'): ?>
         <script>
             document.addEventListener("DOMContentLoaded", function() {
