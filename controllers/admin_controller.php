@@ -407,6 +407,49 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
 
         if (empty($res['estado'])) {
             http_response_code(422);
+        } elseif (!empty($res['usuario']['id_usuario']) && !empty($res['usuario']['activo'])) {
+            require_once __DIR__ . '/../dao/RecuperacionDAO.php';
+            $recDao = new RecuperacionDAO();
+            $envio = $recDao->enviarBienvenidaAdmin((int)$res['usuario']['id_usuario'], 60);
+            if (!empty($envio['estado'])) {
+                $res['mensaje'] = 'Usuario creado y correo de bienvenida enviado a ' . $envio['correo'] . '.';
+                $res['correo_enviado'] = true;
+            } else {
+                $res['mensaje'] = 'Usuario creado, pero no se pudo enviar el correo de bienvenida.';
+                $res['correo_enviado'] = false;
+            }
+        }
+
+        echo json_encode($res, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'usuario_enviar_recuperacion') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'Método no permitido.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $idUsuario = (int)($_POST['id_usuario'] ?? 0);
+        if ($idUsuario <= 0) {
+            http_response_code(400);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'ID de usuario no válido.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        require_once __DIR__ . '/../dao/RecuperacionDAO.php';
+        $recDao = new RecuperacionDAO();
+        $res = $recDao->solicitarEnlaceRecuperacionAdmin($idUsuario, 15);
+
+        if (empty($res['estado'])) {
+            http_response_code(422);
         }
 
         echo json_encode($res, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

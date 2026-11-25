@@ -592,15 +592,80 @@
 
     editEstadoCheck?.addEventListener('change', sincronizarTextoEstadoEditar);
 
-    btnEnviarCodigoRecEl?.addEventListener('click', () => {
-        const correo = (editCorreoInput?.value || '').trim();
-        const destino = correo ? ` a ${correo}` : '';
-        notificarToast(
-            'info',
-            'Recuperación de contraseña',
-            `Solo diseño: aquí se enviará un código de recuperación${destino}.`,
-            4500
-        );
+    btnEnviarCodigoRecEl?.addEventListener('click', async () => {
+        const idUsuario = Number(editUsuarioCargado?.id_usuario || editIdInput?.value || 0);
+        if (idUsuario <= 0) return;
+
+        const correoActualInput = (editCorreoInput?.value || '').trim();
+        const correoGuardado = (editUsuarioCargado?.correo || '').trim();
+
+        if (correoActualInput !== correoGuardado) {
+            notificarToast(
+                'warning',
+                'Correo modificado',
+                'Guarda primero los cambios del correo antes de enviar el enlace de restablecimiento.',
+                4500
+            );
+            return;
+        }
+
+        if (!editEstadoCheck?.checked) {
+            notificarToast(
+                'warning',
+                'Cuenta suspendida',
+                'Activa la cuenta antes de enviar el enlace de restablecimiento.',
+                4500
+            );
+            return;
+        }
+
+        const btnText = document.getElementById('btnEnviarCodigoRecText');
+        const textoOriginal = btnText ? btnText.textContent : 'Enviar enlace';
+
+        btnEnviarCodigoRecEl.disabled = true;
+        if (btnText) btnText.textContent = 'Enviando...';
+
+        try {
+            const formData = new FormData();
+            formData.append('opcion', 'usuario_enviar_recuperacion');
+            formData.append('id_usuario', String(idUsuario));
+
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { Accept: 'application/json' },
+                body: formData
+            });
+
+            if (response.status === 401) {
+                const errData = await response.json().catch(() => ({}));
+                window.location.href = errData.redirect || `${baseUrl}views/auth/login.php${errData.expired ? '?reason=inactivity' : ''}`;
+                return;
+            }
+
+            const payload = await response.json().catch(() => null);
+            if (!response.ok || !payload?.estado) {
+                notificarToast(
+                    'error',
+                    'No se pudo enviar',
+                    payload?.mensaje || 'No se pudo enviar el enlace de restablecimiento.',
+                    4500
+                );
+                return;
+            }
+
+            notificarToast(
+                'success',
+                'Enlace enviado',
+                payload.mensaje || 'Se envió el enlace de restablecimiento al correo del usuario.',
+                4500
+            );
+        } catch (err) {
+            console.error('Error al enviar enlace de recuperación:', err);
+            notificarToast('error', 'Error de conexión', 'No se pudo comunicar con el servidor.');
+        } finally {
+            btnEnviarCodigoRecEl.disabled = false;
+            if (btnText) btnText.textContent = textoOriginal;
+        }
     });
 
     detailEditShortcutBtn?.addEventListener('click', () => {

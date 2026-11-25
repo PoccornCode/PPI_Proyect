@@ -78,7 +78,7 @@ $rolesListaModal = $rolesAdmin ?? [];
                         <div class="adm-user-edit-section">
                             <span class="mod-detail-desc-label mb-0">Datos del usuario</span>
 
-                            <div class="row g-3">
+                            <div class="row g-2">
                                 <div class="col-sm-6">
                                     <label for="admUserEditNombre" class="form-label small text-secondary mb-1">Nombre <span class="adm-req-star">*</span></label>
                                     <input type="text" class="form-control" id="admUserEditNombre" name="nombre" maxlength="100" required>
@@ -118,15 +118,14 @@ $rolesListaModal = $rolesAdmin ?? [];
                             <div class="adm-user-recovery-copy">
                                 <div class="adm-user-recovery-title">
                                     Restablecer contraseña
-                                    <span class="adm-user-recovery-pill">Solo diseño</span>
                                 </div>
                                 <p class="adm-user-recovery-desc">
-                                    Envía un código de recuperación al correo del usuario para que defina una nueva clave.
+                                    Envía un correo con un enlace directo al usuario para que defina una nueva clave.
                                 </p>
                             </div>
                             <button type="button" class="adm-user-recovery-btn" id="btnEnviarCodigoRecuperacion">
                                 <i class="fa-regular fa-paper-plane"></i>
-                                <span>Enviar código</span>
+                                <span id="btnEnviarCodigoRecText">Enviar enlace</span>
                             </button>
                         </div>
                     </div>

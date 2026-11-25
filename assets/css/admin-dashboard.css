@@ -2949,7 +2949,7 @@ body.admin-body .adm-badge--finalizada {
 
 /* Modal editar usuario */
 #modalEditarUsuario .adm-user-detail-dialog {
-    max-width: 600px;
+    max-width: 720px;
 }
 
 #modalAgregarUsuario .adm-user-detail-dialog {
@@ -2969,19 +2969,53 @@ body.admin-body .adm-badge--finalizada {
     border: none;
 }
 
-#modalEditarUsuario .modal-header,
+#modalEditarUsuario .modal-header {
+    padding: 14px 24px 6px;
+}
+
 #modalAgregarUsuario .modal-header {
     padding: 20px 26px 8px;
 }
 
-#modalEditarUsuario .modal-body,
+#modalEditarUsuario .modal-body {
+    padding: 8px 24px 10px;
+}
+
 #modalAgregarUsuario .modal-body {
     padding: 14px 26px 18px;
 }
 
-#modalEditarUsuario .modal-footer,
+#modalEditarUsuario .modal-footer {
+    padding: 6px 24px 14px;
+}
+
 #modalAgregarUsuario .modal-footer {
     padding: 8px 26px 22px;
+}
+
+#modalEditarUsuario .adm-user-detail-body {
+    gap: 8px;
+}
+
+#modalEditarUsuario .adm-user-detail-avatar {
+    width: 44px;
+    height: 44px;
+    font-size: 1.05rem;
+}
+
+#modalEditarUsuario .adm-user-detail-divider {
+    margin: 0;
+}
+
+#modalEditarUsuario .adm-user-edit-section {
+    gap: 6px;
+}
+
+#modalEditarUsuario .form-control,
+#modalEditarUsuario .form-select {
+    padding-top: 0.42rem;
+    padding-bottom: 0.42rem;
+    font-size: 0.875rem;
 }
 
 .adm-user-add-subtitle {

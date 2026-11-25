@@ -33,21 +33,25 @@ class RecuperacionDAO
         return $usuario ?: null;
     }
 
-    public function solicitarCodigoRecuperacion($correo, $minutosValidez = 15)
+    public function obtenerUsuarioPorId(int $idUsuario): ?array
     {
-        $mensajeGenerico = "Si el correo está registrado y activo, recibirás un código de recuperación.";
+        $sql = "SELECT u.id_usuario, u.nombre, u.apellido, u.username, u.estado, c.correo
+                FROM sb_usuario u
+                LEFT JOIN sb_correo_usuario c ON c.id_usuario = u.id_usuario
+                WHERE u.id_usuario = ?
+                LIMIT 1";
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->bind_param("i", $idUsuario);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $usuario = $res->fetch_assoc();
+        $stmt->close();
 
-        $usuario = $this->obtenerUsuarioPorCorreo($correo);
-        if (!$usuario || (int)$usuario['estado'] !== 1) {
-            return [
-                "estado" => true,
-                "mensaje" => $mensajeGenerico,
-                "correo" => $correo
-            ];
-        }
+        return $usuario ?: null;
+    }
 
-        $id_usuario = (int)$usuario['id_usuario'];
-
+    private function crearCodigoRecuperacion(int $idUsuario, int $minutosValidez = 15): array
+    {
         // Rate limit en backend: mínimo 60 segundos entre solicitudes
         $sqlLast = "SELECT expira_en
                     FROM sb_codigo_verificacion
@@ -55,7 +59,7 @@ class RecuperacionDAO
                     ORDER BY id_codigo DESC
                     LIMIT 1";
         $stmtLast = $this->conexion->prepare($sqlLast);
-        $stmtLast->bind_param("i", $id_usuario);
+        $stmtLast->bind_param("i", $idUsuario);
         $stmtLast->execute();
         $resLast = $stmtLast->get_result();
         $ultimo = $resLast->fetch_assoc();
@@ -78,7 +82,7 @@ class RecuperacionDAO
                    SET utilizado = 1 
                    WHERE id_usuario = ? AND tipo = 'recuperacion' AND utilizado = 0";
         $stmtInv = $this->conexion->prepare($sqlInv);
-        $stmtInv->bind_param("i", $id_usuario);
+        $stmtInv->bind_param("i", $idUsuario);
         $stmtInv->execute();
         $stmtInv->close();
 
@@ -89,20 +93,51 @@ class RecuperacionDAO
         $sql = "INSERT INTO sb_codigo_verificacion (id_usuario, codigo, tipo, expira_en, utilizado, intentos)
                 VALUES (?, ?, 'recuperacion', ?, 0, 0)";
         $stmt = $this->conexion->prepare($sql);
-        $stmt->bind_param("iss", $id_usuario, $codigo, $expiraEn);
+        $stmt->bind_param("iss", $idUsuario, $codigo, $expiraEn);
         $stmt->execute();
-        $id_codigo = $this->conexion->insert_id;
+        $idCodigo = (int)$this->conexion->insert_id;
         $stmt->close();
 
+        return [
+            "estado"    => true,
+            "id_codigo" => $idCodigo,
+            "codigo"    => $codigo
+        ];
+    }
+
+    private function invalidarCodigoPorId(int $idCodigo): void
+    {
+        $sqlFail = "UPDATE sb_codigo_verificacion SET utilizado = 1 WHERE id_codigo = ?";
+        $stmtFail = $this->conexion->prepare($sqlFail);
+        $stmtFail->bind_param("i", $idCodigo);
+        $stmtFail->execute();
+        $stmtFail->close();
+    }
+
+    public function solicitarCodigoRecuperacion($correo, $minutosValidez = 15)
+    {
+        $mensajeGenerico = "Si el correo está registrado y activo, recibirás un código de recuperación.";
+
+        $usuario = $this->obtenerUsuarioPorCorreo($correo);
+        if (!$usuario || (int)$usuario['estado'] !== 1) {
+            return [
+                "estado" => true,
+                "mensaje" => $mensajeGenerico,
+                "correo" => $correo
+            ];
+        }
+
+        $id_usuario = (int)$usuario['id_usuario'];
+        $creacion = $this->crearCodigoRecuperacion($id_usuario, (int)$minutosValidez);
+        if (empty($creacion['estado'])) {
+            return $creacion;
+        }
+
         // Envío de correo mediante el helper Mailer
-        $envio = Mailer::enviarCodigoRecuperacion($correo, $usuario['nombre'], $codigo);
+        $envio = Mailer::enviarCodigoRecuperacion($correo, $usuario['nombre'], $creacion['codigo']);
 
         if (empty($envio['exito'])) {
-            $sqlFail = "UPDATE sb_codigo_verificacion SET utilizado = 1 WHERE id_codigo = ?";
-            $stmtFail = $this->conexion->prepare($sqlFail);
-            $stmtFail->bind_param("i", $id_codigo);
-            $stmtFail->execute();
-            $stmtFail->close();
+            $this->invalidarCodigoPorId((int)$creacion['id_codigo']);
 
             return [
                 "estado" => false,
@@ -113,6 +148,110 @@ class RecuperacionDAO
         return [
             "estado" => true,
             "mensaje" => $mensajeGenerico,
+            "correo" => $correo
+        ];
+    }
+
+    public function solicitarEnlaceRecuperacionAdmin(int $idUsuario, int $minutosValidez = 15): array
+    {
+        $usuario = $this->obtenerUsuarioPorId($idUsuario);
+        if (!$usuario) {
+            return [
+                "estado" => false,
+                "mensaje" => "No se encontró el usuario solicitado."
+            ];
+        }
+
+        $correo = trim((string)($usuario['correo'] ?? ''));
+        if ($correo === '' || !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+            return [
+                "estado" => false,
+                "mensaje" => "El usuario no tiene un correo electrónico válido registrado."
+            ];
+        }
+
+        if ((int)$usuario['estado'] !== 1) {
+            return [
+                "estado" => false,
+                "mensaje" => "La cuenta está suspendida. Actívala antes de enviar el enlace de restablecimiento."
+            ];
+        }
+
+        $creacion = $this->crearCodigoRecuperacion($idUsuario, $minutosValidez);
+        if (empty($creacion['estado'])) {
+            return $creacion;
+        }
+
+        $urlEnlace = BASE_URL . 'views/auth/recuperar-clave.php?correo=' . urlencode($correo) . '&codigo=' . urlencode($creacion['codigo']);
+        $envio = Mailer::enviarEnlaceRecuperacionAdmin($correo, (string)$usuario['nombre'], $creacion['codigo'], $urlEnlace);
+
+        if (empty($envio['exito'])) {
+            $this->invalidarCodigoPorId((int)$creacion['id_codigo']);
+
+            return [
+                "estado" => false,
+                "mensaje" => "No se pudo enviar el correo de restablecimiento. Verifica la configuración SMTP."
+            ];
+        }
+
+        return [
+            "estado" => true,
+            "mensaje" => "Enlace de restablecimiento enviado a {$correo}.",
+            "correo" => $correo
+        ];
+    }
+
+    public function enviarBienvenidaAdmin(int $idUsuario, int $minutosValidez = 60): array
+    {
+        $usuario = $this->obtenerUsuarioPorId($idUsuario);
+        if (!$usuario) {
+            return [
+                "estado" => false,
+                "mensaje" => "No se encontró el usuario recién creado."
+            ];
+        }
+
+        $correo = trim((string)($usuario['correo'] ?? ''));
+        if ($correo === '' || !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+            return [
+                "estado" => false,
+                "mensaje" => "El usuario no tiene un correo electrónico válido."
+            ];
+        }
+
+        if ((int)$usuario['estado'] !== 1) {
+            return [
+                "estado" => false,
+                "mensaje" => "La cuenta fue creada como suspendida, no se envió correo de bienvenida."
+            ];
+        }
+
+        $creacion = $this->crearCodigoRecuperacion($idUsuario, $minutosValidez);
+        if (empty($creacion['estado'])) {
+            return $creacion;
+        }
+
+        $urlEnlace = BASE_URL . 'views/auth/recuperar-clave.php?correo=' . urlencode($correo) . '&codigo=' . urlencode($creacion['codigo']);
+        $envio = Mailer::enviarBienvenidaUsuarioAdmin(
+            $correo,
+            (string)$usuario['nombre'],
+            (string)$usuario['username'],
+            $creacion['codigo'],
+            $urlEnlace
+        );
+
+        if (empty($envio['exito'])) {
+            $this->invalidarCodigoPorId((int)$creacion['id_codigo']);
+
+            return [
+                "estado" => false,
+                "mensaje" => "No se pudo enviar el correo de bienvenida."
+            ];
+        }
+
+        return [
+            "estado" => true,
+            "mensaje" => "Correo de bienvenida enviado a {$correo}.",
             "correo" => $correo
         ];
     }
