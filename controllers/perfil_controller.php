@@ -137,8 +137,23 @@ if ($opcion === "actualizarDatos") {
         exit;
     }
  
-    if (mb_strlen($nombre) > 50 || mb_strlen($apellido) > 50) {
-        echo json_encode(["estado" => false, "mensaje" => "El nombre y el apellido pueden tener máximo 50 caracteres."]);
+    if (mb_strlen($nombre) > 50) {
+        echo json_encode(["estado" => false, "campo" => "nombre", "mensaje" => "El nombre puede tener máximo 50 caracteres."]);
+        exit;
+    }
+
+    if (mb_strlen($apellido) > 50) {
+        echo json_encode(["estado" => false, "campo" => "apellido", "mensaje" => "El apellido puede tener máximo 50 caracteres."]);
+        exit;
+    }
+
+    if (!preg_match('/^\p{L}+(?:[\s\'-]\p{L}+)*$/u', $nombre)) {
+        echo json_encode(["estado" => false, "campo" => "nombre", "mensaje" => "El nombre solo puede contener letras y espacios."]);
+        exit;
+    }
+
+    if (!preg_match('/^\p{L}+(?:[\s\'-]\p{L}+)*$/u', $apellido)) {
+        echo json_encode(["estado" => false, "campo" => "apellido", "mensaje" => "El apellido solo puede contener letras y espacios."]);
         exit;
     }
  

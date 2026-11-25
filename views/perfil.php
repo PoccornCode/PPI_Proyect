@@ -447,9 +447,8 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content modal-content-ppi">
                 <div class="modal-header modal-header-ppi">
-                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2" id="modalEditarPerfilTitulo">
-                        <i class="fas fa-user-edit text-warning fs-5"></i>
-                        <span>Editar datos personales</span>
+                    <h5 class="modal-title fw-bold text-white" id="modalEditarPerfilTitulo">
+                        Editar datos personales
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
@@ -460,18 +459,22 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                             <div class="col-md-6">
                                 <label for="edit_nombre" class="form-label text-main-ppi fw-bold">Nombre <span class="req-star">*</span></label>
                                 <input type="text" class="form-control" id="edit_nombre" name="nombre" maxlength="50" value="<?= e($perfil['nombre']) ?>" required>
+                                <div class="invalid-feedback" id="err_edit_nombre">Ingresa tu nombre.</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="edit_apellido" class="form-label text-main-ppi fw-bold">Apellido <span class="req-star">*</span></label>
                                 <input type="text" class="form-control" id="edit_apellido" name="apellido" maxlength="50" value="<?= e($perfil['apellido']) ?>" required>
+                                <div class="invalid-feedback" id="err_edit_apellido">Ingresa tu apellido.</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="edit_telefono" class="form-label text-main-ppi fw-bold">Teléfono <span class="req-star">*</span></label>
                                 <input type="tel" class="form-control" id="edit_telefono" name="telefono" placeholder="Ej. 7000-0000" maxlength="9" value="<?= e($perfil['telefono']) ?>" required>
+                                <div class="invalid-feedback" id="err_edit_telefono">Usa el formato 7000-0000.</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="edit_ubicacion" class="form-label text-main-ppi fw-bold">Ubicación <span class="req-star">*</span></label>
                                 <input type="text" class="form-control" id="edit_ubicacion" name="ubicacion" placeholder="Ciudad, Departamento" maxlength="100" value="<?= e($perfil['ubicacion']) ?>" required>
+                                <div class="invalid-feedback" id="err_edit_ubicacion">Ingresa tu ubicación.</div>
                             </div>
                             <div class="col-12">
                                 <div class="form-text text-second-ppi">El correo y el nombre de usuario no se pueden cambiar desde aquí.</div>
@@ -491,7 +494,7 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>assets/js/toast-ppi.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/perfil.js?v=6"></script>
+    <script src="<?= BASE_URL ?>assets/js/perfil.js?v=7"></script>
 </body>
 
 </html>

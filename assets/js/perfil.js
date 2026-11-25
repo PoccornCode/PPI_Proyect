@@ -314,87 +314,126 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // editar datos personales
 const REGEX_TELEFONO = /^\d{4}-\d{4}$/;
- 
+const REGEX_NOMBRE = /^\p{L}+(?:[\s'-]\p{L}+)*$/u;
+
 document.addEventListener("DOMContentLoaded", () => {
     const modalEl = document.getElementById("modalEditarPerfil");
     const form = document.getElementById("formEditarPerfil");
     const btnGuardar = document.getElementById("btnGuardarDatos");
     if (!modalEl || !form) return;
- 
+
     const nombre = document.getElementById("edit_nombre");
     const apellido = document.getElementById("edit_apellido");
     const telefono = document.getElementById("edit_telefono");
     const ubicacion = document.getElementById("edit_ubicacion");
     const campos = [nombre, apellido, telefono, ubicacion];
- 
-    function marcar(campo, ok) {
+
+    const feedbackPorCampo = {
+        edit_nombre: document.getElementById("err_edit_nombre"),
+        edit_apellido: document.getElementById("err_edit_apellido"),
+        edit_telefono: document.getElementById("err_edit_telefono"),
+        edit_ubicacion: document.getElementById("err_edit_ubicacion")
+    };
+
+    function marcar(campo, ok, mensajeError = "") {
         campo.classList.toggle("is-invalid", !ok);
         campo.classList.toggle("is-valid", ok);
+        const fb = feedbackPorCampo[campo.id];
+        if (!ok && fb && mensajeError) {
+            fb.textContent = mensajeError;
+        }
         return ok;
     }
- 
+
     function validar(campo) {
-        if (campo === telefono) return marcar(campo, REGEX_TELEFONO.test(campo.value.trim()));
-        return marcar(campo, campo.value.trim() !== "");
+        const valor = campo.value.trim();
+
+        if (campo === nombre) {
+            if (valor === "") return marcar(campo, false, "Ingresa tu nombre.");
+            if (!REGEX_NOMBRE.test(valor)) return marcar(campo, false, "Solo se permiten letras y espacios.");
+            return marcar(campo, true);
+        }
+
+        if (campo === apellido) {
+            if (valor === "") return marcar(campo, false, "Ingresa tu apellido.");
+            if (!REGEX_NOMBRE.test(valor)) return marcar(campo, false, "Solo se permiten letras y espacios.");
+            return marcar(campo, true);
+        }
+
+        if (campo === telefono) {
+            if (valor === "") return marcar(campo, false, "Ingresa tu teléfono.");
+            if (!REGEX_TELEFONO.test(valor)) return marcar(campo, false, "Usa el formato 7000-0000.");
+            return marcar(campo, true);
+        }
+
+        if (valor === "") return marcar(campo, false, "Ingresa tu ubicación.");
+        return marcar(campo, true);
     }
- 
+
     // el telefono se va formateando solo: 7000-0000
     telefono.addEventListener("input", () => {
         let valor = telefono.value.replace(/\D/g, "").substring(0, 8);
         if (valor.length > 4) valor = valor.substring(0, 4) + "-" + valor.substring(4);
         telefono.value = valor;
     });
- 
+
     campos.forEach((campo) => {
         campo.addEventListener("blur", () => validar(campo));
         campo.addEventListener("input", () => {
             if (campo.classList.contains("is-invalid")) validar(campo);
         });
     });
- 
+
     modalEl.addEventListener("hidden.bs.modal", () => {
         form.reset();
         campos.forEach((campo) => campo.classList.remove("is-valid", "is-invalid"));
     });
- 
+
     modalEl.addEventListener("shown.bs.modal", () => nombre.focus());
- 
+
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
- 
-        let todoOk = true;
+
+        let primerInvalido = null;
         campos.forEach((campo) => {
-            if (!validar(campo)) todoOk = false;
+            if (!validar(campo) && !primerInvalido) {
+                primerInvalido = campo;
+            }
         });
-        if (!todoOk) {
+        if (primerInvalido) {
+            primerInvalido.focus();
             mostrarToast("warning", "Revisa el formulario", "Completa los campos marcados en rojo.");
             return;
         }
- 
+
         try {
             btnGuardar.disabled = true;
             btnGuardar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
- 
+
             const datos = new FormData(form);
             datos.append("opcion", "actualizarDatos");
- 
+
             const respuesta = await fetch(form.action, { method: "POST", body: datos });
             const resultado = await respuesta.json().catch(() => null);
- 
+
             if (resultado && resultado.auth_required) {
                 window.location.href = resultado.redirect;
                 return;
             }
             if (!resultado) throw new Error("Respuesta inesperada del servidor (" + respuesta.status + ").");
- 
+
             if (resultado.estado) {
                 bootstrap.Modal.getInstance(modalEl).hide();
                 mostrarToast("success", "Datos actualizados", resultado.mensaje);
                 // se recarga para que el nombre del perfil y del menu se vean actualizados
                 setTimeout(() => window.location.reload(), 1200);
             } else {
-                if (resultado.campo === "telefono") marcar(telefono, false);
-                if (resultado.campo === "ubicacion") marcar(ubicacion, false);
+                const mapaCampos = { nombre, apellido, telefono, ubicacion };
+                const campoSrv = mapaCampos[resultado.campo];
+                if (campoSrv) {
+                    marcar(campoSrv, false, resultado.mensaje || "");
+                    campoSrv.focus();
+                }
                 mostrarToast("error", "No se pudo guardar", resultado.mensaje || "Inténtalo de nuevo.");
             }
         } catch (error) {
