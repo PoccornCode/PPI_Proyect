@@ -203,14 +203,25 @@ main {
 .chat-msg {
     display: flex;
     align-items: flex-end;
+    margin-left: 10px;
+    margin-bottom: 5px;
+    margin-right: 10px;
     gap: 0.6rem;
-    max-width: 88%;
+    max-width: 100%;
 }
-
+.span-puja-lider{
+  margin-left: auto;
+  padding: 3px 20px 3px 20px;
+  background-color: #080708;
+  color: rgb(255, 187, 0);
+  border-radius: 5px;
+  border: rgb(255,187,0) solid 1px;
+}
 .chat-msg-mio {
     align-self: flex-end;
     justify-content: flex-end;
-    max-width: 80%;
+    max-width: 100%;
+    align-items: flex-end;
 }
 
 .chat-burbuja {
@@ -219,6 +230,7 @@ main {
     border-radius: 14px 14px 14px 4px;
     background: #131611;
     border: 1px solid #1f251a;
+    width: 55%;
 }
 
 .chat-msg-mio .chat-burbuja {
@@ -226,6 +238,12 @@ main {
     background: #25301a;
     border-color: #3d4f1c;
     text-align: right;
+    width: 100%;
+}
+
+.chat-tag-lider{
+  border-color: #5e7325;
+  background: #1a2410;
 }
 
 .chat-meta {
@@ -254,11 +272,11 @@ main {
 .chat-monto {
     font-family: "Raleway", sans-serif;
     font-weight: 800;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     line-height: 1.2;
     color: #f2f2f2;
 }
-
+/* 
 .chat-tag-lider {
     display: inline-flex;
     align-items: center;
@@ -270,7 +288,7 @@ main {
     color: #a3cc00;
     font-size: 0.72rem;
     font-weight: 600;
-}
+} */
 
 .chat-alerta {
     display: flex;

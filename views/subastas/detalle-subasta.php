@@ -72,13 +72,6 @@ if (!function_exists('e')) {
 
                         <div id="miniaturas" class="mt-4 m-2"
                             style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px;">
-                            
-                            <!-- <button class="btn-miniaturas">
-                                <i class="bi bi-image d-block" style="font-size: 1.5rem;"></i>
-                            </button>
-                            <button class="btn-miniaturas">
-                                <i class="bi bi-image d-block" style="font-size: 1.5rem;"></i>
-                            </button> -->
                         </div>
 
 
@@ -175,112 +168,6 @@ if (!function_exists('e')) {
 
                         <div id="chat-feed" class="chat-feed" role="log" aria-live="polite"
                             aria-label="Historial de pujas">
-
-                            <!-- <div data-dc-tpl="173"
-                                style="display: flex; align-items: flex-end; gap: 10px; max-width: 88%;" class="m-3">
-                                <div data-dc-tpl="174" aria-hidden="true"
-                                    style="flex: 0 0 36px; width: 36px; height: 36px; border-radius: 50%; background: rgb(28, 34, 23); color: rgb(148, 170, 52); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">
-                                    <span class="sc-interp">JO</span>
-                                </div>
-                                <div data-dc-tpl="175"
-                                    style="min-width: 0px; padding: 10px 14px 12px; border-radius: 14px 14px 14px 4px; background: rgb(19, 22, 17); border: 1px solid rgb(31, 37, 26);">
-                                    <div data-dc-tpl="176"
-                                        style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; margin-bottom: 2px;">
-                                        <span data-dc-tpl="177"
-                                            style="font-size: 13px; font-weight: 600; color: rgb(201, 201, 201);"><span
-                                                class="sc-interp">jose92</span></span><span data-dc-tpl="178"
-                                            style="font-size: 12px; color: rgb(167, 165, 157);"><span
-                                                class="sc-interp">09:12</span></span>
-                                    </div>
-                                    <div data-dc-tpl="179"
-                                        style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px;">
-                                        <span data-dc-tpl="180"
-                                            style="font-family: Raleway, sans-serif; font-weight: 800; font-size: 22px; line-height: 1.2; color: rgb(242, 242, 242);"><span
-                                                class="sc-interp">$ 105.00</span></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div data-dc-tpl="173"
-                                style="display: flex; align-items: flex-end; gap: 10px; max-width: 88%;"class="m-3">
-                                <div data-dc-tpl="174" aria-hidden="true"
-                                    style="flex: 0 0 36px; width: 36px; height: 36px; border-radius: 50%; background: rgb(28, 34, 23); color: rgb(148, 170, 52); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">
-                                    <span class="sc-interp">JO</span>
-                                </div>
-                                <div data-dc-tpl="175"
-                                    style="min-width: 0px; padding: 10px 14px 12px; border-radius: 14px 14px 14px 4px; background: rgb(19, 22, 17); border: 1px solid rgb(31, 37, 26);">
-                                    <div data-dc-tpl="176"
-                                        style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; margin-bottom: 2px;">
-                                        <span data-dc-tpl="177"
-                                            style="font-size: 13px; font-weight: 600; color: rgb(201, 201, 201);"><span
-                                                class="sc-interp">jose92</span></span><span data-dc-tpl="178"
-                                            style="font-size: 12px; color: rgb(167, 165, 157);"><span
-                                                class="sc-interp">09:12</span></span>
-                                    </div>
-                                    <div data-dc-tpl="179"
-                                        style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px;">
-                                        <span data-dc-tpl="180"
-                                            style="font-family: Raleway, sans-serif; font-weight: 800; font-size: 22px; line-height: 1.2; color: rgb(242, 242, 242);"><span
-                                                class="sc-interp">$ 105.00</span></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div data-dc-tpl="173"
-                                style="display: flex; align-items: flex-end; gap: 10px; max-width: 88%;"class="m-3">
-                                <div data-dc-tpl="174" aria-hidden="true"
-                                    style="flex: 0 0 36px; width: 36px; height: 36px; border-radius: 50%; background: rgb(28, 34, 23); color: rgb(148, 170, 52); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">
-                                    <span class="sc-interp">JO</span>
-                                </div>
-                                <div data-dc-tpl="175"
-                                    style="min-width: 0px; padding: 10px 14px 12px; border-radius: 14px 14px 14px 4px; background: rgb(19, 22, 17); border: 1px solid rgb(31, 37, 26);">
-                                    <div data-dc-tpl="176"
-                                        style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; margin-bottom: 2px;">
-                                        <span data-dc-tpl="177"
-                                            style="font-size: 13px; font-weight: 600; color: rgb(201, 201, 201);"><span
-                                                class="sc-interp">jose92</span></span><span data-dc-tpl="178"
-                                            style="font-size: 12px; color: rgb(167, 165, 157);"><span
-                                                class="sc-interp">09:12</span></span>
-                                    </div>
-                                    <div data-dc-tpl="179"
-                                        style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px;">
-                                        <span data-dc-tpl="180"
-                                            style="font-family: Raleway, sans-serif; font-weight: 800; font-size: 22px; line-height: 1.2; color: rgb(242, 242, 242);"><span
-                                                class="sc-interp">$ 105.00</span></span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div data-dc-tpl="186" style="display: flex; justify-content: flex-end;"class="m-3">
-                                <div data-dc-tpl="187"
-                                    style="max-width: 80%; min-width: 0px; padding: 10px 14px 12px; border-radius: 14px 14px 4px; background: rgb(37, 48, 26); border: 1px solid rgb(61, 79, 28); text-align: right;">
-                                    <div data-dc-tpl="188"
-                                        style="display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: baseline; gap: 2px 10px; margin-bottom: 2px;">
-                                        <span data-dc-tpl="189"
-                                            style="font-size: 12px; color: rgb(167, 165, 157);"><span
-                                                class="sc-interp">14:22</span></span><span data-dc-tpl="190"
-                                            style="font-size: 13px; font-weight: 600; color: rgb(201, 201, 201);">Tú</span>
-                                    </div><span data-dc-tpl="191"
-                                        style="font-family: Raleway, sans-serif; font-weight: 800; font-size: 22px; line-height: 1.2; color: rgb(242, 242, 242);"><span
-                                            class="sc-interp">$ 140.00</span></span>
-                                </div>
-                            </div>
-                            <div data-dc-tpl="186" style="display: flex; justify-content: flex-end;"class="m-3">
-                                <div data-dc-tpl="187"
-                                    style="max-width: 80%; min-width: 0px; padding: 10px 14px 12px; border-radius: 14px 14px 4px; background: rgb(37, 48, 26); border: 1px solid rgb(61, 79, 28); text-align: right;">
-                                    <div data-dc-tpl="188"
-                                        style="display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: baseline; gap: 2px 10px; margin-bottom: 2px;">
-                                        <span data-dc-tpl="189"
-                                            style="font-size: 12px; color: rgb(167, 165, 157);"><span
-                                                class="sc-interp">14:22</span></span><span data-dc-tpl="190"
-                                            style="font-size: 13px; font-weight: 600; color: rgb(201, 201, 201);">Tú</span>
-                                    </div><span data-dc-tpl="191"
-                                        style="font-family: Raleway, sans-serif; font-weight: 800; font-size: 22px; line-height: 1.2; color: rgb(242, 242, 242);"><span
-                                            class="sc-interp">$ 140.00</span></span>
-                                </div>
-                            </div> -->
-                            
-                            <!-- <div id="chat-feed-inner" class="chat-feed-inner">
-                                    <div class="chat-sistema">Cargando pujas…</div>
-                                </div> -->
                         </div>
 
                         <form id="formPuja" class="chat-composer" method="POST" autocomplete="off" novalidate>
@@ -290,7 +177,7 @@ if (!function_exists('e')) {
 
                             <div class="input-group">
                                 <span class="input-group-text addon-gavel">$</span>
-                                <input type="number" class="form-control" id="monto" name="monto" step="0.01" min="0"
+                                <input type="number" class="form-control" id="monto-input" name="monto" step="0.01" min="0"
                                     inputmode="decimal" placeholder="0.00" required>
                                 <button type="submit" id="btnPujar" class="btn btn-primary fw-bold px-4">
                                     <i class="fas fa-gavel me-2"></i>Pujar

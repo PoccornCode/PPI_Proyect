@@ -14,7 +14,8 @@ const montoInicial = document.getElementById("dato-monto-inicial"),
     imagenPrincipal = document.getElementById("foto-principal"),
     datoPostores = document.getElementById("dato-postores"),
     imagenesMiniaturas = document.getElementById("miniaturas"),
-    chatFeed = document.getElementById("chat-feed")
+    chatFeed = document.getElementById("chat-feed"),
+    montoInput = document.getElementById("monto-input")
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {
@@ -25,6 +26,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             method: "POST",
             body: datos
         });
+        let resultadoSesion
+        try {
+            let datosSesion = new FormData();
+            datosSesion.append("opcion", "consultarSesion")
+            let respuestaSesion = await fetch(ruta_controller, {
+                method: "POST",
+                body: datosSesion
+            })
+            resultadoSesion = await respuestaSesion.json()
+        } catch (error) {
+            console.error("no se leyó la sesion")
+        }
+
         if (!respuesta.ok) {
             console.error(respuesta.status);
             throw new Error("Error HTTP: " + respuesta.status);
@@ -35,7 +49,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 fecha: {
                     anio: fechaInicioObjeto.getFullYear(),
                     mes: String(fechaInicioObjeto.getMonth() + 1).padStart(2, '0'),
-                    dia: String(fechaInicioObjeto.getDay()).padStart(2, '0')
+                    dia: String(fechaInicioObjeto.getDate()).padStart(2, '0')
                 },
                 hora: {
                     hora: String(fechaInicioObjeto.getHours()).padStart(2, '0'),
@@ -48,7 +62,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 fecha: {
                     anio: fechaFinalObjeto.getFullYear(),
                     mes: String(fechaFinalObjeto.getMonth() + 1).padStart(2, '0'),
-                    dia: String(fechaFinalObjeto.getDay()).padStart(2, '0')
+                    dia: String(fechaFinalObjeto.getDate()).padStart(2, '0')
                 },
                 hora: {
                     hora: String(fechaFinalObjeto.getHours()).padStart(2, '0'),
@@ -57,7 +71,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             },
             estadoDato = resultado.datos.estado
-
+        
         let estadoClass = new Map()
         estadoClass.set("activa", { class: "status-activa", text: "Subasta Activa" })
         estadoClass.set("pendiente", { class: "status-none", text: "Pendiente" })
@@ -68,7 +82,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         montoInicial.textContent = "$ " + resultado.datos.precio_inicial
         datoIncremento.textContent = "$ " + resultado.datos.dato_incremento
-        datoPujaActual.textContent = "$ " + resultado.datos.dato_puja_actual
+        datoPujaActual.textContent = "$ " + resultado.pujas[0][0]
         //datos para llenar la fecha y hora inicial
         datoFechaInicio.textContent = `${fechaInicioComp.fecha.dia}-${fechaInicioComp.fecha.mes}-${fechaInicioComp.fecha.anio}`
         datoHoraInicio.textContent = `${fechaInicioComp.hora.hora}:${fechaInicioComp.hora.minutos}`
@@ -90,9 +104,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         vendedorAvatar.textContent = String(resultado.datos.nombreU).slice(0, 2)
         // posicionamiento de fotografias
         imagenPrincipal.src = ruta_base_img + resultado.rutasImg[0]
-        datoPostores.textContent = resultado.datos.datoPostores
+        datoPostores.textContent = resultado.postores
         rutasImagenes = resultado.rutasImg
-
         if (resultado.rutasImg.length > 1) {
             resultado.rutasImg.forEach((i, index) => {
 
@@ -113,40 +126,62 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         }
 
-        alert(resultado.pujas.length)
-        alert(chatFeed.id)
         if (resultado.pujas.length > 0) {
 
-            resultado.pujas.forEach(puja => {
+            resultado.pujas.forEach((puja, index) => {
+
+                // alert(resultado.pujas.length)
+                // alert(puja.length)
+                // alert(chatFeed.id)
 
                 const msg_card = document.createElement("div"),
-                    avatar = document.createElement("div")
+                    avatar = document.createElement("div"),
+                    chatBurbuja = document.createElement("div"),
+                    chatMeta = document.createElement("div"),
+                    chatUsuario = document.createElement("span"),
+                    chatMonto = document.createElement("span")
+
                 msg_card.classList.add("chat-msg")
-                avatar.classList.add(["avatar-ppi","avatar-char"])
-                msg_card.append(avatar)
+                if (puja[2] == resultadoSesion.idUsuario) {
+                    msg_card.classList.add("chat-msg-mio")
+                    chatUsuario.textContent = "Tú"
+                }
+                else {
+                    avatar.classList.add("avatar-ppi")
+                    msg_card.append(avatar)
+                    avatar.textContent = String(puja[3]).slice(0, 2)
+                    chatUsuario.textContent = puja[3]
+                }
+                chatBurbuja.classList.add("chat-burbuja")
+                chatMeta.append(chatUsuario)
+                if (index == 0) {
+                    chatBurbuja.classList.add("chat-tag-lider")
+                    let tag = document.createElement("span"),
+                        icon = document.createElement("i")
+                    icon.classList.add("fas")
+                    icon.classList.add("fa-crown")
+                    tag.textContent = "Puja lider "
+                    tag.append(icon)
+                    tag.classList.add("span-puja-lider")
 
-                chatFeed.append(msg_card)
-                // let msg = document.createElement("div"),
-                //     user = document.createElement("div")
-                // msg.classList.add(["chat-msg","chat-burbuja"])
-                // user.style.margin = "10px"
-                // msg.append(user)
+                    chatMeta.appendChild(tag)
+                }
 
-                // <div class="chat-msg">
-                //     <div class="avatar-ppi avatar-chat">MA</div>
-                //     <div class="chat-burbuja">
-                //         <div class="chat-meta">
-                //             <span class="chat-usuario">maria_sv</span>
-                //             <span class="chat-hora">15:02</span>
-                //         </div>
-                //         <span class="chat-monto">$ 185.00</span>
-                //     </div>
-                // </div>
+                // avatar.classList.add("avatar-chat")
+                msg_card.append(chatBurbuja)
+                chatMeta.classList.add("chat-meta")
+                chatBurbuja.append(chatMeta)
+                chatUsuario.classList.add("chat-usuario")
+                chatMonto.textContent = "$  " + puja[0]
+                chatMonto.classList.add("chat-monto")
+                chatBurbuja.append(chatMonto)
+                chatFeed.appendChild(msg_card)
 
             })
         }
     } catch (error) {
         // Swal.close();
+
     }
 }
 )

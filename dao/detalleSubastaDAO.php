@@ -41,14 +41,22 @@ class subastaDao
                 sbu.username
                 FROM sb_puja sbp
                 JOIN sb_usuario sbu ON sbu.id_usuario = sbp.id_usuario
-                WHERE sbp.id_subasta = ?";
+                WHERE sbp.id_subasta = ?
+                ORDER BY sbp.monto DESC";
         $stmt3 = $this->conexion->prepare($sql3);
         $stmt3->bind_param("i", $id);
         $stmt3->execute();
         $res3 = $stmt3->get_result();
-        $datos3 = $res3->fetch_all(MYSQLI_ASSOC);
-        $pujas = array_column($datos3, "monto");
+        $datos3 = $res3->fetch_all(PDO::FETCH_ASSOC);
         $stmt3->close();
+
+        $sql4 = "SELECT COUNT(DISTINCT id_usuario) FROM sb_puja 
+                WHERE id_subasta = ?";
+        $stmt4 = $this->conexion->prepare($sql4);
+        $stmt4->bind_param("i", $id);
+        $stmt4->execute();
+        $res4 = $stmt4->get_result();
+        $stmt4->close();
 
         if (1 > 0) {
             return [
@@ -66,8 +74,9 @@ class subastaDao
                     "nombreC" => $datos["nombreC"],
                     "datoPostores" => $datos["nombreC"]
                 ],
-                "pujas" => $pujas,
-                "rutasImg" => $rutas
+                "pujas" => $datos3,
+                "rutasImg" => $rutas,
+                "postores"=>(int)$res4->fetch_column()
             ];
         }
         $this->conexion->close();
