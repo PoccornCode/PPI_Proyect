@@ -41,6 +41,11 @@ if ($totalUsuarios === 0) {
                     <option value="<?= (int)$rolOpt['id_rol'] ?>"><?= htmlspecialchars($rolOpt['etiqueta']) ?></option>
                 <?php endforeach; ?>
             </select>
+            <select class="adm-select-filter" id="admUserStatusFilter" aria-label="Filtrar por estado">
+                <option value="todos">Todos los estados</option>
+                <option value="activo">Activos</option>
+                <option value="suspendido">Suspendidos</option>
+            </select>
         </div>
         <button type="button" class="adm-btn-primary" data-bs-toggle="modal" data-bs-target="#modalAgregarUsuario">
             <i class="fa-solid fa-plus"></i> Agregar usuario
@@ -107,7 +112,8 @@ if ($totalUsuarios === 0) {
                                             <i class="fa-regular fa-eye"></i>
                                         </button>
                                         <button type="button" class="adm-action-btn adm-action-btn--edit" title="Editar usuario"
-                                            data-adm-demo-action="Editar <?= htmlspecialchars($etiqueta) ?> (referencia)">
+                                            aria-label="Editar usuario <?= htmlspecialchars($etiqueta) ?>"
+                                            data-adm-user-action="editar" data-user-id="<?= (int)$u['id_usuario'] ?>">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </button>
                                     </div>
@@ -118,9 +124,22 @@ if ($totalUsuarios === 0) {
                 </tbody>
             </table>
         </div>
-        <div class="adm-table-footer">
-            <span class="adm-table-count" id="admUsersCount"><?= htmlspecialchars($textoConteoUsuarios) ?></span>
-            <nav class="adm-pagination" id="admUsersPagination" aria-label="Paginación de usuarios"></nav>
+        <div class="mod-table-footer">
+            <div class="mod-table-footer-info">
+                <span class="adm-table-count" id="admUsersCount"><?= htmlspecialchars($textoConteoUsuarios) ?></span>
+            </div>
+            <div class="mod-table-footer-controls">
+                <label class="mod-page-size-wrap" for="admUsersPageSize">
+                    <span>Por página</span>
+                    <select class="mod-page-size-select" id="admUsersPageSize" aria-label="Usuarios por página">
+                        <option value="5" selected>5</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                </label>
+                <nav class="mod-pagination" id="admUsersPagination" aria-label="Paginación de usuarios"></nav>
+            </div>
         </div>
     </div>
 </section>

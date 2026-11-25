@@ -420,7 +420,7 @@ class AdminDAO
         return $roles;
     }
 
-    public function listarUsuariosAdmin(string $busqueda = '', int $idRol = 0, int $pagina = 1, int $porPagina = 10): array
+    public function listarUsuariosAdmin(string $busqueda = '', int $idRol = 0, int $pagina = 1, int $porPagina = 10, string $estadoFiltro = 'todos'): array
     {
         $pagina = max(1, $pagina);
         $porPagina = max(1, min(50, $porPagina));
@@ -447,6 +447,13 @@ class AdminDAO
             $where[] = 'u.id_rol = ?';
             $types .= 'i';
             $params[] = $idRol;
+        }
+
+        $estadoNorm = strtolower(trim($estadoFiltro));
+        if ($estadoNorm === 'activo' || $estadoNorm === '1') {
+            $where[] = 'u.estado = 1';
+        } elseif ($estadoNorm === 'suspendido' || $estadoNorm === '0') {
+            $where[] = 'u.estado = 0';
         }
 
         $busquedaLimpia = trim($busqueda);
@@ -562,7 +569,7 @@ class AdminDAO
         return $resultado;
     }
 
-    public function obtenerDetalleUsuarioAdmin(int $idUsuario): ?array
+    public function obtenerDetalleUsuarioAdmin(int $idUsuario, int $idAdminActual = 0): ?array
     {
         if ($idUsuario <= 0 || !$this->conexion || $this->conexion->connect_errno) {
             return null;
@@ -698,6 +705,8 @@ class AdminDAO
         $fechaRegistroFmt = $this->formatearFechaDetalleEs($fechaRegistroRaw);
         $ultimaPujaFmt = $actividad['ultima_puja'] ? $this->formatearFechaDetalleEs($actividad['ultima_puja']) : 'Sin pujas';
 
+        $esUltimoAdmin = ((int)$row['id_rol'] === 1 && $activo && $this->contarAdministradoresActivos() <= 1);
+
         return [
             'id_usuario'           => (int)$row['id_usuario'],
             'nombre'               => $nombre,
@@ -717,6 +726,8 @@ class AdminDAO
             'estado'               => $activo ? 'Activo' : 'Suspendido',
             'fecha_registro'       => $fechaRegistroRaw,
             'fecha_registro_fmt'   => $fechaRegistroFmt,
+            'es_propio'            => ($idAdminActual > 0 && (int)$row['id_usuario'] === $idAdminActual),
+            'es_ultimo_admin'      => $esUltimoAdmin,
             'productos'            => $actividad['productos'],
             'subastas_total'       => $actividad['subastas_total'],
             'subastas_activas'     => $actividad['subastas_activas'],
@@ -729,6 +740,243 @@ class AdminDAO
             'ultima_puja'          => $actividad['ultima_puja'],
             'ultima_puja_fmt'      => $ultimaPujaFmt,
         ];
+    }
+
+    private function contarAdministradoresActivos(): int
+    {
+        if (!$this->conexion || $this->conexion->connect_errno) {
+            return 0;
+        }
+        $res = $this->conexion->query("SELECT COUNT(*) AS total FROM sb_usuario WHERE id_rol = 1 AND estado = 1");
+        if ($res && ($row = $res->fetch_assoc())) {
+            return (int)($row['total'] ?? 0);
+        }
+        return 0;
+    }
+
+    private function existeRol(int $idRol): bool
+    {
+        $stmt = $this->conexion->prepare("SELECT id_rol FROM sb_rol WHERE id_rol = ? LIMIT 1");
+        if (!$stmt) {
+            return false;
+        }
+        $stmt->bind_param('i', $idRol);
+        $stmt->execute();
+        $existe = $stmt->get_result()->num_rows > 0;
+        $stmt->close();
+        return $existe;
+    }
+
+    private function existeUsernameEnOtro(string $username, int $excluirId): bool
+    {
+        $stmt = $this->conexion->prepare("SELECT id_usuario FROM sb_usuario WHERE username = ? AND id_usuario <> ? LIMIT 1");
+        if (!$stmt) {
+            return false;
+        }
+        $stmt->bind_param('si', $username, $excluirId);
+        $stmt->execute();
+        $existe = $stmt->get_result()->num_rows > 0;
+        $stmt->close();
+        return $existe;
+    }
+
+    private function existeCorreoEnOtro(string $correo, int $excluirId): bool
+    {
+        $stmt = $this->conexion->prepare("SELECT id_usuario FROM sb_correo_usuario WHERE correo = ? AND id_usuario <> ? LIMIT 1");
+        if (!$stmt) {
+            return false;
+        }
+        $stmt->bind_param('si', $correo, $excluirId);
+        $stmt->execute();
+        $existe = $stmt->get_result()->num_rows > 0;
+        $stmt->close();
+        return $existe;
+    }
+
+    public function validarActualizacionUsuarioAdmin(int $idUsuario, array $datos, int $idAdminActual): array
+    {
+        if ($idUsuario <= 0 || !$this->conexion || $this->conexion->connect_errno) {
+            return ['estado' => false, 'mensaje' => 'Usuario no válido.'];
+        }
+
+        $actual = $this->obtenerDetalleUsuarioAdmin($idUsuario, $idAdminActual);
+        if (!$actual) {
+            return ['estado' => false, 'mensaje' => 'El usuario solicitado no existe.'];
+        }
+
+        $nombre = trim((string)($datos['nombre'] ?? ''));
+        $apellido = trim((string)($datos['apellido'] ?? ''));
+        $username = ltrim(trim((string)($datos['username'] ?? '')), '@');
+        $correo = strtolower(trim((string)($datos['correo'] ?? '')));
+        $telefono = trim((string)($datos['telefono'] ?? ''));
+        $ubicacion = trim((string)($datos['ubicacion'] ?? ''));
+        $idRol = (int)($datos['id_rol'] ?? $actual['id_rol']);
+        $estado = ((int)($datos['estado'] ?? ($actual['activo'] ? 1 : 0))) === 1 ? 1 : 0;
+
+        if ($nombre === '') {
+            return ['estado' => false, 'campo' => 'nombre', 'mensaje' => 'El nombre es obligatorio.'];
+        }
+        if (mb_strlen($nombre, 'UTF-8') < 2 || mb_strlen($nombre, 'UTF-8') > 100 || !preg_match('/^[\p{L}\s\'\-]+$/u', $nombre)) {
+            return ['estado' => false, 'campo' => 'nombre', 'mensaje' => 'Ingresa un nombre válido (solo letras, mínimo 2 caracteres).'];
+        }
+        if ($apellido === '') {
+            return ['estado' => false, 'campo' => 'apellido', 'mensaje' => 'El apellido es obligatorio.'];
+        }
+        if (mb_strlen($apellido, 'UTF-8') < 2 || mb_strlen($apellido, 'UTF-8') > 100 || !preg_match('/^[\p{L}\s\'\-]+$/u', $apellido)) {
+            return ['estado' => false, 'campo' => 'apellido', 'mensaje' => 'Ingresa un apellido válido (solo letras, mínimo 2 caracteres).'];
+        }
+        if ($username === '' || strlen($username) < 3 || strlen($username) > 50 || !preg_match('/^[A-Za-z0-9._-]+$/', $username)) {
+            return ['estado' => false, 'campo' => 'username', 'mensaje' => 'Usa entre 3 y 50 caracteres válidos (letras, números, punto o guion).'];
+        }
+        if ($correo === '' || strlen($correo) > 100 || !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+            return ['estado' => false, 'campo' => 'correo', 'mensaje' => 'Ingresa un correo electrónico válido.'];
+        }
+        if ($telefono !== '' && !preg_match('/^\d{4}-\d{4}$/', $telefono)) {
+            return ['estado' => false, 'campo' => 'telefono', 'mensaje' => 'Usa el formato de 8 dígitos: 0000-0000.'];
+        }
+        if ($ubicacion !== '' && (mb_strlen($ubicacion, 'UTF-8') < 3 || mb_strlen($ubicacion, 'UTF-8') > 150 || !preg_match('/\p{L}/u', $ubicacion))) {
+            return ['estado' => false, 'campo' => 'ubicacion', 'mensaje' => 'Ingresa una ubicación válida (mínimo 3 caracteres).'];
+        }
+        if (!$this->existeRol($idRol)) {
+            return ['estado' => false, 'campo' => 'id_rol', 'mensaje' => 'El rol seleccionado no es válido.'];
+        }
+
+        // Impedir que el administrador autenticado se quite el rol o se suspenda a sí mismo
+        if ($idUsuario === $idAdminActual) {
+            if ($idRol !== (int)$actual['id_rol']) {
+                return ['estado' => false, 'mensaje' => 'No puedes cambiar el rol de tu propia cuenta.'];
+            }
+            if ($estado !== 1) {
+                return ['estado' => false, 'mensaje' => 'No puedes suspender tu propia cuenta mientras tienes la sesión activa.'];
+            }
+        }
+
+        // Impedir dejar la plataforma sin administradores activos
+        $eraAdminActivo = ((int)$actual['id_rol'] === 1 && !empty($actual['activo']));
+        $dejaDeSerAdminActivo = ($idRol !== 1 || $estado !== 1);
+        if ($eraAdminActivo && $dejaDeSerAdminActivo && $this->contarAdministradoresActivos() <= 1) {
+            return ['estado' => false, 'mensaje' => 'Debe permanecer al menos un administrador activo en la plataforma.'];
+        }
+
+        if ($this->existeUsernameEnOtro($username, $idUsuario)) {
+            return ['estado' => false, 'campo' => 'username', 'mensaje' => 'Ese nombre de usuario ya pertenece a otra cuenta.'];
+        }
+        if ($this->existeCorreoEnOtro($correo, $idUsuario)) {
+            return ['estado' => false, 'campo' => 'correo', 'mensaje' => 'Ese correo electrónico ya pertenece a otra cuenta.'];
+        }
+
+        return [
+            'estado'      => true,
+            'actual'      => $actual,
+            'normalizado' => [
+                'nombre'    => $nombre,
+                'apellido'  => $apellido,
+                'username'  => $username,
+                'correo'    => $correo,
+                'telefono'  => $telefono,
+                'ubicacion' => $ubicacion,
+                'id_rol'    => $idRol,
+                'estado'    => $estado,
+            ],
+        ];
+    }
+
+    public function actualizarUsuarioAdmin(int $idUsuario, array $datos, int $idAdminActual): array
+    {
+        $validacion = $this->validarActualizacionUsuarioAdmin($idUsuario, $datos, $idAdminActual);
+        if (empty($validacion['estado'])) {
+            return $validacion;
+        }
+
+        $actual = $validacion['actual'];
+        $norm = $validacion['normalizado'];
+        $nombre = $norm['nombre'];
+        $apellido = $norm['apellido'];
+        $username = $norm['username'];
+        $correo = $norm['correo'];
+        $telefono = $norm['telefono'];
+        $ubicacion = $norm['ubicacion'];
+        $idRol = $norm['id_rol'];
+        $estado = $norm['estado'];
+
+        $this->conexion->begin_transaction();
+        try {
+            $sqlUser = "UPDATE sb_usuario
+                        SET nombre = ?, apellido = ?, username = ?, ubicacion = ?, estado = ?, id_rol = ?
+                        WHERE id_usuario = ?";
+            $stmtUser = $this->conexion->prepare($sqlUser);
+            if (!$stmtUser) {
+                throw new Exception('No se pudo preparar la actualización del usuario.');
+            }
+            $stmtUser->bind_param('ssssiii', $nombre, $apellido, $username, $ubicacion, $estado, $idRol, $idUsuario);
+            if (!$stmtUser->execute()) {
+                throw new Exception('Error al actualizar los datos del usuario.');
+            }
+            $stmtUser->close();
+
+            $correoAnterior = (string)($actual['correo'] ?? '');
+            if ($correo !== $correoAnterior) {
+                if ($correoAnterior !== '') {
+                    $stmtCorreo = $this->conexion->prepare("UPDATE sb_correo_usuario SET correo = ? WHERE id_usuario = ? AND correo = ?");
+                    if (!$stmtCorreo) {
+                        throw new Exception('No se pudo preparar la actualización del correo.');
+                    }
+                    $stmtCorreo->bind_param('sis', $correo, $idUsuario, $correoAnterior);
+                } else {
+                    $stmtCorreo = $this->conexion->prepare("INSERT INTO sb_correo_usuario (id_usuario, correo) VALUES (?, ?)");
+                    if (!$stmtCorreo) {
+                        throw new Exception('No se pudo preparar el registro del correo.');
+                    }
+                    $stmtCorreo->bind_param('is', $idUsuario, $correo);
+                }
+                if (!$stmtCorreo->execute()) {
+                    throw new Exception('Error al guardar el correo electrónico.');
+                }
+                $stmtCorreo->close();
+            }
+
+            $telefonoAnterior = (string)($actual['telefono'] ?? '');
+            if ($telefono !== $telefonoAnterior) {
+                if ($telefono === '' && $telefonoAnterior !== '') {
+                    $stmtTel = $this->conexion->prepare("DELETE FROM sb_telefono_usuario WHERE id_usuario = ? AND telefono = ?");
+                    if ($stmtTel) {
+                        $stmtTel->bind_param('is', $idUsuario, $telefonoAnterior);
+                        $stmtTel->execute();
+                        $stmtTel->close();
+                    }
+                } elseif ($telefono !== '' && $telefonoAnterior !== '') {
+                    $stmtTel = $this->conexion->prepare("UPDATE sb_telefono_usuario SET telefono = ? WHERE id_usuario = ? AND telefono = ?");
+                    if (!$stmtTel) {
+                        throw new Exception('No se pudo preparar la actualización del teléfono.');
+                    }
+                    $stmtTel->bind_param('sis', $telefono, $idUsuario, $telefonoAnterior);
+                    if (!$stmtTel->execute()) {
+                        throw new Exception('Error al actualizar el teléfono.');
+                    }
+                    $stmtTel->close();
+                } elseif ($telefono !== '') {
+                    $stmtTel = $this->conexion->prepare("INSERT INTO sb_telefono_usuario (id_usuario, telefono) VALUES (?, ?)");
+                    if (!$stmtTel) {
+                        throw new Exception('No se pudo preparar el registro del teléfono.');
+                    }
+                    $stmtTel->bind_param('is', $idUsuario, $telefono);
+                    if (!$stmtTel->execute()) {
+                        throw new Exception('Error al guardar el teléfono.');
+                    }
+                    $stmtTel->close();
+                }
+            }
+
+            $this->conexion->commit();
+            return [
+                'estado'  => true,
+                'mensaje' => 'Usuario actualizado correctamente.',
+                'usuario' => $this->obtenerDetalleUsuarioAdmin($idUsuario, $idAdminActual),
+            ];
+        } catch (Exception $e) {
+            $this->conexion->rollback();
+            return ['estado' => false, 'mensaje' => $e->getMessage()];
+        }
     }
 
     private function formatearFechaDetalleEs(string $fechaRaw): string

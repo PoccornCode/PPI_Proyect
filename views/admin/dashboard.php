@@ -16,7 +16,7 @@ $kpisAdmin = obtenerKpisAdmin('30d');
 $graficosInicio = obtenerGraficosInicioAdmin('7d');
 $resumenInferiorInicio = obtenerResumenInferiorInicioAdmin($base_url);
 $rolesAdmin = obtenerRolesAdmin();
-$usuariosAdminInicial = obtenerUsuariosAdmin('', 0, 1, 10);
+$usuariosAdminInicial = obtenerUsuariosAdmin('', 0, 1, 5);
 
 $adm_nombre_completo = $perfilAdmin['nombre_completo'];
 $adm_primer_nombre = $perfilAdmin['primer_nombre'];
@@ -1276,6 +1276,7 @@ $resumen_categorias = [
     </div>
 
     <?php include __DIR__ . '/partials/modal-detalle-usuario.php'; ?>
+    <?php include __DIR__ . '/partials/modal-editar-usuario.php'; ?>
     <?php include dirname(__DIR__) . '/moderador/partials/modal-logout.php'; ?>
     <?php include dirname(__DIR__, 2) . '/includes/modal-sesion-inactiva.php'; ?>
 

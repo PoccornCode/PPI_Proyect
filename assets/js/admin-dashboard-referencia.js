@@ -838,11 +838,11 @@
         syncDirtyState();
     }
 
-    // Demo action buttons (edit/delete) — delegated so dynamically rendered rows work too
-    document.addEventListener('click', (e) => {
-        const btn = e.target.closest('[data-adm-demo-action]');
-        if (!btn) return;
-        showToast(btn.dataset.admDemoAction);
+    // Botones de referencia (secciones aún sin backend)
+    document.querySelectorAll('[data-adm-demo-action]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            showToast(btn.dataset.admDemoAction);
+        });
     });
 
     // Demo form submit inside modals

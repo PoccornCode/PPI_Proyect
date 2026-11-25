@@ -2220,7 +2220,7 @@ body.admin-body .adm-badge--finalizada {
     color: #dce7c4;
 }
 
-/* Tabla sobria y cómoda */
+/* Tabla */
 .adm-rep-table-wrap {
     margin-bottom: 8px;
 }
@@ -2945,6 +2945,341 @@ body.admin-body .adm-badge--finalizada {
     .adm-user-detail-specs {
         grid-template-columns: 1fr;
     }
+}
+
+/* Modal editar usuario */
+#modalEditarUsuario .adm-user-detail-dialog {
+    max-width: 600px;
+}
+
+#modalEditarUsuario .modal-content {
+    border: 1px solid #232623;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+}
+
+#modalEditarUsuario .modal-header,
+#modalEditarUsuario .modal-footer {
+    border: none;
+}
+
+#modalEditarUsuario .modal-header {
+    padding: 20px 26px 8px;
+}
+
+#modalEditarUsuario .modal-body {
+    padding: 14px 26px 18px;
+}
+
+#modalEditarUsuario .modal-footer {
+    padding: 8px 26px 22px;
+}
+
+.adm-user-edit-subline {
+    font-size: 0.82rem;
+    color: var(--adm-text-muted);
+}
+
+.adm-req-star {
+    color: #e88277;
+    font-weight: 600;
+    margin-left: 2px;
+}
+
+.adm-field-error {
+    font-size: 0.75rem;
+    color: #e89187;
+    margin-top: 4px;
+    line-height: 1.35;
+}
+
+.adm-field-error:empty {
+    display: none;
+}
+
+#modalEditarUsuario .form-control.is-invalid,
+#modalEditarUsuario .form-select.is-invalid {
+    border-color: #d8685d;
+    background-image: none;
+    padding-right: 0.75rem;
+}
+
+#modalEditarUsuario .form-control.is-invalid:focus,
+#modalEditarUsuario .form-select.is-invalid:focus {
+    border-color: #d8685d;
+    box-shadow: 0 0 0 3px rgba(216, 104, 93, 0.16);
+}
+
+.toast-ppi-container {
+    z-index: 1090;
+}
+
+.adm-user-edit-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.adm-user-edit-status-inline {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 38px;
+}
+
+.adm-user-edit-status-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.adm-user-edit-status-copy label {
+    cursor: pointer;
+}
+
+.adm-user-edit-status-copy span {
+    font-size: 0.74rem;
+    color: var(--adm-text-muted);
+    line-height: 1.3;
+}
+
+.adm-user-edit-lock-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: #d7cb8c;
+}
+
+#modalEditarUsuario .form-select:disabled,
+#modalEditarUsuario .form-control:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.adm-user-recovery-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.adm-user-recovery-copy {
+    min-width: 0;
+}
+
+.adm-user-recovery-title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: #eef1ea;
+    margin-bottom: 2px;
+}
+
+.adm-user-recovery-pill {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--adm-text-muted);
+    background-color: #0e110c;
+    border: 1px solid #23291e;
+    border-radius: 999px;
+    padding: 1px 8px;
+}
+
+.adm-user-recovery-desc {
+    margin: 0;
+    font-size: 0.77rem;
+    color: var(--adm-text-muted);
+    line-height: 1.4;
+}
+
+.adm-user-recovery-btn {
+    flex-shrink: 0;
+    height: 36px;
+    padding: 0 13px;
+    border-radius: 9px;
+    border: 1px solid #35402c;
+    background-color: transparent;
+    color: #dfe5d9;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    transition: border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease;
+}
+
+.adm-user-recovery-btn:hover {
+    border-color: var(--adm-accent);
+    background-color: rgba(167, 204, 59, 0.08);
+    color: #ffffff;
+}
+
+@media (max-width: 576px) {
+    .adm-user-recovery-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .adm-user-recovery-btn {
+        justify-content: center;
+    }
+}
+
+/* Modal confirmar cambios de usuario */
+.adm-user-confirm-dialog {
+    max-width: 500px;
+}
+
+#modalConfirmarEditarUsuario .modal-content {
+    border: 1px solid #232623;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+}
+
+#modalConfirmarEditarUsuario .modal-header,
+#modalConfirmarEditarUsuario .modal-footer {
+    border: none;
+}
+
+#modalConfirmarEditarUsuario .modal-header {
+    padding: 20px 26px 8px;
+}
+
+#modalConfirmarEditarUsuario .modal-body {
+    padding: 10px 26px 16px;
+}
+
+#modalConfirmarEditarUsuario .modal-footer {
+    padding: 8px 26px 22px;
+}
+
+.adm-user-confirm-intro {
+    font-size: 0.86rem;
+    color: var(--adm-text-muted);
+    line-height: 1.45;
+}
+
+.adm-user-confirm-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.adm-user-confirm-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.adm-user-confirm-row:last-child {
+    border-bottom: none;
+}
+
+.adm-user-confirm-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--adm-text-muted);
+    flex-shrink: 0;
+}
+
+.adm-user-confirm-values {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 7px;
+    text-align: right;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.adm-user-confirm-old {
+    font-size: 0.82rem;
+    color: #8b9385;
+    text-decoration: line-through;
+}
+
+.adm-user-confirm-arrow {
+    font-size: 0.68rem;
+    color: #6b7465;
+}
+
+.adm-user-confirm-new {
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: #f1f3ee;
+}
+
+/* Ajuste vertical compacto y dimensiones fijas en Usuarios para evitar saltos al paginar */
+#sec-usuarios .adm-section-head {
+    margin-bottom: 10px;
+}
+
+#sec-usuarios .adm-section-divider {
+    margin: 0 0 12px;
+}
+
+#sec-usuarios .adm-toolbar {
+    margin-bottom: 12px;
+}
+
+#sec-usuarios .adm-table-responsive {
+    min-height: 342px;
+}
+
+#sec-usuarios .adm-table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+#sec-usuarios .adm-table thead th:nth-child(1) {
+    width: 40%;
+}
+
+#sec-usuarios .adm-table thead th:nth-child(2) {
+    width: 22%;
+}
+
+#sec-usuarios .adm-table thead th:nth-child(3) {
+    width: 15%;
+}
+
+#sec-usuarios .adm-table thead th:nth-child(4) {
+    width: 12%;
+}
+
+#sec-usuarios .adm-table thead th:nth-child(5) {
+    width: 11%;
+}
+
+#sec-usuarios .adm-table thead th {
+    padding: 10px 18px;
+}
+
+#sec-usuarios .adm-table tbody tr {
+    height: 60px;
+}
+
+#sec-usuarios .adm-table tbody td {
+    padding: 9px 18px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#sec-usuarios .adm-cell-user {
+    min-width: 0;
+}
+
+#sec-usuarios .mod-table-footer {
+    padding: 10px 18px;
 }
 
 .adm-toast {

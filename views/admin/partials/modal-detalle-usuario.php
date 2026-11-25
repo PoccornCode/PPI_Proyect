@@ -103,8 +103,11 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer justify-content-end">
-                <button type="button" class="adm-btn-primary" style="height:36px; font-size:0.86rem;" data-bs-dismiss="modal">Cerrar</button>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="mod-btn-sm mod-btn-cancel px-3 d-none" id="admUserDetailEditShortcut" style="height:36px;">
+                    <i class="fa-solid fa-pen-to-square"></i> Editar usuario
+                </button>
+                <button type="button" class="adm-btn-primary ms-auto" style="height:36px; font-size:0.86rem;" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
