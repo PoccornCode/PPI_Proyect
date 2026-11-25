@@ -287,8 +287,16 @@ body.admin-body {
 
 .adm-table.mod-table th:nth-child(6),
 .adm-table.mod-table td:nth-child(6) {
-    width: 86px;
+    width: 124px;
+    white-space: normal;
+}
+
+.adm-table.mod-table td:nth-child(6) .adm-badge {
     white-space: nowrap;
+}
+
+.adm-table.mod-table td:nth-child(6) .mod-sub-meta {
+    line-height: 1.25;
 }
 
 .adm-table.mod-table th:nth-child(7),

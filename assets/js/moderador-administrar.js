@@ -305,7 +305,7 @@
         }
     }
 
-    async function actualizarEstadoSubasta(idSubasta, nuevoEstado, estadoEsperado, triggerBtn) {
+    async function actualizarEstadoSubasta(idSubasta, nuevoEstado, estadoEsperado, triggerBtn, motivo = '') {
         const row = tbody.querySelector(`tr[data-subasta-id="${idSubasta}"]`);
         if (!row || !idSubasta || !nuevoEstado) return { ok: false };
 
@@ -316,7 +316,8 @@
                 opcion: 'cambiar_estado',
                 id_subasta: String(idSubasta),
                 nuevo_estado: nuevoEstado,
-                estado_esperado: String(estadoEsperado || '')
+                estado_esperado: String(estadoEsperado || ''),
+                motivo: String(motivo || '').trim()
             });
 
             const resp = await fetch(`${baseUrl}controllers/moderador_controller.php`, {
@@ -351,6 +352,7 @@
             aplicarEstadoVisualFila(row, nuevoEstado);
             notificar('success', 'Estado actualizado', data.mensaje || 'El estado se actualizó correctamente.');
             filtrar(false);
+            recargarTodas();
             window.ModeradorCola?.recargarPendientes();
             return { ok: true };
         } catch (err) {
@@ -408,7 +410,10 @@
     modalSaveBtn?.addEventListener('click', async () => {
         const nuevoEstado = obtenerEstadoSeleccionadoModal();
         if (!activeSubastaId || !nuevoEstado || nuevoEstado === activeCurrentStatus) return;
-        const res = await actualizarEstadoSubasta(activeSubastaId, nuevoEstado, activeCurrentStatus, modalSaveBtn);
+        const motivo = (nuevoEstado === 'rechazada' || nuevoEstado === 'cancelada')
+            ? (modalMotivoInput?.value || '').trim()
+            : '';
+        const res = await actualizarEstadoSubasta(activeSubastaId, nuevoEstado, activeCurrentStatus, modalSaveBtn, motivo);
         if (res.ok && modalInstance) {
             modalInstance.hide();
         } else if (res.conflicto && res.estadoActual) {

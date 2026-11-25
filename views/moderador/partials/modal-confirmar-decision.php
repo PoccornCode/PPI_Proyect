@@ -21,7 +21,7 @@
                         rows="3"
                         placeholder="Describe brevemente el motivo del rechazo..."></textarea>
                     <div class="mod-sub-meta mt-1">
-                        Este motivo se enviará al vendedor en una próxima actualización.
+                        Este motivo se mostrará al vendedor en Mis Productos.
                     </div>
                 </div>
             </div>
