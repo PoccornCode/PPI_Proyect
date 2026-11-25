@@ -15,7 +15,8 @@ const montoInicial = document.getElementById("dato-monto-inicial"),
     datoPostores = document.getElementById("dato-postores"),
     imagenesMiniaturas = document.getElementById("miniaturas"),
     chatFeed = document.getElementById("chat-feed"),
-    montoInput = document.getElementById("monto-input")
+    montoInput = document.getElementById("monto-input"),
+    btnPujar = document.getElementById("btnPujar")
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {
@@ -26,18 +27,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             method: "POST",
             body: datos
         });
-        let resultadoSesion
-        try {
-            let datosSesion = new FormData();
-            datosSesion.append("opcion", "consultarSesion")
-            let respuestaSesion = await fetch(ruta_controller, {
-                method: "POST",
-                body: datosSesion
-            })
-            resultadoSesion = await respuestaSesion.json()
-        } catch (error) {
-            console.error("no se leyó la sesion")
-        }
+        let resultadoSesion, datosSesion = new FormData();
+        datosSesion.append("opcion", "consultarSesion")
+        const respuestaSesion = await fetch(ruta_controller, {
+            method: "POST",
+            body: datosSesion
+        })
+        resultadoSesion = await respuestaSesion.json()
 
         if (!respuesta.ok) {
             console.error(respuesta.status);
@@ -71,7 +67,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             },
             estadoDato = resultado.datos.estado
-        
+
         let estadoClass = new Map()
         estadoClass.set("activa", { class: "status-activa", text: "Subasta Activa" })
         estadoClass.set("pendiente", { class: "status-none", text: "Pendiente" })
@@ -89,7 +85,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         //datos para llenar la fecha y hora final
         datoFechaCierre.textContent = `${fechaFinalComp.fecha.dia}-${fechaFinalComp.fecha.mes}-${fechaFinalComp.fecha.anio}`
         datoHoraCierre.textContent = `${fechaFinalComp.hora.hora}:${fechaFinalComp.hora.minutos}`
-
+        montoInput.setAttribute("step", resultado.datos.dato_incremento)
         estado.innerHTML = `
             <span id="subasta-categoria" class="detalle-categoria">${resultado.datos.nombreC}</span>
             <span id="subasta-estado" class="status-badge ${estadoClass.get(estadoDato).class}">
@@ -127,13 +123,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         if (resultado.pujas.length > 0) {
-
             resultado.pujas.forEach((puja, index) => {
-
                 // alert(resultado.pujas.length)
                 // alert(puja.length)
                 // alert(chatFeed.id)
-
                 const msg_card = document.createElement("div"),
                     avatar = document.createElement("div"),
                     chatBurbuja = document.createElement("div"),
@@ -166,7 +159,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                     chatMeta.appendChild(tag)
                 }
-
                 // avatar.classList.add("avatar-chat")
                 msg_card.append(chatBurbuja)
                 chatMeta.classList.add("chat-meta")
@@ -185,3 +177,63 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 }
 )
+
+btnPujar.addEventListener("click",async function (){
+
+    let datos = new FormData()
+    datos.append("opcion", "guardarPuja")
+
+    const respuesta = await fetch(ruta_controller, {
+        method: "POST",
+        body: datos
+    })
+    resultado = await respuestaSesion.json()
+
+    mostrarModal(resultado.titulo,resultado.mensaje);
+})
+
+
+let modalInstance = null;
+let callbackModal = null;
+function mostrarModal(tipo, titulo, mensaje, onCerrar = null) {
+    const modalEl = document.getElementById("modalPPI");
+    const tituloEl = document.getElementById("modalPPITitulo");
+    const cuerpoEl = document.getElementById("modalPPICuerpo");
+    const btnAccion = document.getElementById("btnModalPPIAccion");
+
+    if (!modalEl || !tituloEl || !cuerpoEl || !btnAccion) return;
+
+    callbackModal = onCerrar;
+
+    let icon = "";
+    btnAccion.className = "btn btn-ppi-modal btn-sm";
+
+    if (tipo === "success") {
+        icon = '<i class="fas fa-check-circle fs-5" style="color: #658807;"></i>';
+        btnAccion.textContent = "Continuar";
+    } else if (tipo === "danger" || tipo === "error") {
+        icon = '<i class="fas fa-times-circle fs-5" style="color: #d8685d;"></i>';
+        btnAccion.className = "btn btn-ppi-modal btn-danger btn-sm";
+        btnAccion.textContent = "Entendido";
+    } else {
+        icon = '<i class="fas fa-exclamation-triangle text-warning fs-5"></i>';
+        btnAccion.className = "btn btn-ppi-modal btn-warning btn-sm";
+        btnAccion.textContent = "Entendido";
+    }
+
+    tituloEl.innerHTML = `${icon} <span>${titulo}</span>`;
+    cuerpoEl.innerHTML = `<p class="mb-0 text-second-ppi">${mensaje}</p>`;
+
+    if (!modalInstance) {
+        modalInstance = new bootstrap.Modal(modalEl);
+        modalEl.addEventListener("hidden.bs.modal", () => {
+            if (typeof callbackModal === "function") {
+                const cb = callbackModal;
+                callbackModal = null;
+                cb();
+            }
+        });
+    }
+
+    modalInstance.show();
+}

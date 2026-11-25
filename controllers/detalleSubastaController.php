@@ -24,5 +24,9 @@ if($option == 'consultarSesion'){
         ]
     );
 }
+if($option == 'guardarPuja'){
+    $respuesta = $dao->guardarPuja();
+    echo json_encode($respuesta);
+}
 
 ?>

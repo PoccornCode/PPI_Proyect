@@ -179,7 +179,7 @@ if (!function_exists('e')) {
                                 <span class="input-group-text addon-gavel">$</span>
                                 <input type="number" class="form-control" id="monto-input" name="monto" step="0.01" min="0"
                                     inputmode="decimal" placeholder="0.00" required>
-                                <button type="submit" id="btnPujar" class="btn btn-primary fw-bold px-4">
+                                <button type="button" id="btnPujar" class="btn btn-primary fw-bold px-4">
                                     <i class="fas fa-gavel me-2"></i>Pujar
                                 </button>
                             </div>
@@ -198,7 +198,28 @@ if (!function_exists('e')) {
         </div>
     </main>
 
+    <div class="modal fade" id="modalPPI" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-ppi">
+                <div class="modal-header modal-header-ppi">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2" id="modalPPITitulo">
+                        Aviso
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body py-4" id="modalPPICuerpo">
+                    Mensaje
+                </div>
+                <div class="modal-footer modal-footer-ppi">
+                    <button type="button" class="btn btn-ppi-modal btn-sm" id="btnModalPPIAccion" data-bs-dismiss="modal">Entendido</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <?php include dirname(__DIR__, 1) . "/Footer/footer.php"; ?>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const id_subasta = <?= (int) $id ?>,

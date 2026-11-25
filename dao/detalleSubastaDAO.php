@@ -11,8 +11,7 @@ class subastaDao
         $this->conexion = $conexion;
     }
 
-    public function getSubastaDao($id)
-    {
+    public function getSubastaDao($id){
         $sql = "SELECT sb.precio_inicial,sb.incremento_minimo,sb.fecha_inicial,sb.fecha_final,
                 sb.estado, sbp.nombre,sbp.descripcion,sbp.condicion,
                 sbu.username as nombreU, sbc.nombre as nombreC,sbp.id_producto
@@ -80,6 +79,10 @@ class subastaDao
             ];
         }
         $this->conexion->close();
+    }
+
+    public function guardarPuja(){
+        return [];
     }
 }
 
