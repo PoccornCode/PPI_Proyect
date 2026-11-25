@@ -115,7 +115,7 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/main.css?v=30" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/forms.css?v=41" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/perfil.css?v=2" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/perfil.css?v=6" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi d-flex flex-column min-vh-100">
@@ -198,7 +198,12 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
             <?php if ($esAdmin): ?>
                 <!-- amnin redirecciones links -->
                 <section aria-labelledby="titulo-admin">
-                    <h2 id="titulo-admin" class="fs-4 fw-bold text-main-ppi mb-3">Administración</h2>
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                        <h2 id="titulo-admin" class="fs-4 fw-bold text-main-ppi mb-0">Administración</h2>
+                        <a href="<?= e($urlPanelAdmin) ?>" class="btn btn-outline-publish btn-sm px-3 py-2 fw-semibold">
+                            <i class="fas fa-crown me-2"></i>Panel de administración
+                        </a>
+                    </div>
                     <div class="row g-3">
                         <div class="col-6 col-lg-3">
                             <div class="perfil-acceso">
@@ -229,21 +234,21 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                             </a>
                         </div>
                     </div>
-                    <div class="mt-3">
-                        <a href="<?= e($urlPanelAdmin) ?>" class="btn btn-outline-publish px-4 py-2 fw-semibold">
-                            <i class="fas fa-crown me-2"></i>Panel de administración
-                        </a>
-                    </div>
                 </section>
             <?php endif; ?>
 
             <?php if ($esPersonal): ?>
                 <!-- mod y admin-->
                 <section aria-labelledby="titulo-moderacion">
-                    <h2 id="titulo-moderacion" class="fs-4 fw-bold text-main-ppi mb-3">Moderación de subastas</h2>
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                        <h2 id="titulo-moderacion" class="fs-4 fw-bold text-main-ppi mb-0">Moderación de subastas</h2>
+                        <a href="<?= e($urlPanelModeracion) ?>" class="btn btn-outline-publish btn-sm px-3 py-2 fw-semibold">
+                            <i class="fas fa-shield-alt me-2"></i>Ir al panel de moderación
+                        </a>
+                    </div>
                     <div class="row g-3">
                         <div class="col-12 col-md-4">
-                            <a href="<?= e($urlPanelModeracion) ?>" class="perfil-acceso <?= $moderacion['pendientes'] > 0 ? 'perfil-acceso-alerta' : '' ?>">
+                            <a href="<?= e($urlPanelModeracion) ?>" class="perfil-acceso" title="Abrir panel de moderación">
                                 <span class="perfil-acceso-valor"><?= $moderacion['pendientes'] ?></span>
                                 <span class="perfil-acceso-titulo">Por revisar</span>
                                 <span class="perfil-acceso-detalle">Solicitudes esperando decisión</span>
@@ -263,11 +268,6 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                                 <span class="perfil-acceso-detalle">Finalizadas o sin ofertas</span>
                             </div>
                         </div>
-                    </div>
-                    <div class="mt-3">
-                        <a href="<?= e($urlPanelModeracion) ?>" class="btn btn-primary px-4 py-2 fw-semibold">
-                            <i class="fas fa-shield-alt me-2"></i>Ir al panel de moderación
-                        </a>
                     </div>
                 </section>
             <?php endif; ?>
@@ -330,7 +330,7 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
 
             <?php if ($esUsuario): ?>
                 <!-- USUARIO COMÚN: sus subastas en curso -->
-                <section aria-labelledby="titulo-subastas">
+                <section id="seccionMisSubastas" aria-labelledby="titulo-subastas" data-subastas-url="<?= BASE_URL ?>controllers/perfil_controller.php">
                     <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
                         <h2 id="titulo-subastas" class="fs-4 fw-bold text-main-ppi mb-0">Mis subastas activas</h2>
                         <a href="<?= BASE_URL ?>views/subastas/mis-productos.php" class="link-ppi fw-bold d-inline p-0 small">Ver mis productos</a>
@@ -355,17 +355,17 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                                 $pujas = (int)$s['total_pujas'];
                                 ?>
                                 <div class="col-12 col-md-6 col-lg-4">
-                                    <article class="perfil-subasta">
+                                    <a href="<?= BASE_URL ?>views/subastas/mis-productos.php" class="perfil-subasta d-block text-decoration-none" data-subasta-id="<?= (int)$s['id_subasta'] ?>" title="Ver en mis productos">
                                         <img src="<?= $imgRuta ?>" alt="<?= e($s['nombre']) ?>" class="perfil-subasta-img" onerror="this.onerror=null; this.src='<?= BASE_URL ?>assets/img/hero-img.jpg';">
                                         <div class="p-3">
                                             <h3 class="fs-6 fw-bold text-main-ppi text-truncate mb-2" title="<?= e($s['nombre']) ?>"><?= e($s['nombre']) ?></h3>
                                             <div class="d-flex justify-content-between align-items-baseline gap-2">
-                                                <span class="precio-ppi fs-5" title="Puja más alta">$<?= number_format((float)$s['precio_actual'], 2) ?></span>
-                                                <span class="tiempo-ppi small"><?= e(tiempoRestante($s['segundos_restantes'])) ?></span>
+                                                <span class="precio-ppi fs-5" data-subasta-precio title="Puja más alta">$<?= number_format((float)$s['precio_actual'], 2) ?></span>
+                                                <span class="tiempo-ppi small" data-segundos-restantes="<?= max(0, (int)$s['segundos_restantes']) ?>"><?= e(tiempoRestante($s['segundos_restantes'])) ?></span>
                                             </div>
-                                            <div class="text-second-ppi small mt-1"><?= $pujas ?> <?= $pujas === 1 ? 'puja' : 'pujas' ?></div>
+                                            <div class="text-second-ppi small mt-1" data-subasta-pujas><?= $pujas ?> <?= $pujas === 1 ? 'puja' : 'pujas' ?></div>
                                         </div>
-                                    </article>
+                                    </a>
                                 </div>
                             <?php endforeach; ?>
                         </div>
@@ -381,9 +381,8 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content modal-content-ppi">
                 <div class="modal-header modal-header-ppi">
-                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2" id="modalCambiarClaveTitulo">
-                        <i class="fas fa-key text-warning fs-5"></i>
-                        <span>Cambiar contraseña</span>
+                    <h5 class="modal-title fw-bold text-white" id="modalCambiarClaveTitulo">
+                        Cambiar contraseña
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
@@ -424,11 +423,30 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
         </div>
     </div>
 
+    <div class="modal fade" id="modalPPI" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-ppi">
+                <div class="modal-header modal-header-ppi">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2" id="modalPPITitulo">
+                        Aviso
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body py-4" id="modalPPICuerpo">
+                    Mensaje
+                </div>
+                <div class="modal-footer modal-footer-ppi">
+                    <button type="button" class="btn btn-ppi-modal btn-sm" id="btnModalPPIAccion" data-bs-dismiss="modal">Entendido</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <?php include "Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>assets/js/toast-ppi.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/perfil.js?v=2"></script>
+    <script src="<?= BASE_URL ?>assets/js/perfil.js?v=5"></script>
 </body>
 
 </html>

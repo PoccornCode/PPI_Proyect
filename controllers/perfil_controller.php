@@ -12,8 +12,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-//sesion vencio por inactividad responde con JSON (no redirige)
-verificarInactividadSesion(true);
+$opcion = $_POST['opcion'] ?? '';
+
+//sesion vencio por inactividad responde con JSON (no redirige); el polling no renueva actividad
+verificarInactividadSesion(true, $opcion !== 'subastasActivas');
 
 if (empty($_SESSION['id_usuario'])) {
     http_response_code(401);
@@ -26,8 +28,22 @@ if (empty($_SESSION['id_usuario'])) {
     exit;
 }
 
-$opcion = $_POST['opcion'] ?? '';
 $id_usuario = (int)$_SESSION['id_usuario'];
+
+if ($opcion === "subastasActivas") {
+    $dao = new PerfilDAO();
+    $subastas = $dao->obtenerSubastasActivas($id_usuario, 3);
+    echo json_encode([
+        "estado" => true,
+        "subastas" => array_map(fn($s) => [
+            "id_subasta" => (int)$s['id_subasta'],
+            "precio_actual" => (float)$s['precio_actual'],
+            "total_pujas" => (int)$s['total_pujas'],
+            "segundos_restantes" => max(0, (int)$s['segundos_restantes'])
+        ], $subastas)
+    ]);
+    exit;
+}
 
 if ($opcion === "cambiarContrasenia") {
     // Token de la página de perfil: evita que otro sitio envíe este formulario por el usuario

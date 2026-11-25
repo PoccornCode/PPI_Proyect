@@ -122,13 +122,6 @@ $categorias_nav = obtenerCategoriasPopularesNav(6);
                                         </a>
                                     </li>
                                 <?php endif; ?>
-                                <?php if ((int)($_SESSION['id_rol'] ?? 0) === 1): ?>
-                                    <li>
-                                        <a class="dropdown-item d-flex align-items-center gap-2" href="<?php echo $base_url; ?>views/admin/dashboard.php">
-                                            <i class="fas fa-crown"></i> Panel de Administración
-                                        </a>
-                                    </li>
-                                <?php endif; ?>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
