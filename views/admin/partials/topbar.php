@@ -1,14 +1,20 @@
 <?php
+$baseUrlTopbar = (string)($base_url ?? '');
 $totalAlertasAdmin = (int)($alertasTopbar['total'] ?? 0);
 $subastasPorValidar = (int)($alertasTopbar['subastas_pendientes'] ?? 0);
 $mensajesPendientes = (int)($alertasTopbar['contactos_pendientes'] ?? 0);
+$inicialTopbar = (string)($adm_inicial ?? 'A');
+$primerNombreTopbar = (string)($adm_primer_nombre ?? 'Admin');
+$nombreCompletoTopbar = (string)($adm_nombre_completo ?? 'Administrador');
+$usernameTopbar = (string)($adm_username ?? '');
+$rolNombreTopbar = (string)($adm_rol_nombre ?? '');
 ?>
 <header class="adm-topbar">
     <div class="adm-topbar-brand">
         <button type="button" class="adm-mobile-toggle" id="admMobileToggle" aria-label="Abrir menú lateral">
             <i class="fa-solid fa-bars"></i>
         </button>
-        <a href="<?= $base_url ?>index.php" class="adm-brand-link d-flex align-items-center gap-2 text-decoration-none" title="Volver al sitio principal" style="font-family: 'Raleway', sans-serif;">
+        <a href="<?= $baseUrlTopbar ?>index.php" class="adm-brand-link d-flex align-items-center gap-2 text-decoration-none" title="Volver al sitio principal" style="font-family: 'Raleway', sans-serif;">
             <i class="fa-solid fa-gavel" style="font-size: 1.45rem; line-height: 1; color: #62803f;" aria-hidden="true"></i>
             <span class="d-flex flex-column" style="line-height: 1;">
                 <span class="d-flex align-items-baseline gap-1">
@@ -18,14 +24,6 @@ $mensajesPendientes = (int)($alertasTopbar['contactos_pendientes'] ?? 0);
                 <span style="font-family: 'Open Sans', sans-serif; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #7c8575; margin-top: 3px;">Administración</span>
             </span>
         </a>
-    </div>
-
-    <div class="adm-topbar-search">
-        <div class="adm-search-box">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <span class="adm-search-divider" aria-hidden="true"></span>
-            <input type="search" id="admGlobalSearch" placeholder="Buscar usuarios, subastas..." aria-label="Buscar usuarios o subastas">
-        </div>
     </div>
 
     <div class="adm-topbar-actions">
@@ -42,7 +40,7 @@ $mensajesPendientes = (int)($alertasTopbar['contactos_pendientes'] ?? 0);
                     </span>
                 </div>
                 <hr class="dropdown-divider my-1">
-                <a class="dropdown-item" href="<?= $base_url ?>views/moderador/dashboard.php">
+                <a class="dropdown-item" href="<?= $baseUrlTopbar ?>views/moderador/dashboard.php">
                     <i class="fa-solid fa-clock" style="color:#e29b8e;"></i>
                     <div>
                         <div class="small text-white" id="admNotifSubastasText">
@@ -65,27 +63,27 @@ $mensajesPendientes = (int)($alertasTopbar['contactos_pendientes'] ?? 0);
 
         <div class="dropdown">
             <button class="adm-profile-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menú de usuario">
-                <span class="adm-avatar-circle"><?= htmlspecialchars($adm_inicial) ?></span>
-                <span class="fw-semibold d-none d-sm-inline"><?= htmlspecialchars($adm_primer_nombre) ?></span>
+                <span class="adm-avatar-circle"><?= htmlspecialchars($inicialTopbar) ?></span>
+                <span class="fw-semibold d-none d-sm-inline"><?= htmlspecialchars($primerNombreTopbar) ?></span>
                 <i class="fa-solid fa-chevron-down" style="font-size:0.75rem; color:#9aa392;"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end adm-dropdown-menu menu-perfil-ppi">
                 <li class="menu-perfil-header">
-                    <div class="menu-perfil-name"><?= htmlspecialchars($adm_nombre_completo) ?></div>
-                    <div class="menu-perfil-user">@<?= htmlspecialchars($adm_username) ?><?= $adm_rol_nombre !== '' ? ' · ' . htmlspecialchars($adm_rol_nombre) : '' ?></div>
+                    <div class="menu-perfil-name"><?= htmlspecialchars($nombreCompletoTopbar) ?></div>
+                    <div class="menu-perfil-user">@<?= htmlspecialchars($usernameTopbar) ?><?= $rolNombreTopbar !== '' ? ' · ' . htmlspecialchars($rolNombreTopbar) : '' ?></div>
                 </li>
                 <li>
-                    <a class="dropdown-item" href="<?= $base_url ?>views/perfil.php">
+                    <a class="dropdown-item" href="<?= $baseUrlTopbar ?>views/perfil.php">
                         <i class="fa-solid fa-user"></i> Mi Perfil
                     </a>
                 </li>
                 <li>
-                    <a class="dropdown-item" href="<?= $base_url ?>index.php">
+                    <a class="dropdown-item" href="<?= $baseUrlTopbar ?>index.php">
                         <i class="fa-solid fa-arrow-up-right-from-square"></i> Ir al sitio público
                     </a>
                 </li>
                 <li>
-                    <a class="dropdown-item" href="<?= $base_url ?>views/moderador/dashboard.php">
+                    <a class="dropdown-item" href="<?= $baseUrlTopbar ?>views/moderador/dashboard.php">
                         <i class="fa-solid fa-shield-halved"></i> Panel de Moderación
                     </a>
                 </li>

@@ -23,6 +23,24 @@ document.addEventListener("DOMContentLoaded", () => {
     let correoActual = "";
     let countdownInterval = null;
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const correoParam = (urlParams.get("correo") || "").trim();
+    const codigoParam = (urlParams.get("codigo") || "").trim().replace(/\D/g, "");
+
+    if (correoParam && /^\d{6}$/.test(codigoParam) && pasoSolicitar && pasoRestablecer) {
+        correoActual = correoParam;
+        if (inputCorreo) inputCorreo.value = correoParam;
+        if (lblCorreoDestino) lblCorreoDestino.textContent = correoParam;
+
+        otpInputs.forEach((inp, idx) => {
+            inp.value = codigoParam[idx] || "";
+        });
+
+        pasoSolicitar.classList.add("d-none");
+        pasoRestablecer.classList.remove("d-none");
+        if (nuevaContrasenia) nuevaContrasenia.focus();
+    }
+
     // Manejo de casillas OTP (auto-avance, retroceso y pegado)
     otpInputs.forEach((input, index) => {
         input.addEventListener("input", (e) => {

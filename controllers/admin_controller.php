@@ -158,6 +158,24 @@ function obtenerResumenInferiorInicioAdmin(string $baseUrl = '', int $limiteUsua
     ];
 }
 
+function obtenerRolesAdmin(): array
+{
+    $dao = new AdminDAO();
+    return $dao->obtenerRolesFiltro();
+}
+
+function obtenerUsuariosAdmin(string $busqueda = '', int $idRol = 0, int $pagina = 1, int $porPagina = 10, string $estadoFiltro = 'todos'): array
+{
+    $dao = new AdminDAO();
+    return $dao->listarUsuariosAdmin($busqueda, $idRol, $pagina, $porPagina, $estadoFiltro);
+}
+
+function obtenerDetalleUsuarioAdmin(int $idUsuario, int $idAdminActual = 0): ?array
+{
+    $dao = new AdminDAO();
+    return $dao->obtenerDetalleUsuarioAdmin($idUsuario, $idAdminActual);
+}
+
 if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -171,7 +189,8 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     header('Pragma: no-cache');
 
     $esPollFondo = (($_GET['bg'] ?? '') === '1');
-    requerirAdministradorAutenticado(true, !$esPollFondo);
+    $adminActual = requerirAdministradorAutenticado(true, !$esPollFondo);
+    $idAdminActual = (int)($adminActual['id_usuario'] ?? 0);
 
     $opcion = $_POST['opcion'] ?? $_GET['opcion'] ?? 'alertas';
 
@@ -206,6 +225,234 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
             'estado'  => true,
             'resumen' => obtenerResumenInferiorInicioAdmin(BASE_URL),
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'usuarios') {
+        $busqueda = trim((string)($_GET['q'] ?? $_POST['q'] ?? ''));
+        $idRol = (int)($_GET['id_rol'] ?? $_POST['id_rol'] ?? 0);
+        $estadoFiltro = trim((string)($_GET['estado'] ?? $_POST['estado'] ?? 'todos'));
+        $pagina = (int)($_GET['pagina'] ?? $_POST['pagina'] ?? 1);
+        $porPagina = (int)($_GET['por_pagina'] ?? $_POST['por_pagina'] ?? 10);
+        echo json_encode([
+            'estado' => true,
+            'data'   => obtenerUsuariosAdmin($busqueda, $idRol, $pagina, $porPagina, $estadoFiltro),
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'usuario_detalle') {
+        $idUsuario = (int)($_GET['id_usuario'] ?? $_POST['id_usuario'] ?? 0);
+        if ($idUsuario <= 0) {
+            http_response_code(400);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'ID de usuario no válido.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $detalle = obtenerDetalleUsuarioAdmin($idUsuario, $idAdminActual);
+        if (!$detalle) {
+            http_response_code(404);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'No se encontró el usuario solicitado.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        echo json_encode([
+            'estado'  => true,
+            'usuario' => $detalle,
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'usuario_validar_edicion') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'Método no permitido.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $idUsuario = (int)($_POST['id_usuario'] ?? 0);
+        $dao = new AdminDAO();
+        $res = $dao->validarActualizacionUsuarioAdmin($idUsuario, [
+            'nombre'    => $_POST['nombre'] ?? '',
+            'apellido'  => $_POST['apellido'] ?? '',
+            'username'  => $_POST['username'] ?? '',
+            'correo'    => $_POST['correo'] ?? '',
+            'telefono'  => $_POST['telefono'] ?? '',
+            'ubicacion' => $_POST['ubicacion'] ?? '',
+            'id_rol'    => $_POST['id_rol'] ?? 2,
+            'estado'    => $_POST['estado'] ?? 1,
+        ], $idAdminActual);
+
+        if (empty($res['estado'])) {
+            http_response_code(422);
+            echo json_encode([
+                'estado'  => false,
+                'campo'   => $res['campo'] ?? '',
+                'mensaje' => $res['mensaje'] ?? 'Los datos ingresados no son válidos.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        echo json_encode(['estado' => true], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    if ($opcion === 'usuario_actualizar') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'Método no permitido.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $idUsuario = (int)($_POST['id_usuario'] ?? 0);
+        $dao = new AdminDAO();
+        $res = $dao->actualizarUsuarioAdmin($idUsuario, [
+            'nombre'    => $_POST['nombre'] ?? '',
+            'apellido'  => $_POST['apellido'] ?? '',
+            'username'  => $_POST['username'] ?? '',
+            'correo'    => $_POST['correo'] ?? '',
+            'telefono'  => $_POST['telefono'] ?? '',
+            'ubicacion' => $_POST['ubicacion'] ?? '',
+            'id_rol'    => $_POST['id_rol'] ?? 2,
+            'estado'    => $_POST['estado'] ?? 1,
+        ], $idAdminActual);
+
+        if (!empty($res['estado']) && $idUsuario === $idAdminActual && !empty($res['usuario'])) {
+            $_SESSION['nombre'] = $res['usuario']['nombre'];
+            $_SESSION['apellido'] = $res['usuario']['apellido'];
+            $_SESSION['username'] = $res['usuario']['username'];
+        }
+
+        if (empty($res['estado'])) {
+            http_response_code(422);
+        }
+
+        echo json_encode($res, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'usuario_validar_creacion') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'Método no permitido.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $dao = new AdminDAO();
+        $res = $dao->validarCreacionUsuarioAdmin([
+            'nombre'                => $_POST['nombre'] ?? '',
+            'apellido'              => $_POST['apellido'] ?? '',
+            'username'              => $_POST['username'] ?? '',
+            'correo'                => $_POST['correo'] ?? '',
+            'telefono'              => $_POST['telefono'] ?? '',
+            'ubicacion'             => $_POST['ubicacion'] ?? '',
+            'id_rol'                => $_POST['id_rol'] ?? 2,
+            'estado'                => $_POST['estado'] ?? 1,
+            'contrasenia'           => $_POST['contrasenia'] ?? '',
+            'confirmar_contrasenia' => $_POST['confirmar_contrasenia'] ?? '',
+        ]);
+
+        if (empty($res['estado'])) {
+            http_response_code(422);
+            echo json_encode([
+                'estado'  => false,
+                'campo'   => $res['campo'] ?? '',
+                'mensaje' => $res['mensaje'] ?? 'Los datos ingresados no son válidos.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        echo json_encode(['estado' => true], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    if ($opcion === 'usuario_crear') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'Método no permitido.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $dao = new AdminDAO();
+        $res = $dao->crearUsuarioAdmin([
+            'nombre'                => $_POST['nombre'] ?? '',
+            'apellido'              => $_POST['apellido'] ?? '',
+            'username'              => $_POST['username'] ?? '',
+            'correo'                => $_POST['correo'] ?? '',
+            'telefono'              => $_POST['telefono'] ?? '',
+            'ubicacion'             => $_POST['ubicacion'] ?? '',
+            'id_rol'                => $_POST['id_rol'] ?? 2,
+            'estado'                => $_POST['estado'] ?? 1,
+            'contrasenia'           => $_POST['contrasenia'] ?? '',
+            'confirmar_contrasenia' => $_POST['confirmar_contrasenia'] ?? '',
+        ], $idAdminActual);
+
+        if (empty($res['estado'])) {
+            http_response_code(422);
+        } elseif (!empty($res['usuario']['id_usuario']) && !empty($res['usuario']['activo'])) {
+            require_once __DIR__ . '/../dao/RecuperacionDAO.php';
+            $recDao = new RecuperacionDAO();
+            $envio = $recDao->enviarBienvenidaAdmin((int)$res['usuario']['id_usuario'], 60);
+            if (!empty($envio['estado'])) {
+                $res['mensaje'] = 'Usuario creado y correo de bienvenida enviado a ' . $envio['correo'] . '.';
+                $res['correo_enviado'] = true;
+            } else {
+                $res['mensaje'] = 'Usuario creado, pero no se pudo enviar el correo de bienvenida.';
+                $res['correo_enviado'] = false;
+            }
+        }
+
+        echo json_encode($res, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'usuario_enviar_recuperacion') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'Método no permitido.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $idUsuario = (int)($_POST['id_usuario'] ?? 0);
+        if ($idUsuario <= 0) {
+            http_response_code(400);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'ID de usuario no válido.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        require_once __DIR__ . '/../dao/RecuperacionDAO.php';
+        $recDao = new RecuperacionDAO();
+        $res = $recDao->solicitarEnlaceRecuperacionAdmin($idUsuario, 15);
+
+        if (empty($res['estado'])) {
+            http_response_code(422);
+        }
+
+        echo json_encode($res, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
 
