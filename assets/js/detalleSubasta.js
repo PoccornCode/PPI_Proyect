@@ -171,9 +171,7 @@ async function refrescarPujas() {
     }
 }
 
-
 async function dibujarPujas(consultar) {
-
     if (consultar) {
         let datos = new FormData();
         datos.append("opcion", "consultarPujas")

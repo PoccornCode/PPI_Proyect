@@ -92,13 +92,9 @@ class subastaDao
     {
         $begin = $this->conexion->begin_transaction();
         try {
-            $sql = "SELECT sb.precio_inicial,sb.incremento_minimo,sb.fecha_inicial,sb.fecha_final,
-                    sb.estado, sbp.nombre,sbp.descripcion,sbp.condicion,
-                    sbu.username as nombreU, sbc.nombre as nombreC,sbp.id_producto
+            $sql = "SELECT sb.precio_inicial,sb.incremento_minimo,sb.fecha_inicial,
+                    sb.fecha_final,sb.estado
                     FROM sb_subasta sb
-                    JOIN sb_producto sbp ON sb.id_producto = sbp.id_producto
-                    JOIN sb_usuario sbU ON sbu.id_usuario = sbp.id_usuario
-                    JOIN sb_categoria sbc ON sbc.id_categoria = sbp.id_categoria
                     WHERE sb.id_subasta = ? FOR UPDATE";
 
             $stmt = $this->conexion->prepare($sql);

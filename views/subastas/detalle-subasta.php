@@ -52,10 +52,10 @@ if (!function_exists('e')) {
     <main class="py-4">
         <div class="container-fluid px-4 px-lg-5">
 
-            <div class="row g-4">
-
+            <div class="row g-4 ">
+                <div class="col-lg-1"></div>
                 <!-- Producto -->
-                <div class="col-lg-8">
+                <div class="col-lg-6">
                     <section class="card-gavel detalle-panel h-100 p-3">
                         <div class="text-center mt-2 mb-4">
                             <h3 class="text-main-ppi">Detalles de la subasta</h3>
@@ -136,7 +136,7 @@ if (!function_exists('e')) {
                     </section>
                 </div>
                 <div class="col-lg-4">
-                    <section class="card-gavel chat-panel h-100">
+                    <section class="card-gavel chat-panel h-60">
                         <div class="chat-header">
                             <div>
                                 <h2 class="h5 text-main-ppi fw-bold mb-0">Pujas realizadas</h2>
@@ -146,8 +146,7 @@ if (!function_exists('e')) {
                                 <span class="status-dot"></span>En vivo
                             </span>
                         </div>
-                        <div id="chat-feed" class="chat-feed">
-                        </div>
+                        <div id="chat-feed" class="chat-feed"></div>
                         <form id="formPuja" class="chat-composer" method="POST" autocomplete="off" novalidate>
                             <div class="d-flex flex-wrap align-items-baseline justify-content-between gap-2 mb-2">
                                 <label for="monto" class="form-label text-main-ppi fw-bold mb-0">Tu puja</label>
@@ -167,8 +166,9 @@ if (!function_exists('e')) {
                             </p>
                         </form>
                     </section>
+                    <!-- <div style="height: 200px;"></div> -->
                 </div>
-
+                <div class="col-lg-1"></div>
             </div>
         </div>
     </main>

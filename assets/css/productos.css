@@ -154,7 +154,7 @@ main {
 
 .chat-feed {
     flex: 1 1 auto;
-    height: 620px;
+    height: 400px;
     display: flex;
     flex-direction: column-reverse;
     overflow-y: auto;
@@ -433,20 +433,11 @@ main {
 }
 
 .status-badge.status-activa {
-<<<<<<< HEAD
-  color: #8db61b;
-}
-
-.status-badge.status-activa .status-dot {
-  background-color: #8db61b;
-  box-shadow: 0 0 6px rgba(141, 182, 27, 0.45);
-=======
     color: #8ea35a;
 }
 
 .status-badge.status-activa .status-dot {
     background-color: #8ea35a;
->>>>>>> develop
 }
 
 .status-badge.status-finalizada {
@@ -580,17 +571,6 @@ main {
 }
 
 .preview-img-box .badge-principal {
-<<<<<<< HEAD
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  background: #5e7325;
-  color: #fff;
-  font-size: 0.65rem;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-=======
     position: absolute;
     top: 4px;
     left: 4px;
@@ -656,4 +636,3 @@ main {
     line-height: 1;
     cursor: pointer;
 }
->>>>>>> develop
