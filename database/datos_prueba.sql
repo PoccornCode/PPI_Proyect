@@ -1,0 +1,118 @@
+-- Datos de prueba: categorias, productos, imagenes y subastas
+-- Nota: copiar la carpeta uploads/productos/ en el proyecto.
+
+SET FOREIGN_KEY_CHECKS = 0;
+SET @id_usuario = COALESCE((SELECT MIN(id_usuario) FROM sb_usuario), 1);
+
+-- Categorias
+INSERT IGNORE INTO sb_categoria (id_categoria, nombre, descripcion, imagen) VALUES (1, 'Tecnología', 'Equipos de cómputo, cámaras fotográficas, consolas, audio de alta fidelidad y periféricos.', 'assets/img/cat-tecnologia.jpg');
+INSERT IGNORE INTO sb_categoria (id_categoria, nombre, descripcion, imagen) VALUES (2, 'Vehículos', 'Automóviles clásicos, motocicletas, bicicletas de ruta, repuestos originales y accesorios.', 'assets/img/cat-vehiculos.jpg');
+INSERT IGNORE INTO sb_categoria (id_categoria, nombre, descripcion, imagen) VALUES (3, 'Arte', 'Pinturas al óleo, esculturas, grabados originales, fotografía artística y piezas de autor.', 'assets/img/cat-arte.jpg');
+INSERT IGNORE INTO sb_categoria (id_categoria, nombre, descripcion, imagen) VALUES (4, 'Joyería', 'Relojería fina, anillos de plata y oro, piedras preciosas y accesorios de alta gama.', 'assets/img/cat-joyeria.jpg');
+INSERT IGNORE INTO sb_categoria (id_categoria, nombre, descripcion, imagen) VALUES (5, 'Moda', 'Prendas de diseñador, calzado, bolsos, artículos vintage y accesorios exclusivos.', 'assets/img/cat-moda.jpg');
+INSERT IGNORE INTO sb_categoria (id_categoria, nombre, descripcion, imagen) VALUES (6, 'Hogar', 'Mobiliario de diseño, iluminación decorativa, cerámica fina, alfombras y artículos para el hogar.', 'assets/img/cat-hogar.jpg');
+INSERT IGNORE INTO sb_categoria (id_categoria, nombre, descripcion, imagen) VALUES (7, 'Coleccionables', 'Numismática, filatelia, relojes antiguos, figuras de edición limitada y artículos históricos.', 'assets/img/cat-coleccionables.jpg');
+INSERT IGNORE INTO sb_categoria (id_categoria, nombre, descripcion, imagen) VALUES (8, 'Deportes', 'Artículos deportivos, equipamiento de ciclismo, aventura y coleccionables deportivos.', 'assets/img/cat-deportes.jpg');
+INSERT IGNORE INTO sb_categoria (id_categoria, nombre, descripcion, imagen) VALUES (9, 'Instrumentos Musicales', 'Guitarras acústicas y eléctricas, teclados, amplificadores de estudio y equipamiento musical.', 'assets/img/cat-instrumentos.jpg');
+INSERT IGNORE INTO sb_categoria (id_categoria, nombre, descripcion, imagen) VALUES (10, 'Libros', 'Primeras ediciones, libros antiguos, literatura clásica, manuscritos y publicaciones históricas.', 'assets/img/cat-libros.jpg');
+
+-- Productos
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (5, 'Reloj de bolsillo de latón, siglo XIX', 'Pieza en buen estado de funcionamiento, con cadena original y estuche. Sin precio de reserva.', 'Excelente', 1, 7, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (6, 'Cámara de película de 35 mm', 'Cámara clásica totalmente mecánica con lente 50mm f/1.8 y funda de cuero.', 'Como nuevo', 1, 1, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (7, 'Lámpara de mesa de bronce', 'Lámpara vintage con base de bronce macizo y pantalla de vidrio opalino.', 'Excelente', 1, 6, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (8, 'Colección de monedas antiguas', 'Lote de 18 monedas históricas de plata y cobre en álbum protector.', 'Excelente', 1, 7, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (9, 'Guitarra acústica de estudio', 'Tapa de abeto macizo, diapasón de palisandro y estuche rígido incluido.', 'Como nuevo', 1, 9, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (10, 'Óleo sobre lienzo, paisaje', 'Obra original firmada, enmarcada en madera tallada de 60x45 cm.', 'Nuevo', 1, 3, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (11, 'Consola portátil retro', 'Edición clásica restaurada con pantalla IPS brillante y batería recargable.', 'Como nuevo', 1, 1, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (12, 'Juego de vajilla de cerámica', 'Set artesanal de 16 piezas esmaltadas a mano, apto para lavavajillas.', 'Nuevo', 1, 6, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (13, 'Anillo de plata con ópalo', 'Plata esterlina 925 con ópalo natural engastado a mano, talla 7.', 'Nuevo', 1, 4, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (14, 'Máquina de escribir vintage', 'Máquina mecánica portátil de los años 60 con estuche rígido original y cinta nueva.', 'Excelente', 1, 7, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (21, 'Raqueta de tenis clásica de madera', 'Raqueta vintage en buen estado con funda original de lona.', 'Excelente', 1, 8, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (22, 'Balón de cuero vintage de fútbol', 'Balón cosido a mano estilo retro para colección o exhibición.', 'Como nuevo', 1, 8, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (23, 'Primera edición ilustrada, 1954', 'Libro de tapa dura encuadernado en tela con grabados originales.', 'Excelente', 1, 10, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (24, 'Atlas geográfico antiguo', 'Edición de colección con mapas a color en excelente conservación.', 'Excelente', 1, 10, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (25, 'Guantes de boxeo de cuero retro', 'Par de guantes clásicos de cuero genuino con cordones.', 'Como nuevo', 1, 8, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (26, 'Chaqueta de cuero clásica', 'Chaqueta estilo aviador de cuero marrón, talla M.', 'Como nuevo', 1, 5, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (27, 'Gafas de sol vintage', 'Montura clásica metálica con estuche rígido original.', 'Nuevo', 1, 5, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (28, 'Patines Clásicos de Cuatro Ruedas Riedell', 'Par de patines clásicos de cuatro ruedas marca Riedell modelo R3 con bota de cuero negro, plancha Avanti, ruedas de uretano con núcleo verde y punteras protectoras de cuero azul.', 'Como nuevo', 1, 8, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (29, 'Lote de 4 Libros Antiguos Encuadernados en Piel', 'Colección de 4 tomos antiguos de tapa dura con lomos grabados en dorado, cantos marmoleados y corte rojo. Encuadernación firme y páginas completas sin hojas sueltas.', 'Excelente', 1, 10, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (30, 'Casco Integral Vega con Visor Abatible', 'Casco cerrado marca Vega con acabado texturizado tipo fibra de carbono, visor transparente abatible e interior acolchado limpio en color negro.', 'Buen estado', 1, 2, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (31, 'Brújula y Reloj Solar de Bolsillo en Latón', 'Pieza antigua de bolsillo fabricada en latón grabado con brújula central bajo cristal y cuadrante solar plegable con numeración romana.', 'Excelente', 1, 7, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (33, 'Violín Clásico 4/4 de Madera con Lote de Arcos', 'Violín acústico tamaño 4/4 en madera barnizada con voluta tallada, puente ajustado, cuatro cuerdas instaladas y juego de 4 arcos de madera con crin natural.', 'Como nuevo', 1, 9, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (35, 'Cámara Réflex Canon EOS 80D (Cuerpo)', 'Cuerpo de cámara réflex digital Canon EOS 80D de 24.2 MP con tapa frontal original de montura EF, zapata superior limpia y dial de modos en perfecto funcionamiento.', 'Como nuevo', 1, 1, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (36, 'Reloj Automático Seiko 5 Acero Inoxidable', 'Reloj mecánico automático Seiko 5 de 21 joyas con caja y brazalete de acero inoxidable, esfera oscura con números romanos XII y VI, y fechador doble de día y fecha.', 'Buen estado', 1, 4, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (37, 'Guitarra Acústica Walden D310e Tapa de Abeto', 'Guitarra acústica Walden modelo D310e con tapa de abeto natural, golpeador negro, diapasón de palisandro y 6 cuerdas metálicas recién calibradas.', 'Excelente', 1, 9, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (38, 'Álbum de Monedas Antiguas (24 Piezas)', 'Carpeta roja de colección numismática con hojas plásticas y 24 monedas antiguas de plata, cobre y bronce protegidas individualmente en cartones.', 'Excelente', 1, 7, @id_usuario);
+INSERT INTO sb_producto (id_producto, nombre, descripcion, condicion, estado, id_categoria, id_usuario) VALUES (39, 'Cafetera Espresso Italiana de Aluminio', 'Cafetera tipo moka italiana fabricada en aluminio con asa ergonómica negra, válvula de seguridad en la caldera y embudo dosificador metálico interno.', 'Buen estado', 1, 6, @id_usuario);
+
+-- Imagenes
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (5, 1, 'subasta_5.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (6, 1, 'subasta_6.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (7, 1, 'subasta_7.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (8, 1, 'subasta_8.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (9, 1, 'subasta_9.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (10, 1, 'subasta_10.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (11, 1, 'subasta_11.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (12, 1, 'subasta_12.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (13, 1, 'subasta_13.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (14, 1, 'subasta_14.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (21, 1, 'subasta_21.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (22, 1, 'subasta_22.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (23, 1, 'subasta_23.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (24, 1, 'subasta_lote_4_1795161786.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (25, 1, 'subasta_25.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (26, 1, 'subasta_26.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (27, 1, 'subasta_27.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (28, 1, 'subasta_28.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (28, 0, 'subasta_28_2.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (29, 1, 'subasta_29_1.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (29, 0, 'subasta_29_2.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (29, 0, 'subasta_29_3.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (30, 1, 'subasta_30.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (30, 0, 'subasta_30_2.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (31, 1, 'producto_31.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (33, 1, 'producto_33.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (35, 1, 'pend_canon_80d_1.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (35, 0, 'pend_canon_80d_2.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (35, 0, 'pend_canon_80d_3.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (36, 1, 'pend_seiko_1.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (36, 0, 'pend_seiko_2.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (37, 1, 'pend_guitarra_1.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (37, 0, 'pend_guitarra_2.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (38, 1, 'pend_monedas_1.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (38, 0, 'pend_monedas_2.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (39, 1, 'pend_moka_1.jpg');
+INSERT INTO sb_imagen_producto (id_producto, principal, ruta) VALUES (39, 0, 'pend_moka_2.jpg');
+
+-- Subastas activas
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (5, 185.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 20 HOUR), 'activa', 5);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (6, 64.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 17 HOUR), 'activa', 6);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (7, 38.50, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 18 HOUR), 'activa', 7);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (8, 120.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 19 HOUR), 'activa', 8);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (9, 165.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 21 HOUR), 'activa', 9);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (10, 95.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 142 HOUR), 'activa', 10);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (11, 72.00, 3.00, NOW(), DATE_ADD(NOW(), INTERVAL 118 HOUR), 'activa', 11);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (12, 45.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 94 HOUR), 'activa', 12);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (13, 88.00, 4.00, NOW(), DATE_ADD(NOW(), INTERVAL 70 HOUR), 'activa', 13);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (14, 82.00, 3.00, NOW(), DATE_ADD(NOW(), INTERVAL 71 HOUR), 'activa', 14);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (21, 42.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 94 HOUR), 'activa', 21);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (22, 55.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 118 HOUR), 'activa', 22);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (23, 68.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 142 HOUR), 'activa', 23);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (24, 79.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 118 HOUR), 'activa', 24);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (25, 64.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 94 HOUR), 'activa', 25);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (26, 115.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 142 HOUR), 'activa', 26);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (27, 48.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 70 HOUR), 'activa', 27);
+
+-- Subastas pendientes de moderacion
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (28, 59.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 96 HOUR), 'pendiente', 28);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (29, 92.00, 3.00, NOW(), DATE_ADD(NOW(), INTERVAL 120 HOUR), 'pendiente', 29);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (30, 110.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 120 HOUR), 'pendiente', 30);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (31, 95.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 96 HOUR), 'pendiente', 31);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (33, 180.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 144 HOUR), 'pendiente', 33);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (35, 350.00, 10.00, NOW(), DATE_ADD(NOW(), INTERVAL 120 HOUR), 'pendiente', 35);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (36, 120.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 96 HOUR), 'pendiente', 36);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (37, 165.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 120 HOUR), 'pendiente', 37);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (38, 140.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 144 HOUR), 'pendiente', 38);
+INSERT INTO sb_subasta (id_subasta, precio_inicial, incremento_minimo, fecha_inicial, fecha_final, estado, id_producto) VALUES (39, 35.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 72 HOUR), 'pendiente', 39);
+
+SET FOREIGN_KEY_CHECKS = 1;

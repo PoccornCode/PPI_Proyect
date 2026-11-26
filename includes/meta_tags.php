@@ -18,9 +18,9 @@ $og_type = isset($meta_tipo) && !empty($meta_tipo) ? $meta_tipo : "website";
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="<?= htmlspecialchars($page_url, ENT_QUOTES, 'UTF-8') ?>">
 
-<link rel="icon" type="image/svg+xml" href="<?= BASE_URL ?>assets/img/favicon.svg">
-<link rel="alternate icon" type="image/x-icon" href="<?= BASE_URL ?>assets/img/favicon.svg">
-<link rel="apple-touch-icon" href="<?= BASE_URL ?>assets/img/favicon.svg">
+<link rel="icon" type="image/svg+xml" href="<?= BASE_URL ?>assets/img/favicon.svg?v=2">
+<link rel="alternate icon" type="image/svg+xml" href="<?= BASE_URL ?>assets/img/favicon.svg?v=2">
+<link rel="apple-touch-icon" href="<?= BASE_URL ?>assets/img/favicon.svg?v=2">
 
 <meta property="og:locale" content="es_SV">
 <meta property="og:site_name" content="<?= htmlspecialchars($site_name, ENT_QUOTES, 'UTF-8') ?>">

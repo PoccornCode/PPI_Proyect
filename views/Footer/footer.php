@@ -5,7 +5,7 @@ if (!defined('BASE_URL')) {
 $base_url = BASE_URL;
 ?>
 <footer class="footer-ppi-wrapper">
-    <div class="container-fluid bg-dark-ppi-2 footer-ppi" style="border-top: 3px solid #658807;">
+    <div class="container-fluid bg-dark-ppi-2 footer-ppi footer-ppi-top">
         <div class="container py-4">
             <div class="row g-4 align-items-start">
 
@@ -88,7 +88,7 @@ $base_url = BASE_URL;
                             </a>
                         </li>
                         <li>
-                            <a href="<?php echo $base_url; ?>views/catalogo.php" class="link-ppi p-0 d-inline-flex align-items-center">
+                            <a href="<?php echo $base_url; ?>views/categorias.php" class="link-ppi p-0 d-inline-flex align-items-center">
                                 <i class="fas fa-angle-right me-2 text-third-ppi" style="font-size: 0.75rem;"></i>Categorías
                             </a>
                         </li>
@@ -99,7 +99,7 @@ $base_url = BASE_URL;
                         </li>
                         <li>
                             <a href="<?php echo $base_url; ?>views/subastas/registro-producto.php" class="link-ppi p-0 d-inline-flex align-items-center">
-                                <i class="fas fa-angle-right me-2 text-third-ppi" style="font-size: 0.75rem;"></i>Publicar lote
+                                <i class="fas fa-angle-right me-2 text-third-ppi" style="font-size: 0.75rem;"></i>Registrar producto
                             </a>
                         </li>
                     </ul>
@@ -167,7 +167,7 @@ $base_url = BASE_URL;
     <div class="container-fluid bg-dark-ppi-2 py-3" style="border-top: 1px solid #1e2417;">
         <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
             <p class="text-second-ppi mb-0 small text-center text-md-start">
-                &copy; <?php echo date('Y'); ?> <span class="text-main-ppi fw-semibold">Gavel.net</span> &bull; Todos los derechos reservados. 
+                &copy; <?php echo date('Y'); ?> <span class="text-main-ppi fw-semibold">Gavel.net</span> &bull; Todos los derechos reservados.
                 <span class="d-none d-sm-inline">&bull; </span><a href="<?php echo $base_url; ?>views/legal/terminos.php" class="text-second-ppi text-decoration-underline">Aviso Legal</a>
             </p>
             <p class="text-third-ppi mb-0 small text-center text-md-end fw-semibold">
@@ -177,7 +177,6 @@ $base_url = BASE_URL;
     </div>
 </footer>
 
-<!-- Componente Banner de Cookies no invasivo -->
 <?php
 $cookie_banner_file = dirname(__DIR__, 2) . '/includes/cookie-banner.php';
 if (file_exists($cookie_banner_file)) {
@@ -185,3 +184,17 @@ if (file_exists($cookie_banner_file)) {
 }
 ?>
 <script src="<?php echo $base_url; ?>assets/js/cookie-banner.js"></script>
+
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+if (isset($_SESSION['id_usuario'])) {
+    $modal_sesion_inactiva = dirname(__DIR__, 2) . '/includes/modal-sesion-inactiva.php';
+    if (file_exists($modal_sesion_inactiva)) {
+        include $modal_sesion_inactiva;
+    }
+    $ver_inactividad = filemtime(dirname(__DIR__, 2) . '/assets/js/sesion-inactividad.js');
+    echo '<script src="' . $base_url . 'assets/js/sesion-inactividad.js?v=' . $ver_inactividad . '"></script>';
+}
+?>

@@ -29,12 +29,18 @@ function mostrarToast(tipo = 'success', titulo = '', mensaje = '', duracionMs = 
 
     container.appendChild(toast);
 
+    // Forzar reflow inicial para que la barra siempre anime desde 100% hasta 0%
+    void toast.offsetWidth;
+
     requestAnimationFrame(() => {
         toast.classList.add('show');
         const progress = toast.querySelector('.toast-ppi-progress');
         if (progress) {
-            progress.style.transition = `transform ${duracionMs}ms linear`;
-            progress.style.transform = 'scaleX(0)';
+            progress.style.transform = 'scaleX(1)';
+            requestAnimationFrame(() => {
+                progress.style.transition = `transform ${duracionMs}ms linear`;
+                progress.style.transform = 'scaleX(0)';
+            });
         }
     });
 
