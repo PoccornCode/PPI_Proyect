@@ -6,36 +6,6 @@
 
     const showToast = (msg) => window.AdminDashboard?.notify(msg);
 
-    // Filtros en vivo de subastas (referencia)
-    const auctionSearchInput = document.getElementById('admAuctionSearch');
-    const auctionCatFilter = document.getElementById('admAuctionCatFilter');
-    const auctionsTableBody = document.getElementById('admAuctionsTbody');
-    const auctionsCountLabel = document.getElementById('admAuctionsCount');
-
-    function filterAuctionsTable() {
-        if (!auctionsTableBody) return;
-        const q = (auctionSearchInput?.value || '').trim().toLowerCase();
-        const cat = (auctionCatFilter?.value || '').toLowerCase();
-        let visible = 0;
-
-        auctionsTableBody.querySelectorAll('tr').forEach((row) => {
-            const title = (row.dataset.title || '').toLowerCase();
-            const rowCat = (row.dataset.category || '').toLowerCase();
-            const matchText = !q || title.includes(q) || rowCat.includes(q);
-            const matchCat = !cat || rowCat === cat;
-            const show = matchText && matchCat;
-            row.style.display = show ? '' : 'none';
-            if (show) visible++;
-        });
-
-        if (auctionsCountLabel) {
-            auctionsCountLabel.textContent = `Mostrando ${visible} subasta${visible === 1 ? '' : 's'}`;
-        }
-    }
-
-    auctionSearchInput?.addEventListener('input', filterAuctionsTable);
-    auctionCatFilter?.addEventListener('change', filterAuctionsTable);
-
     // Categorías en modo referencia (sin backend)
     const catCfg = window.ADM_CATEGORIES_DEMO;
     if (catCfg && document.getElementById('admCatGrid')) {

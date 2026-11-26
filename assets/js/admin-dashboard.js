@@ -76,6 +76,9 @@
         if (pushHash && target === 'usuarios') {
             window.AdminUsuarios?.recargar();
         }
+        if (pushHash && target === 'subastas') {
+            window.AdminSubastas?.recargar();
+        }
 
         closeMobileSidebar();
         window.scrollTo(0, 0);

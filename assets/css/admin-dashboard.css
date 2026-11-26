@@ -996,6 +996,19 @@ body.admin-body .adm-badge--finalizada {
     color: #85a9ba;
 }
 
+body.admin-body .adm-badge--sin-ofertas {
+    background: transparent;
+    border: none;
+    color: #9aa392;
+}
+
+body.admin-body .adm-badge--rechazada,
+body.admin-body .adm-badge--cancelada {
+    background: transparent;
+    border: none;
+    color: #e68a8a;
+}
+
 .adm-status {
     display: inline-flex;
     align-items: center;
@@ -3436,6 +3449,74 @@ body.admin-body .adm-badge--finalizada {
 }
 
 #sec-usuarios .mod-table-footer {
+    padding: 10px 18px;
+}
+
+#sec-subastas .adm-table-responsive {
+    min-height: 362px;
+}
+
+#sec-subastas .adm-table {
+    table-layout: fixed;
+    width: 100%;
+    min-width: 860px;
+}
+
+#sec-subastas .adm-table thead th:nth-child(1) {
+    width: 37%;
+}
+
+#sec-subastas .adm-table thead th:nth-child(2) {
+    width: 16%;
+}
+
+#sec-subastas .adm-table thead th:nth-child(3) {
+    width: 14%;
+}
+
+#sec-subastas .adm-table thead th:nth-child(4) {
+    width: 13%;
+}
+
+#sec-subastas .adm-table thead th:nth-child(5) {
+    width: 10%;
+}
+
+#sec-subastas .adm-table thead th:nth-child(6) {
+    width: 10%;
+}
+
+#sec-subastas .adm-table thead th {
+    padding: 10px 18px;
+}
+
+#sec-subastas .adm-table tbody tr {
+    height: 64px;
+}
+
+#sec-subastas .adm-table tbody td {
+    padding: 9px 18px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#sec-subastas .adm-cell-item {
+    min-width: 0;
+}
+
+#sec-subastas .adm-cell-item > div {
+    min-width: 0;
+}
+
+#sec-subastas .adm-item-name,
+#sec-subastas .mod-sub-meta {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#sec-subastas .mod-table-footer {
     padding: 10px 18px;
 }
 

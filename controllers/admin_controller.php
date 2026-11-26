@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../dao/AdminDAO.php';
 require_once __DIR__ . '/../dao/ModeradorDAO.php';
+require_once __DIR__ . '/../dao/CategoriaDAO.php';
 require_once __DIR__ . '/../helpers/sesion_inactividad.php';
 require_once __DIR__ . '/../helpers/kpi_helper.php';
 
@@ -176,6 +177,21 @@ function obtenerDetalleUsuarioAdmin(int $idUsuario, int $idAdminActual = 0): ?ar
     return $dao->obtenerDetalleUsuarioAdmin($idUsuario, $idAdminActual);
 }
 
+function obtenerCategoriasAdmin(): array
+{
+    $dao = new CategoriaDAO();
+    return $dao->listarCategorias();
+}
+
+function obtenerSubastasAdmin(string $baseUrl = ''): array
+{
+    $modDao = new ModeradorDAO();
+    $modDao->inactivarSubastasVencidas();
+
+    $dao = new AdminDAO();
+    return $dao->listarSubastasAdmin($baseUrl);
+}
+
 if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -237,6 +253,14 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
         echo json_encode([
             'estado' => true,
             'data'   => obtenerUsuariosAdmin($busqueda, $idRol, $pagina, $porPagina, $estadoFiltro),
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'subastas') {
+        echo json_encode([
+            'estado'   => true,
+            'subastas' => obtenerSubastasAdmin(BASE_URL),
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
