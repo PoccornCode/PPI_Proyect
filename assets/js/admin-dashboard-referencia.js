@@ -808,13 +808,6 @@
         syncDirtyState();
     }
 
-    // Botones de referencia (secciones aún sin backend)
-    document.querySelectorAll('[data-adm-demo-action]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-            showToast(btn.dataset.admDemoAction);
-        });
-    });
-
     // Demo form submit inside modals
     document.querySelectorAll('[data-adm-demo-form]').forEach((form) => {
         form.addEventListener('submit', (e) => {

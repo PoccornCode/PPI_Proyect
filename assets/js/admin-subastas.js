@@ -156,6 +156,7 @@
 
     function construirFila(item) {
         const estadoRaw = String(item.estado_raw || 'pendiente').toLowerCase();
+        const esFinalizada = estadoRaw === 'finalizada';
         const badgeInfo = BADGE_MAP[estadoRaw] || { clase: 'adm-badge--pendiente', texto: estadoRaw };
         const titulo = item.titulo || '';
         const vendedor = item.vendedor || '';
@@ -201,8 +202,10 @@
                         data-adm-auction-action="ver" data-subasta-id="${idSubasta}">
                         <i class="fa-regular fa-eye"></i>
                     </button>
-                    <button type="button" class="adm-action-btn adm-action-btn--edit" title="Editar subasta"
-                        aria-label="Editar subasta ${escHtml(titulo)}"
+                    <button type="button" class="adm-action-btn adm-action-btn--edit"
+                        title="${esFinalizada ? 'Las subastas finalizadas no se pueden modificar' : 'Cambiar estado'}"
+                        aria-label="${esFinalizada ? 'Subasta finalizada' : 'Cambiar estado de ' + escHtml(titulo)}"
+                        ${esFinalizada ? 'disabled' : ''}
                         data-adm-auction-action="editar" data-subasta-id="${idSubasta}">
                         <i class="fa-solid fa-pen-to-square"></i>
                     </button>

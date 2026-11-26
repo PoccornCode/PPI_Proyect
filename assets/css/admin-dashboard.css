@@ -3301,7 +3301,9 @@ body.admin-body .adm-badge--cancelada {
 }
 
 #modalConfirmarEditarUsuario .modal-content,
-#modalConfirmarAgregarUsuario .modal-content {
+#modalConfirmarAgregarUsuario .modal-content,
+#modalConfirmarEstadoSubasta .modal-content,
+#modalConfirmarAdministrarEstado .modal-content {
     border: 1px solid #232623;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
 }
@@ -3309,22 +3311,32 @@ body.admin-body .adm-badge--cancelada {
 #modalConfirmarEditarUsuario .modal-header,
 #modalConfirmarEditarUsuario .modal-footer,
 #modalConfirmarAgregarUsuario .modal-header,
-#modalConfirmarAgregarUsuario .modal-footer {
+#modalConfirmarAgregarUsuario .modal-footer,
+#modalConfirmarEstadoSubasta .modal-header,
+#modalConfirmarEstadoSubasta .modal-footer,
+#modalConfirmarAdministrarEstado .modal-header,
+#modalConfirmarAdministrarEstado .modal-footer {
     border: none;
 }
 
 #modalConfirmarEditarUsuario .modal-header,
-#modalConfirmarAgregarUsuario .modal-header {
+#modalConfirmarAgregarUsuario .modal-header,
+#modalConfirmarEstadoSubasta .modal-header,
+#modalConfirmarAdministrarEstado .modal-header {
     padding: 20px 26px 8px;
 }
 
 #modalConfirmarEditarUsuario .modal-body,
-#modalConfirmarAgregarUsuario .modal-body {
+#modalConfirmarAgregarUsuario .modal-body,
+#modalConfirmarEstadoSubasta .modal-body,
+#modalConfirmarAdministrarEstado .modal-body {
     padding: 10px 26px 16px;
 }
 
 #modalConfirmarEditarUsuario .modal-footer,
-#modalConfirmarAgregarUsuario .modal-footer {
+#modalConfirmarAgregarUsuario .modal-footer,
+#modalConfirmarEstadoSubasta .modal-footer,
+#modalConfirmarAdministrarEstado .modal-footer {
     padding: 8px 26px 22px;
 }
 
@@ -3463,27 +3475,27 @@ body.admin-body .adm-badge--cancelada {
 }
 
 #sec-subastas .adm-table thead th:nth-child(1) {
-    width: 37%;
+    width: 32%;
 }
 
 #sec-subastas .adm-table thead th:nth-child(2) {
-    width: 16%;
+    width: 15%;
 }
 
 #sec-subastas .adm-table thead th:nth-child(3) {
-    width: 14%;
-}
-
-#sec-subastas .adm-table thead th:nth-child(4) {
     width: 13%;
 }
 
+#sec-subastas .adm-table thead th:nth-child(4) {
+    width: 14%;
+}
+
 #sec-subastas .adm-table thead th:nth-child(5) {
-    width: 10%;
+    width: 14%;
 }
 
 #sec-subastas .adm-table thead th:nth-child(6) {
-    width: 10%;
+    width: 12%;
 }
 
 #sec-subastas .adm-table thead th {
@@ -3501,11 +3513,17 @@ body.admin-body .adm-badge--cancelada {
     text-overflow: ellipsis;
 }
 
+#sec-subastas .adm-table tbody td:nth-child(5),
+#sec-subastas .adm-table tbody td:nth-child(6) {
+    overflow: visible;
+    text-overflow: clip;
+}
+
 #sec-subastas .adm-cell-item {
     min-width: 0;
 }
 
-#sec-subastas .adm-cell-item > div {
+#sec-subastas .adm-cell-item>div {
     min-width: 0;
 }
 
@@ -3518,6 +3536,81 @@ body.admin-body .adm-badge--cancelada {
 
 #sec-subastas .mod-table-footer {
     padding: 10px 18px;
+}
+
+#modalDetalleSubasta .modal-dialog {
+    max-width: 940px;
+}
+
+#modalDetalleSubasta .modal-content,
+#modalConfirmarSubasta .modal-content,
+#modalEditarEstadoSubasta .modal-content {
+    border: 1px solid #232623;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+}
+
+#modalDetalleSubasta .modal-header,
+#modalDetalleSubasta .modal-footer,
+#modalConfirmarSubasta .modal-header,
+#modalConfirmarSubasta .modal-footer,
+#modalEditarEstadoSubasta .modal-header,
+#modalEditarEstadoSubasta .modal-footer {
+    border: none;
+}
+
+.adm-action-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+#modalDetalleSubasta .modal-header {
+    padding: 20px 26px 8px;
+}
+
+#modalDetalleSubasta .modal-body {
+    padding: 14px 26px 20px;
+}
+
+#modalDetalleSubasta .modal-footer {
+    padding: 8px 26px 22px;
+}
+
+@media (min-width: 768px) {
+    #modalDetalleSubasta .modal-body {
+        height: 440px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #admAuctionDetailLoading,
+    #admAuctionDetailError {
+        flex: 1 1 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #admAuctionDetailContent {
+        height: 100%;
+        min-height: 0;
+    }
+
+    #modalDetalleSubasta .mod-gallery {
+        height: 100%;
+    }
+
+    #modalDetalleSubasta .mod-detail-info {
+        height: 100%;
+        overflow-y: auto;
+        padding-right: 6px;
+    }
+
+    #modalDetalleSubasta .mod-detail-desc {
+        max-height: none;
+        overflow-y: visible;
+    }
 }
 
 .adm-toast {

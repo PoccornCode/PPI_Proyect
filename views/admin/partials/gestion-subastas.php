@@ -104,8 +104,11 @@ $totalSubastas = count($subastasLista);
                                         data-adm-auction-action="ver" data-subasta-id="<?= (int)($s['id_subasta'] ?? 0) ?>">
                                         <i class="fa-regular fa-eye"></i>
                                     </button>
-                                    <button type="button" class="adm-action-btn adm-action-btn--edit" title="Editar subasta"
-                                        aria-label="Editar subasta <?= htmlspecialchars($titulo) ?>"
+                                    <?php $esFinalizada = ($estadoRaw === 'finalizada'); ?>
+                                    <button type="button" class="adm-action-btn adm-action-btn--edit"
+                                        title="<?= $esFinalizada ? 'Las subastas finalizadas no se pueden modificar' : 'Cambiar estado' ?>"
+                                        aria-label="<?= $esFinalizada ? 'Subasta finalizada' : 'Cambiar estado de ' . htmlspecialchars($titulo) ?>"
+                                        <?= $esFinalizada ? 'disabled' : '' ?>
                                         data-adm-auction-action="editar" data-subasta-id="<?= (int)($s['id_subasta'] ?? 0) ?>">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </button>
