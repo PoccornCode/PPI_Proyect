@@ -35,6 +35,7 @@ class CatalogoDAO
         $sql = "SELECT s.id_subasta, s.fecha_final,
                        TIMESTAMPDIFF(SECOND, NOW(), s.fecha_final) AS segundos_restantes,
                        p.nombre AS titulo,
+                       p.condicion,
                        COALESCE(c.nombre, 'General') AS categoria,
                        img.ruta AS imagen_ruta,
                        COALESCE(pu.total, 0) AS total_pujas,
@@ -63,6 +64,7 @@ class CatalogoDAO
             $lista[] = [
                 'id'              => (int)$fila['id_subasta'],
                 'titulo'          => $fila['titulo'],
+                'condicion'       => $fila['condicion'] ?? '',
                 'categoria'       => $fila['categoria'],
                 'imagen'          => $this->rutaImagen($fila['imagen_ruta']),
                 'precio'          => number_format((float)$fila['precio_actual'], 2, '.', ','),
@@ -171,23 +173,6 @@ class CatalogoDAO
         $stmt->close();
 
         return $imagenes;
-    }
-
-    // las pujas mas altas de la subasta monto
-    public function obtenerPujas(int $id_subasta, int $limite = 8): array
-    {
-        $montos = [];
-        $sql = "SELECT monto FROM sb_puja WHERE id_subasta = ? ORDER BY monto DESC LIMIT ?";
-        $stmt = $this->conexion->prepare($sql);
-        $stmt->bind_param("ii", $id_subasta, $limite);
-        $stmt->execute();
-        $res = $stmt->get_result();
-        while ($fila = $res->fetch_assoc()) {
-            $montos[] = number_format((float)$fila['monto'], 2, '.', ',');
-        }
-        $stmt->close();
-
-        return $montos;
     }
 
     // arma las vondiciones 

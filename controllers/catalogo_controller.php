@@ -58,7 +58,26 @@ function obtenerDetalleSubasta(int $id, int $idUsuario = 0, int $idRol = 0): ?ar
 
     $subasta['es_dueno'] = $esDueno;
     $subasta['imagenes'] = $dao->obtenerImagenes($subasta['id_producto']);
-    $subasta['historial'] = $dao->obtenerPujas($subasta['id']);
 
     return $subasta;
+}
+
+// endpoint JSON para refresco en vivo del catalogo
+if (
+    isset($_SERVER['SCRIPT_FILENAME'])
+    && realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])
+    && ($_GET['opcion'] ?? '') === 'listar'
+) {
+    header('Content-Type: application/json; charset=utf-8');
+    $filtros = obtenerFiltrosCatalogo();
+    $paginaActual = max(1, (int)($_GET['pagina'] ?? 1));
+    $catalogo = obtenerCatalogo($filtros, $paginaActual);
+    echo json_encode([
+        'estado'  => true,
+        'total'   => $catalogo['total'],
+        'pagina'  => $catalogo['pagina'],
+        'paginas' => $catalogo['paginas'],
+        'items'   => $catalogo['items'],
+    ]);
+    exit;
 }

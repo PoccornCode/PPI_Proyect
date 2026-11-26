@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // el boton de pujar t toca adan
     document.querySelectorAll("[data-proximamente]").forEach((btn) => {
         btn.addEventListener("click", () => {
-            mostrarToast("info", btn.dataset.proximamente, "Esta función estará disponible próximamente.");
+            mostrarToast("info", btn.dataset.proximamente, "Al pujar se enviará a la lógica de pujas de Adán.", 7000);
         });
     });
 });

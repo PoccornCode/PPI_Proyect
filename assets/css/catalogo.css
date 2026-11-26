@@ -20,6 +20,21 @@
     min-height: 46px;
 }
 
+.catalogo-filtros input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23a7a59d' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M4 4l8 8M12 4l-8 8'/%3E%3C/svg%3E") center / contain no-repeat;
+    opacity: .75;
+    transition: opacity .2s ease;
+}
+
+.catalogo-filtros input[type="search"]::-webkit-search-cancel-button:hover {
+    opacity: 1;
+}
+
 .catalogo-filtros .form-select {
     min-height: 46px;
 }
@@ -66,8 +81,10 @@
 
 /* tarjetas */
 .catalogo-card {
+    background-color: #0f110e;
     border: 1px solid #1c2217;
     border-radius: 14px;
+    overflow: hidden;
     transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
 }
 
@@ -77,12 +94,50 @@
     box-shadow: 0 12px 28px rgba(0, 0, 0, .65);
 }
 
+.catalogo-card-thumb {
+    position: relative;
+    height: 185px;
+    overflow: hidden;
+    background-color: #131612;
+}
+
+.catalogo-card-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(.85);
+    transition: transform .4s ease, filter .4s ease;
+}
+
+.catalogo-card:hover .catalogo-card-thumb img {
+    transform: scale(1.05);
+    filter: brightness(.98);
+}
+
 .catalogo-card-titulo {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    min-height: 2.6em;
+}
+
+.catalogo-categoria-label {
+    color: #7b944f;
+    font-weight: 600;
+}
+
+.catalogo-condicion {
+    color: #8b8980;
+    font-size: .8rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.catalogo-meta-label {
+    font-size: .72rem;
+    color: #8b8980;
+    line-height: 1.2;
+    margin-bottom: 2px;
 }
 
 /* sin resultados */
@@ -94,47 +149,69 @@
 }
 
 /* paginacion */
+.catalogo-paginacion {
+    gap: 8px;
+}
+
 .catalogo-paginacion .page-link {
-    min-width: 42px;
-    text-align: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px !important;
     background-color: #0f110e;
-    border-color: #23271f;
+    border: 1px solid #1c2217;
     color: #a7a59d;
+    font-weight: 600;
+    font-size: .9rem;
+    transition: background-color .2s ease, border-color .2s ease, color .2s ease, transform .15s ease;
 }
 
 .catalogo-paginacion .page-link:hover {
     background-color: #151a10;
-    color: #c9c9c9;
+    border-color: #5e7325;
+    color: #f0f0f0;
+    transform: translateY(-1px);
+}
+
+.catalogo-paginacion .page-link:focus {
+    box-shadow: 0 0 0 2px rgba(101, 136, 7, .3);
 }
 
 .catalogo-paginacion .page-item.active .page-link {
     background-color: #56730a;
     border-color: #658807;
     color: #fff;
+    box-shadow: 0 4px 14px rgba(86, 115, 10, .35);
 }
 
 .catalogo-paginacion .page-item.disabled .page-link {
     background-color: #0a0c09;
-    border-color: #191c17;
-    color: #4d4f48;
+    border-color: #151813;
+    color: #444740;
+    transform: none;
 }
 
 /* detalle de la subasta */
-.catalogo-breadcrumb .breadcrumb-item a {
-    color: #94aa34;
-    text-decoration: none;
-}
-
-.catalogo-breadcrumb .breadcrumb-item a:hover {
-    color: #a3cc00;
-}
-
-.catalogo-breadcrumb .breadcrumb-item.active {
+.subasta-volver {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border: 1px solid #1c2217;
+    border-radius: 999px;
+    background-color: #0f110e;
     color: #a7a59d;
+    font-size: .875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: border-color .2s ease, color .2s ease;
 }
 
-.catalogo-breadcrumb .breadcrumb-item+.breadcrumb-item::before {
-    color: #4d4f48;
+.subasta-volver:hover {
+    border-color: #5e7325;
+    color: #c9c9c9;
 }
 
 .subasta-galeria {
@@ -175,12 +252,12 @@
     border-color: #658807;
 }
 
-.subasta-panel,
+.subasta-panel {
+    padding: 4px 0 8px;
+}
+
 .subasta-bloque {
-    padding: 24px;
-    border: 1px solid #1c2217;
-    border-radius: 16px;
-    background-color: #0f110e;
+    padding: 8px 0;
 }
 
 .subasta-panel .etiqueta-ppi {
@@ -193,19 +270,11 @@
     margin: 20px 0;
 }
 
-.subasta-dolar {
-    background-color: #0f110e;
-    border: 2px solid #191c17;
-    border-right: 0;
-    color: #a7a59d;
-}
-
 .subasta-datos div {
     display: flex;
     justify-content: space-between;
     gap: 16px;
-    padding: 10px 0;
-    border-bottom: 1px solid #1c2217;
+    padding: 8px 0;
 }
 
 .subasta-datos dt {
@@ -222,15 +291,6 @@
 
 .subasta-descripcion {
     line-height: 1.7;
-}
-
-.subasta-puja {
-    padding: 10px 0;
-    border-bottom: 1px solid #1c2217;
-}
-
-.subasta-puja:last-child {
-    border-bottom: 0;
 }
 
 @media (max-width: 767.98px) {

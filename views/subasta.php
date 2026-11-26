@@ -59,8 +59,8 @@ $imagenes = !empty($s['imagenes']) ? $s['imagenes'] : ['assets/img/news-1.jpg'];
 
     <link href="<?= $base_url ?>assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="<?= $base_url ?>assets/css/style.css" rel="stylesheet">
-    <link href="<?= $base_url ?>assets/css/main.css?v=40" rel="stylesheet">
-    <link href="<?= $base_url ?>assets/css/catalogo.css?v=1" rel="stylesheet">
+    <link href="<?= $base_url ?>assets/css/main.css?v=49" rel="stylesheet">
+    <link href="<?= $base_url ?>assets/css/catalogo.css?v=10" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi text-second-ppi d-flex flex-column min-vh-100">
@@ -69,16 +69,6 @@ $imagenes = !empty($s['imagenes']) ? $s['imagenes'] : ['assets/img/news-1.jpg'];
 
     <main class="container-fluid px-4 px-lg-5 py-4 flex-grow-1">
         <div class="container catalogo-container">
-
-            <!-- ruta de navegacion -->
-            <nav aria-label="breadcrumb" class="mb-4">
-                <ol class="breadcrumb catalogo-breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="<?= $base_url ?>index.php">Inicio</a></li>
-                    <li class="breadcrumb-item"><a href="<?= $base_url ?>views/catalogo.php">Catálogo</a></li>
-                    <li class="breadcrumb-item"><a href="<?= $base_url ?>views/catalogo.php?categoria=<?= urlencode($s['categoria']) ?>"><?= e($s['categoria']) ?></a></li>
-                    <li class="breadcrumb-item active" aria-current="page"><?= e($s['titulo']) ?></li>
-                </ol>
-            </nav>
 
             <div class="row g-4 g-xl-5">
 
@@ -100,12 +90,17 @@ $imagenes = !empty($s['imagenes']) ? $s['imagenes'] : ['assets/img/news-1.jpg'];
 
                 <!-- datos y puja -->
                 <div class="col-lg-5">
-                    <p class="small text-uppercase text-second-ppi mb-1">
-                        <a href="<?= $base_url ?>views/catalogo.php?categoria=<?= urlencode($s['categoria']) ?>" class="text-third-ppi fw-bold text-decoration-none"><?= e($s['categoria']) ?></a>
-                        <?php if ($s['condicion'] !== ''): ?>
-                            &middot; <?= e($s['condicion']) ?>
-                        <?php endif; ?>
-                    </p>
+                    <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                        <p class="small text-uppercase text-second-ppi mb-0">
+                            <a href="<?= $base_url ?>views/catalogo.php?categoria=<?= urlencode($s['categoria']) ?>" class="text-third-ppi fw-bold text-decoration-none"><?= e($s['categoria']) ?></a>
+                            <?php if ($s['condicion'] !== ''): ?>
+                                &middot; <?= e($s['condicion']) ?>
+                            <?php endif; ?>
+                        </p>
+                        <a href="<?= $base_url ?>views/catalogo.php" class="subasta-volver" onclick="if (document.referrer && document.referrer.indexOf(location.origin) === 0) { history.back(); return false; }">
+                            <i class="fas fa-arrow-left me-2 small"></i>Volver
+                        </a>
+                    </div>
                     <h1 class="fs-2 fw-bold text-main-ppi mb-3"><?= e($s['titulo']) ?></h1>
 
                     <div class="subasta-panel">
@@ -130,8 +125,7 @@ $imagenes = !empty($s['imagenes']) ? $s['imagenes'] : ['assets/img/news-1.jpg'];
                             </div>
                         </div>
 
-                        <hr class="subasta-separador">
-
+                        <div class="mt-3">
                         <?php if ($s['terminada']): ?>
                             <p class="mb-0 small text-second-ppi">Esta subasta ya no acepta pujas.</p>
                         <?php elseif ($s['es_dueno']): ?>
@@ -139,15 +133,9 @@ $imagenes = !empty($s['imagenes']) ? $s['imagenes'] : ['assets/img/news-1.jpg'];
                         <?php elseif ($sinSesion): ?>
                             <a href="<?= $base_url ?>views/auth/login.php?redirect=<?= urlencode('views/subasta.php?id=' . $s['id']) ?>" class="btn btn-primary w-100 py-2 fw-bold">Inicia sesión para pujar</a>
                         <?php else: ?>
-                            <label for="montoPuja" class="form-label small text-second-ppi mb-1">Tu puja (mínimo $<?= e($s['puja_minima']) ?>)</label>
-                            <div class="d-flex gap-2">
-                                <div class="input-group">
-                                    <span class="input-group-text subasta-dolar">$</span>
-                                    <input type="number" class="form-control" id="montoPuja" min="0" step="0.01" placeholder="<?= e($s['puja_minima']) ?>">
-                                </div>
-                                <button type="button" class="btn btn-primary fw-bold px-4" data-proximamente="Pujar">Pujar</button>
-                            </div>
+                            <button type="button" class="btn btn-primary w-100 py-2 fw-bold" data-proximamente="Pujar">Pujar</button>
                         <?php endif; ?>
+                        </div>
                     </div>
 
                     <!-- datos de la subasta -->
@@ -164,29 +152,12 @@ $imagenes = !empty($s['imagenes']) ? $s['imagenes'] : ['assets/img/news-1.jpg'];
                 </div>
             </div>
 
-            <!-- descripcion e historial -->
-            <div class="row g-4 mt-2">
-                <div class="col-lg-7">
+            <!-- descripcion -->
+            <div class="row mt-4">
+                <div class="col-12">
                     <section class="subasta-bloque" aria-labelledby="titulo-descripcion">
                         <h2 id="titulo-descripcion" class="fs-5 fw-bold text-main-ppi mb-3">Descripción</h2>
                         <p class="mb-0 subasta-descripcion"><?= nl2br(e($s['descripcion'] !== '' ? $s['descripcion'] : 'El vendedor no agregó una descripción.')) ?></p>
-                    </section>
-                </div>
-                <div class="col-lg-5">
-                    <section class="subasta-bloque" aria-labelledby="titulo-pujas">
-                        <h2 id="titulo-pujas" class="fs-5 fw-bold text-main-ppi mb-3">Historial de pujas</h2>
-                        <?php if (empty($s['historial'])): ?>
-                            <p class="mb-0 small text-second-ppi">Todavía no hay pujas. ¡Sé el primero en ofertar!</p>
-                        <?php else: ?>
-                            <ul class="list-unstyled mb-0">
-                                <?php foreach ($s['historial'] as $i => $monto): ?>
-                                    <li class="subasta-puja d-flex justify-content-between align-items-center">
-                                        <span class="small text-second-ppi"><?= $i === 0 ? 'Puja más alta' : 'Puja' ?></span>
-                                        <span class="fw-bold <?= $i === 0 ? 'precio-ppi' : 'text-second-ppi' ?>">$<?= e($monto) ?></span>
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
-                        <?php endif; ?>
                     </section>
                 </div>
             </div>
@@ -202,8 +173,8 @@ $imagenes = !empty($s['imagenes']) ? $s['imagenes'] : ['assets/img/news-1.jpg'];
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= $base_url ?>assets/js/toast-ppi.js"></script>
-    <script src="<?= $base_url ?>assets/js/subasta.js"></script>
-    <script src="<?= $base_url ?>assets/js/temporizador-subastas.js" defer></script>
+    <script src="<?= $base_url ?>assets/js/subasta.js?v=2"></script>
+    <script src="<?= $base_url ?>assets/js/temporizador-subastas.js?v=5" defer></script>
 </body>
 
 </html>
