@@ -6,8 +6,23 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__ . '/../../config/env.php';
 require_once __DIR__ . '/../../config/conexion.php';
 
-$titulo = "Registrar Producto";
+if (!isset($_SESSION['id_usuario'])) {
+   $_SESSION['redirect_after_login'] = BASE_URL . 'views/subastas/registro-producto.php'
+    . (isset($_GET['id']) ? '?id=' . (int)$_GET['id'] : '');
+    $_SESSION['flash_toast'] = [
+        'tipo' => 'warning',
+        'titulo' => 'Acceso restringido',
+        'mensaje' => 'Debes iniciar sesión para registrar productos.'
+    ];
+    header("Location: " . BASE_URL . "views/auth/login.php");
+    exit();
+}
+
 $pagina = "registro-producto";
+
+$id_producto = (int)($_GET['id'] ?? 0);
+$titulo = $id_producto > 0 ? "Modificar Producto" : "Registrar Producto";
+$textoBoton = $id_producto > 0 ? "Modificar" : "Guardar Producto";
 
 //Agregar a dao o controller despues
 $categorias = [];
@@ -24,7 +39,8 @@ if ($catQuery) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($titulo) ?></title>
+    <title><?= htmlspecialchars($titulo) ?> | Gavel.net</title>
+    <?php include dirname(__DIR__, 2) . '/includes/meta_tags.php'; ?>
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,95 +56,7 @@ if ($catQuery) {
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/main.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/forms.css?v=8" rel="stylesheet">
-
-    <style>
-        body.bg-dark-ppi {
-            background-color: #080708 !important;
-        }
-
-        main {
-            background-image: none !important;
-            background-color: #080708 !important;
-        }
-
-        .card-gavel {
-            background-color: #0f110e;
-            border: 1px solid #191c17;
-            border-radius: 12px;
-        }
-
-        .section-title {
-            color: #c9c9c9;
-            font-size: 1.15rem;
-            font-weight: 700;
-            border-bottom: 1px solid #191c17;
-            padding-bottom: 0.6rem;
-            margin-bottom: 1.25rem;
-        }
-
-        .form-select.select-gavel {
-            background-color: #080708;
-            color: #a7a59d;
-            border: 2px solid #191c17;
-            border-radius: 10px;
-        }
-
-        .form-select.select-gavel:focus {
-            border-color: #658807;
-            color: #c9c9c9;
-            box-shadow: 0 0 0 .25rem rgba(101, 136, 7, .25);
-        }
-
-        .input-group-text.addon-gavel {
-            background-color: #191c17;
-            border: 2px solid #191c17;
-            color: #c9c9c9;
-            border-top-left-radius: 10px;
-            border-bottom-left-radius: 10px;
-        }
-
-        .upload-dropzone {
-            border: 2px dashed #23271f;
-            background: #080708;
-            border-radius: 10px;
-            padding: 2rem 1.25rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .upload-dropzone:hover {
-            border-color: #658807;
-            background: rgba(101, 136, 7, 0.05);
-        }
-
-        .preview-img-box {
-            position: relative;
-            width: 100px;
-            height: 100px;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid #23271f;
-            background: #080708;
-        }
-
-        .preview-img-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .preview-img-box .badge-principal {
-            position: absolute;
-            top: 4px;
-            left: 4px;
-            background: #5e7325;
-            color: #fff;
-            font-size: 0.65rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-    </style>
+    <link href="<?= BASE_URL ?>assets/css/productos.css?v=3" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -143,7 +71,7 @@ if ($catQuery) {
 
                     <div class="d-flex justify-content-between align-items-end mb-4">
                         <div>
-                            <h3 class="text-main-ppi fw-bold mb-1">Registrar Producto</h3>
+                            <h3 class="text-main-ppi fw-bold mb-1"><?= htmlspecialchars($titulo) ?></h3>
                             <p class="text-second-ppi small mb-0">Completa la información del producto.</p>
                         </div>
                         <a href="<?= BASE_URL ?>index.php" class="btn btn-secondary btn-sm px-3">
@@ -166,7 +94,6 @@ if ($catQuery) {
                                     <label for="id_categoria" class="form-label text-main-ppi fw-bold small">Categoría</label>
                                     <select class="form-select select-gavel" id="id_categoria" name="id_categoria" required>
                                         <option value="" disabled selected>Selecciona una categoría...</option>
-                                        //Agregas a dao o controller despues
                                         <?php if (!empty($categorias)): ?>
                                             <?php foreach ($categorias as $cat): ?>
                                                 <option value="<?= $cat['id_categoria'] ?>"><?= htmlspecialchars($cat['nombre']) ?></option>
@@ -206,14 +133,16 @@ if ($catQuery) {
                                 <p class="text-second-ppi small mb-0">Formatos admitidos: JPG, PNG, WEBP (La primera foto se utilizará como imagen principal)</p>
                                 <input type="file" class="d-none" id="imagenes" name="imagenes[]" multiple accept="image/*">
                             </div>
-
-                            <div id="imagePreviewContainer" class="d-flex flex-wrap gap-2 mt-3"></div>
+                            <label for="contenedorImagenesActuales" class="form-label text-main-ppi fw-bold small mb-1 mt-3" id="labelActuales"></label>
+                            <div id="contenedorImagenesActuales" class="d-flex flex-wrap gap-2 mb-3"></div>
+                            <label for="contenedorImagenNuevas" class="form-label text-main-ppi fw-bold small mb-1" id="labelNuevas"></label>
+                            <div id="contenedorImagenNuevas" class="d-flex flex-wrap gap-2"></div>
                         </div>
 
                         <!-- ACCIONES -->
                         <div class="d-flex justify-content-end gap-3 pb-4">
                             <a href="<?= BASE_URL ?>index.php" class="btn btn-secondary px-4 py-2">Cancelar</a>
-                            <button type="submit" id="btnGuardar" class="btn btn-primary px-5 py-2 fw-bold">Guardar Producto</button>
+                            <button type="submit" id="btnGuardar" class="btn btn-primary px-5 py-2 fw-bold"><?= htmlspecialchars($textoBoton) ?></button>
                         </div>
 
                     </form>
@@ -245,7 +174,12 @@ if ($catQuery) {
     <?php include __DIR__ . "/../Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/registro-producto.js?v=2"></script>
+    <script>
+        const RUTA_MIS_PRODUCTOS = "<?= BASE_URL ?>views/subastas/mis-productos.php";
+        const RUTA_IMAGENES = "<?= BASE_URL ?>uploads/productos/";
+    </script>
+    <script src="<?= BASE_URL ?>assets/js/toast-ppi.js?v=2"></script>
+    <script src="<?= BASE_URL ?>assets/js/registro-producto.js?v=4"></script>
 </body>
 
 </html>

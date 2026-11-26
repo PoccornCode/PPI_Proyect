@@ -6,8 +6,21 @@ $titulo = "Iniciar Sesión";
 $pagina = "login";
 
 if (!empty($_SESSION['id_usuario'])) {
-    header("Location: " . BASE_URL . "index.php");
+    $rolSesion = (int)($_SESSION['id_rol'] ?? 0);
+    if ($rolSesion === 1) {
+        $destino = BASE_URL . "views/admin/dashboard.php";
+    } elseif ($rolSesion === 3) {
+        $destino = BASE_URL . "views/moderador/dashboard.php";
+    } else {
+        $destino = BASE_URL . "index.php";
+    }
+    header("Location: " . $destino);
     exit;
+}
+
+$flashToast = $_SESSION['flash_toast'] ?? null;
+if ($flashToast !== null) {
+    unset($_SESSION['flash_toast']);
 }
 ?>
 <!DOCTYPE html>
@@ -17,6 +30,7 @@ if (!empty($_SESSION['id_usuario'])) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $titulo ?> | Gavel.net</title>
+    <?php include dirname(__DIR__, 2) . '/includes/meta_tags.php'; ?>
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,8 +41,8 @@ if (!empty($_SESSION['id_usuario'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/main.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/forms.css?v=20" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/main.css?v=30" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/forms.css?v=50" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -38,7 +52,7 @@ if (!empty($_SESSION['id_usuario'])) {
     <div class="container-fluid auth-page-wrapper py-5">
         <div class="container auth-container-sm py-3 py-lg-4">
             <div class="row align-items-center justify-content-center g-4 g-lg-5">
-                
+
                 <div class="col-lg-6 auth-showcase pe-lg-3">
                     <span class="auth-eyebrow">Acceso a tu cuenta</span>
                     <h1 class="auth-hero-title">¡Bienvenido de <span class="text-accent-ppi">nuevo!</span></h1>
@@ -62,12 +76,25 @@ if (!empty($_SESSION['id_usuario'])) {
                         <h3 class="mb-2 text-center text-main-ppi fw-bold">Iniciar sesión</h3>
                         <p class="mb-4 text-center text-second-ppi fs-6">Ingresa tus credenciales para continuar</p>
 
+                        <?php if (($_GET['reason'] ?? '') === 'inactivity'): ?>
+                            <div class="auth-session-notice mb-4" id="authSessionNotice" role="alert">
+                                <i class="fas fa-clock auth-session-notice-icon"></i>
+                                <div>
+                                    <div class="fw-semibold text-white mb-1">Sesión cerrada por inactividad</div>
+                                    <div>Tu sesión expiró automáticamente por seguridad. Inicia sesión nuevamente para continuar.</div>
+                                </div>
+                                <button type="button" class="auth-session-notice-close" aria-label="Cerrar aviso" onclick="document.getElementById('authSessionNotice').remove()">&times;</button>
+                            </div>
+                        <?php endif; ?>
+
                         <form id="formLogin" name="formLogin" method="POST" action="<?= BASE_URL ?>controllers/login_controller.php" autocomplete="off">
+                            <input type="hidden" name="redirect" id="redirect" value="<?= htmlspecialchars($_GET['redirect'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+
                             <div class="row g-3">
 
                                 <div class="col-12">
                                     <label for="username" class="form-label text-main-ppi fw-bold">Nombre de usuario <span class="req-star">*</span></label>
-                                    <input type="text" class="form-control" id="username" name="username" placeholder="Ingresa tu usuario" maxlength="50" required>
+                                    <input type="text" class="form-control" id="username" name="username" placeholder="Ingresa tu usuario" maxlength="50" spellcheck="false" autocapitalize="off" autocorrect="off" required>
                                 </div>
 
                                 <div class="col-12">
@@ -84,11 +111,18 @@ if (!empty($_SESSION['id_usuario'])) {
                                     <button class="w-100 btn btn-primary py-2 fw-bold" type="submit" id="btnLogin">Iniciar sesión</button>
                                 </div>
 
+                                <div class="col-12 text-center mt-3">
+                                    <a href="recuperar-clave.php" class="link-ppi link-coral-hover small text-decoration-none">¿Olvidaste tu contraseña?</a>
+                                </div>
+
                             </div>
                         </form>
 
-                        <p class="mt-4 mb-2 text-center text-second-ppi">¿No tienes cuenta? <a href="registro.php" class="link-ppi link-coral-hover fw-bold d-inline p-0">Regístrate aquí</a></p>
-                        <p class="mb-0 text-center"><a href="<?= BASE_URL ?>index.php" class="auth-back-link"><i class="bi bi-arrow-left"></i>Volver al inicio</a></p>
+                        <div class="mt-4 text-center">
+                            <a href="registro.php" class="btn btn-auth-secondary w-100 py-2 fw-semibold">Crear cuenta nueva</a>
+                        </div>
+
+                        <p class="mt-4 mb-0 text-center"><a href="<?= BASE_URL ?>index.php" class="auth-back-link"><i class="bi bi-arrow-left"></i>Volver al inicio</a></p>
                     </div>
                 </div>
             </div>
@@ -117,7 +151,44 @@ if (!empty($_SESSION['id_usuario'])) {
     <?php include "../Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/login.js?v=2"></script>
+    <script src="<?= BASE_URL ?>assets/js/toast-ppi.js"></script>
+    <script src="<?= BASE_URL ?>assets/js/login.js?v=7"></script>
+    <?php if (isset($_GET['verificado']) && $_GET['verificado'] == '1'): ?>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                mostrarToast("success", "Cuenta Verificada", "¡Tu cuenta ha sido activada exitosamente! Ya puedes iniciar sesión.");
+                window.history.replaceState({}, document.title, window.location.pathname);
+            });
+        </script>
+    <?php endif; ?>
+    <?php if (isset($_GET['recuperado']) && $_GET['recuperado'] == '1'): ?>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                mostrarToast("success", "Contraseña Actualizada", "Tu contraseña se restableció correctamente. Inicia sesión con tu nueva clave.");
+                window.history.replaceState({}, document.title, window.location.pathname);
+            });
+        </script>
+    <?php endif; ?>
+    <?php if (($_GET['reason'] ?? '') === 'inactivity'): ?>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                mostrarToast("warning", "Sesión expirada", "Tu sesión se cerró automáticamente por inactividad. Inicia sesión nuevamente para continuar.", 6000);
+                window.history.replaceState({}, document.title, window.location.pathname);
+            });
+        </script>
+    <?php endif; ?>
+    <?php if (is_array($flashToast) && !empty($flashToast['mensaje'])): ?>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                mostrarToast(
+                    <?= json_encode((string)($flashToast['tipo'] ?? 'warning'), JSON_UNESCAPED_UNICODE) ?>,
+                    <?= json_encode((string)($flashToast['titulo'] ?? 'Aviso'), JSON_UNESCAPED_UNICODE) ?>,
+                    <?= json_encode((string)$flashToast['mensaje'], JSON_UNESCAPED_UNICODE) ?>,
+                    5000
+                );
+            });
+        </script>
+    <?php endif; ?>
 </body>
 
 </html>

@@ -1,4 +1,6 @@
-const REGEX_PASSWORD = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#.\-_])[A-Za-z\d@$!%*?&#.\-_]{8,}$/;
+const REGEX_PASSWORD = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9\s]).{8,}$/;
+const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const REGEX_TELEFONO = /^\d{4}-\d{4}$/;
 
 let modalInstance = null;
 let callbackModal = null;
@@ -17,14 +19,14 @@ function mostrarModal(tipo, titulo, mensaje, onCerrar = null) {
     btnAccion.className = "btn btn-ppi-modal btn-sm";
 
     if (tipo === "success") {
-        icon = '<i class="bi bi-check-circle-fill text-success fs-5"></i>';
+        icon = '<i class="fas fa-check-circle fs-5" style="color: #658807;"></i>';
         btnAccion.textContent = "Continuar";
     } else if (tipo === "danger" || tipo === "error") {
-        icon = '<i class="bi bi-x-circle-fill text-danger fs-5"></i>';
+        icon = '<i class="fas fa-times-circle fs-5" style="color: #d8685d;"></i>';
         btnAccion.className = "btn btn-ppi-modal btn-danger btn-sm";
         btnAccion.textContent = "Entendido";
     } else {
-        icon = '<i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i>';
+        icon = '<i class="fas fa-exclamation-triangle text-warning fs-5"></i>';
         btnAccion.className = "btn btn-ppi-modal btn-warning btn-sm";
         btnAccion.textContent = "Entendido";
     }
@@ -49,10 +51,22 @@ function mostrarModal(tipo, titulo, mensaje, onCerrar = null) {
 function validarCampo(campo) {
     if (!campo) return true;
     const valor = campo.value.trim();
-    const vacio = valor === "" || valor === "0";
-    campo.classList.toggle("is-invalid", vacio);
-    campo.classList.toggle("is-valid", !vacio);
-    return !vacio;
+    let valido = valor !== "" && valor !== "0";
+
+    if (valido && campo.id === "correo") {
+        valido = REGEX_EMAIL.test(valor);
+    } else if (valido && campo.id === "telefono") {
+        valido = REGEX_TELEFONO.test(valor);
+    } else if (valido && campo.id === "contrasenia") {
+        valido = REGEX_PASSWORD.test(campo.value);
+    } else if (valido && campo.id === "confirmar_contrasenia") {
+        const pass = document.getElementById("contrasenia");
+        valido = pass ? campo.value === pass.value : true;
+    }
+
+    campo.classList.toggle("is-invalid", !valido);
+    campo.classList.toggle("is-valid", valido);
+    return valido;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -76,8 +90,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 validarCampo(campo);
             });
             campo.addEventListener("input", function () {
-                if (campo.classList.contains("is-invalid")) {
+                if (campo.classList.contains("is-invalid") || campo.classList.contains("is-valid")) {
                     validarCampo(campo);
+                }
+                if (campo === contrasenia && confirmarContrasenia && confirmarContrasenia.value !== "") {
+                    validarCampo(confirmarContrasenia);
                 }
             });
         }
@@ -163,12 +180,13 @@ document.addEventListener("DOMContentLoaded", () => {
             const icon = btn.querySelector("i");
 
             if (targetInput) {
-                if (targetInput.type === "password") {
-                    targetInput.type = "text";
+                const estaOculto = targetInput.classList.contains("font-password-masked");
+                if (estaOculto) {
+                    targetInput.classList.remove("font-password-masked");
                     icon.classList.remove("bi-eye");
                     icon.classList.add("bi-eye-slash");
                 } else {
-                    targetInput.type = "password";
+                    targetInput.classList.add("font-password-masked");
                     icon.classList.remove("bi-eye-slash");
                     icon.classList.add("bi-eye");
                 }
@@ -180,39 +198,67 @@ document.addEventListener("DOMContentLoaded", () => {
         formulario.addEventListener("submit", async function (e) {
             e.preventDefault();
 
-            let todosValidos = true;
+            let primerVacio = null;
             camposObligatorios.forEach(function (campo) {
-                if (!validarCampo(campo)) {
-                    todosValidos = false;
+                if (!campo) return;
+                const valor = campo.value.trim();
+                if (valor === "" || valor === "0") {
+                    campo.classList.add("is-invalid");
+                    campo.classList.remove("is-valid");
+                    if (!primerVacio) primerVacio = campo;
                 }
             });
 
-            if (!todosValidos) {
+            if (primerVacio) {
                 mostrarModal("warning", "Campos incompletos", "Por favor completa todos los campos obligatorios.");
+                primerVacio.focus();
+                return;
+            }
+
+            if (!REGEX_EMAIL.test(correo.value.trim())) {
+                correo.classList.add("is-invalid");
+                correo.classList.remove("is-valid");
+                mostrarModal("warning", "Correo inválido", "Por favor ingresa un correo electrónico válido (ejemplo: nombre@correo.com).");
+                correo.focus();
+                return;
+            }
+
+            if (!REGEX_TELEFONO.test(telefono.value.trim())) {
+                telefono.classList.add("is-invalid");
+                telefono.classList.remove("is-valid");
+                mostrarModal("warning", "Teléfono inválido", "El teléfono debe tener el formato 0000-0000 (8 dígitos).");
+                telefono.focus();
                 return;
             }
 
             if (!REGEX_PASSWORD.test(contrasenia.value)) {
                 contrasenia.classList.add("is-invalid");
-                mostrarModal("warning", "Contraseña débil", "La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un símbolo (@$!%*?&#.-_).");
+                contrasenia.classList.remove("is-valid");
+                mostrarModal("warning", "Contraseña débil", "La contraseña debe tener al menos 8 caracteres, incluir mayúscula, minúscula, número y algún símbolo (como ., :, -, _, @, $, etc.).");
                 contrasenia.focus();
                 return;
             }
 
             if (contrasenia.value !== confirmarContrasenia.value) {
                 confirmarContrasenia.classList.add("is-invalid");
+                confirmarContrasenia.classList.remove("is-valid");
                 mostrarModal("warning", "Contraseñas no coinciden", "Las contraseñas ingresadas no son iguales. Por favor verifica.");
                 confirmarContrasenia.focus();
                 return;
             }
 
+            let redirigiendo = false;
+            const overlayRegistro = document.getElementById("overlayRegistro");
+
             try {
                 const datos = new FormData(formulario);
                 datos.append("opcion", "guardar");
 
+                if (overlayRegistro) {
+                    overlayRegistro.classList.remove("d-none");
+                }
                 if (btnRegistrar) {
                     btnRegistrar.disabled = true;
-                    btnRegistrar.textContent = "Procesando...";
                 }
 
                 const respuesta = await fetch(formulario.action, {
@@ -227,18 +273,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 const resultado = await respuesta.json();
 
                 if (resultado.estado) {
-                    mostrarModal("success", "¡Registro exitoso!", resultado.mensaje || "Tu cuenta ha sido creada exitosamente.", () => {
-                        window.location.href = "login.php";
-                    });
+                    redirigiendo = true;
+                    const emailDestino = encodeURIComponent(resultado.correo || correo.value.trim());
+                    window.location.href = `verificar-codigo.php?correo=${emailDestino}`;
+
                 } else {
                     mostrarModal("danger", "Error", resultado.mensaje || "No se pudo completar el registro.");
                 }
             } catch (error) {
                 mostrarModal("danger", "Error", error.message || "Error al procesar la solicitud con el servidor.");
             } finally {
-                if (btnRegistrar) {
-                    btnRegistrar.disabled = false;
-                    btnRegistrar.textContent = "Registrarse";
+                if (!redirigiendo) {
+                    if (overlayRegistro) {
+                        overlayRegistro.classList.add("d-none");
+                    }
+                    if (btnRegistrar) {
+                        btnRegistrar.disabled = false;
+                    }
                 }
             }
         });

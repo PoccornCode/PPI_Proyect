@@ -15,14 +15,14 @@ function mostrarModal(tipo, titulo, mensaje, onCerrar = null) {
     btnAccion.className = "btn btn-ppi-modal btn-sm";
 
     if (tipo === "success") {
-        icon = '<i class="bi bi-check-circle-fill text-success fs-5"></i>';
+        icon = '<i class="fas fa-check-circle fs-5" style="color: #658807;"></i>';
         btnAccion.textContent = "Continuar";
     } else if (tipo === "danger" || tipo === "error") {
-        icon = '<i class="bi bi-x-circle-fill text-danger fs-5"></i>';
+        icon = '<i class="fas fa-times-circle fs-5" style="color: #d8685d;"></i>';
         btnAccion.className = "btn btn-ppi-modal btn-danger btn-sm";
         btnAccion.textContent = "Entendido";
     } else {
-        icon = '<i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i>';
+        icon = '<i class="fas fa-exclamation-triangle text-warning fs-5"></i>';
         btnAccion.className = "btn btn-ppi-modal btn-warning btn-sm";
         btnAccion.textContent = "Entendido";
     }
@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (btnLogin) {
                     btnLogin.disabled = true;
-                    btnLogin.textContent = "Procesando...";
+                    btnLogin.textContent = "Iniciando sesión...";
                 }
 
                 const respuesta = await fetch(formulario.action, {
@@ -133,13 +133,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 const resultado = await respuesta.json();
 
                 if (resultado.estado) {
-                    mostrarModal("success", "¡Bienvenido!", resultado.mensaje || "Inicio de sesión exitoso.", () => {
-                        window.location.href = resultado.redirect || "../../index.php";
-                    });
+                    window.location.href = resultado.redirect || "../../index.php";
+                } else if (resultado.requiere_verificacion && resultado.correo) {
+                    const emailDestino = encodeURIComponent(resultado.correo);
+                    mostrarModal(
+                        "warning",
+                        "Cuenta sin verificar",
+                        resultado.mensaje || "Tu cuenta aún no está verificada. Te llevaremos a verificar tu código.",
+                        () => {
+                            window.location.href = `verificar-codigo.php?correo=${emailDestino}`;
+                        }
+                    );
                 } else {
                     contrasenia.value = "";
                     contrasenia.classList.remove("is-valid");
-                    mostrarModal("danger", "Error", resultado.mensaje || "No se pudo iniciar sesión.");
+                    mostrarModal("danger", "Error", resultado.mensaje || "Usuario o contraseña incorrectos.");
                 }
             } catch (error) {
                 mostrarModal("danger", "Error", error.message || "Error al procesar la solicitud con el servidor.");

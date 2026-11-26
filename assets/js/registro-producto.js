@@ -5,6 +5,11 @@ let form, btnGuardar, textoBotonOriginal;
 let inputNombre, selectCategoria, selectCondicion, textareaDescripcion, inputImagenes;
 let camposValidables = [];
 
+let esEdicion = false;
+let idsEliminar = [];
+let imagenesNuevas = [];
+let enviando = false;
+
 function mostrarModal(tipo, titulo, mensaje, onCerrar = null) {
     const modalEl = document.getElementById("modalPPI");
     const tituloEl = document.getElementById("modalPPITitulo");
@@ -18,14 +23,14 @@ function mostrarModal(tipo, titulo, mensaje, onCerrar = null) {
 
     let icon;
     if (tipo === "success") {
-        icon = '<i class="bi bi-check-circle-fill text-success fs-5"></i>';
+        icon = '<i class="fas fa-check-circle fs-5" style="color: #658807;"></i>';
         btnAccion.textContent = "Continuar";
     } else if (tipo === "error") {
-        icon = '<i class="bi bi-x-circle-fill text-danger fs-5"></i>';
+        icon = '<i class="fas fa-times-circle fs-5" style="color: #d8685d;"></i>';
         btnAccion.className = "btn btn-ppi-modal btn-danger btn-sm";
         btnAccion.textContent = "Entendido";
     } else {
-        icon = '<i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i>';
+        icon = '<i class="fas fa-exclamation-triangle text-warning fs-5"></i>';
         btnAccion.className = "btn btn-ppi-modal btn-warning btn-sm";
         btnAccion.textContent = "Entendido";
     }
@@ -58,48 +63,105 @@ function validarCampoIndividual(campo) {
 
 function inicializarDropzone() {
     const dropzone = document.getElementById("dropzoneImagenes");
-    const container = document.getElementById("imagePreviewContainer");
 
     dropzone.addEventListener("click", () => inputImagenes.click());
-
     inputImagenes.addEventListener("change", function (event) {
-        container.innerHTML = "";
-        const files = event.target.files;
-        if (!files || files.length === 0) return;
+        const permitidos = ["image/jpeg", "image/png", "image/webp"];
+        const elegidos = Array.from(event.target.files);
+        const nuevos = elegidos.filter(f => permitidos.includes(f.type));
 
-        dropzone.style.borderColor = "#23271f";
+        if (nuevos.length < elegidos.length) {
+            mostrarModal("warning", "Formato no válido", "Solo se permiten imágenes JPG, PNG o WEBP.");
+        }
 
-        Array.from(files).forEach((file, index) => {
-            if (!file.type.startsWith("image/")) return;
+        imagenesNuevas.push(...nuevos);
+        inputImagenes.value = "";
 
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const box = document.createElement("div");
-                box.className = "preview-img-box";
+        if (imagenesNuevas.length > 0) dropzone.style.borderColor = "#23271f";
+        renderNuevas();
+    });
+}
 
-                const img = document.createElement("img");
-                img.src = e.target.result;
-                img.alt = file.name;
-                box.appendChild(img);
+function renderNuevas() {
+    const contenedor = document.getElementById("contenedorImagenNuevas");
+    contenedor.innerHTML = "";
+    const labelNuevas = document.getElementById("labelNuevas");
 
-                if (index === 0) {
-                    const badge = document.createElement("span");
-                    badge.className = "badge-principal";
-                    badge.textContent = "Principal";
-                    box.appendChild(badge);
-                }
+    if (imagenesNuevas.length === 0) {
+        labelNuevas.textContent = "";
+        return;
+    }
 
-                container.appendChild(box);
-            };
-            reader.readAsDataURL(file);
+    labelNuevas.textContent = "Imágenes nuevas";
+    imagenesNuevas.forEach((imagen, index) => {
+        const div = document.createElement("div");
+        div.className = "preview-img-box";
+        div.style.cursor = "pointer";
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(imagen);
+        img.alt = imagen.name;
+        div.appendChild(img);
+
+        if (index === 0 && document.querySelectorAll("#contenedorImagenesActuales .preview-img-box").length === 0) {
+            const badge = document.createElement("span");
+            badge.className = "badge-principal";
+            badge.textContent = "Principal";
+            div.appendChild(badge);
+        }
+
+        const btnQuitar = document.createElement("button");
+        btnQuitar.type = "button";
+        btnQuitar.className = "btn-quitar";
+        btnQuitar.textContent = "X";
+
+        btnQuitar.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (totalImagenesVisibles() <= 1) {
+                mostrarModal("warning", "Acción no permitida", "El producto debe tener al menos una fotografía.");
+                return;
+            }
+            imagenesNuevas.splice(index, 1);
+            renderNuevas();
         });
+
+        div.addEventListener("click", () => abrirVisorImagenes(img.src));
+        div.appendChild(btnQuitar);
+        contenedor.appendChild(div);
+    });
+}
+
+function totalImagenesVisibles() {
+    return document.querySelectorAll("#contenedorImagenesActuales .preview-img-box").length + imagenesNuevas.length;
+}
+
+function abrirVisorImagenes(scr) {
+    const fondo = document.createElement("div");
+    fondo.className = "visor-fondo";
+
+    const img = document.createElement("img");
+    img.className = "visor-img";
+    img.src = scr;
+
+    const btnCerrar = document.createElement("button");
+    btnCerrar.type = "button";
+    btnCerrar.className = "visor-cerrar";
+    btnCerrar.textContent = "X";
+
+    fondo.appendChild(img);
+    fondo.appendChild(btnCerrar);
+    document.body.appendChild(fondo);
+
+    btnCerrar.addEventListener("click", () => fondo.remove());
+    fondo.addEventListener("click", e => {
+        if (e.target === fondo) fondo.remove();
     });
 }
 
 function limpiarFormulario() {
     form.reset();
     camposValidables.forEach(campo => campo.classList.remove("is-valid", "is-invalid"));
-    document.getElementById("imagePreviewContainer").innerHTML = "";
+    imagenesNuevas = [];
+    document.getElementById("contenedorImagenNuevas").innerHTML = "";
     document.getElementById("dropzoneImagenes").style.borderColor = "";
 }
 
@@ -109,20 +171,86 @@ function validarFormulario() {
         mostrarModal("warning", "Campos incompletos", "Completa los campos requeridos marcados en el formulario.");
         return false;
     }
-
-    if (inputImagenes.files.length === 0) {
-        document.getElementById("dropzoneImagenes").style.borderColor = "#dc3545";
-        mostrarModal("warning", "Imágenes requeridas", "Debes subir al menos una fotografía del producto.");
-        return false;
-    }
-
     return true;
+}
+
+async function cargarProductoid(idProduc) {
+    try {
+        const datos = new FormData();
+        datos.append("opcion", "obtener");
+        const respuesta = await fetch(form.action + "?id=" + idProduc, { method: "POST", body: datos });
+        const resultado = await respuesta.json();
+        if (!resultado.estado) {
+            mostrarModal("error", "No encontrado", resultado.mensaje, () => {
+                window.location.href = RUTA_MIS_PRODUCTOS;
+            });
+            return;
+        }
+        inputNombre.value = resultado.producto.nombre;
+        textareaDescripcion.value = resultado.producto.descripcion;
+        selectCategoria.value = resultado.producto.id_categoria;
+        selectCondicion.value = resultado.producto.condicion;
+
+        cargarImagenesActuales(resultado.imagenes);
+    } catch (error) {
+        console.error(error);
+        mostrarModal("error", "Error de conexión", "No se pudo cargar el producto. Intenta de nuevo.");
+    }
+}
+
+function cargarImagenesActuales(imagenes) {
+    const labelActuales = document.getElementById("labelActuales");
+
+    labelActuales.textContent = "Imágenes actuales";
+    const contenedor = document.getElementById("contenedorImagenesActuales");
+    contenedor.innerHTML = "";
+    imagenes.forEach((imagen) => {
+        const div = document.createElement("div");
+        div.className = "preview-img-box";
+        const img = document.createElement("img");
+        img.src = RUTA_IMAGENES + imagen.ruta;
+        img.alt = imagen.ruta;
+        div.appendChild(img);
+
+        if (imagen.principal == 1) {
+            const badge = document.createElement("span");
+            badge.className = "badge-principal";
+            badge.textContent = "Principal";
+            div.appendChild(badge);
+        }
+
+        const btnQuitar = document.createElement("button");
+        btnQuitar.type = "button";
+        btnQuitar.className = "btn-quitar";
+        btnQuitar.textContent = "X";
+
+        btnQuitar.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (totalImagenesVisibles() <= 1) {
+                mostrarModal("warning", "Acción no permitida", "El producto debe tener al menos una fotografía.");
+                return;
+            }
+            idsEliminar.push(imagen.id_imagen_producto);
+            div.remove();
+
+            if (imagenes.length === idsEliminar.length) {
+                labelActuales.textContent = "";
+                return;
+            }
+        });
+
+        div.addEventListener("click", () => abrirVisorImagenes(img.src));
+        div.appendChild(btnQuitar);
+        contenedor.appendChild(div);
+    });
 }
 
 document.addEventListener("DOMContentLoaded", function () {
     form = document.getElementById("formRegistroSubasta");
     btnGuardar = document.getElementById("btnGuardar");
     textoBotonOriginal = btnGuardar.textContent.trim();
+    esEdicion = textoBotonOriginal === "Modificar";
+    const dropzone = document.getElementById("dropzoneImagenes");
 
     inputNombre = document.getElementById("nombre");
     selectCategoria = document.getElementById("id_categoria");
@@ -144,35 +272,85 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    if (esEdicion) {
+        const idProduc = new URLSearchParams(window.location.search).get("id");
+        cargarProductoid(idProduc);
+    }
+
     form.addEventListener("submit", async function (e) {
         e.preventDefault();
+        if (enviando) return;
 
-        if (btnGuardar.textContent.trim() !== textoBotonOriginal) return;
-        if (!validarFormulario()) return;
+        if (btnGuardar.textContent.trim() !== textoBotonOriginal) {
+            return;
+        }
+
+        if (!validarFormulario()) {
+            return;
+        }
+        enviando = true;
+        btnGuardar.disabled = true;
+        inputImagenes.disabled = true;
+        dropzone.style.pointerEvents = "none";
+        dropzone.style.opacity = "0.5";
 
         try {
-            const datos = new FormData(form);
-            datos.append("opcion", "guardar");
+            const datosForm = new FormData(form);
+            datosForm.delete("imagenes[]");
+            imagenesNuevas.forEach(archivo => datosForm.append("imagenes[]", archivo));
+            datosForm.append("opcion", esEdicion ? "modificar" : "guardar");
+
+            if (esEdicion) {
+                idsEliminar.forEach(id => datosForm.append("idrutasEliminar[]", id));
+            }
+
+            const idProduc = new URLSearchParams(window.location.search).get("id");
+            const urlEnvio = esEdicion ? form.action + "?id=" + idProduc : form.action;
 
             btnGuardar.disabled = true;
             btnGuardar.textContent = "Procesando...";
+            inputImagenes.disabled = true;
+            dropzone.style.pointerEvents = "none";
+            dropzone.style.opacity = "0.5";
 
-            const respuesta = await fetch(form.action, { method: "POST", body: datos });
-            if (!respuesta.ok) throw new Error("Error HTTP: " + respuesta.status);
+            const respuesta = await fetch(urlEnvio, { method: "POST", body: datosForm });
+
+            if (!respuesta.ok) {
+                throw new Error("Error HTTP: " + respuesta.status);
+            }
 
             const resultado = await respuesta.json();
 
             if (resultado.estado) {
-                mostrarModal("success", "Producto registrado", resultado.mensaje, limpiarFormulario);
+                btnGuardar.textContent = "Redirigiendo...";
+                const titulo = esEdicion ? "¡Producto modificado!" : "¡Producto registrado!";
+                mostrarToast("success", titulo, "Redirigiendo a tu lista de productos...", 2000);
+                setTimeout(() => {
+                    window.location.href = RUTA_MIS_PRODUCTOS;
+                }, 1200);
+                return;
             } else {
-                mostrarModal("error", "No se pudo guardar", resultado.mensaje);
+                enviando = false;
+                mostrarModal("error", (esEdicion ? "No se pudo modificar" : "No se pudo guardar"), resultado.mensaje);
+                btnGuardar.disabled = false;
+                btnGuardar.textContent = textoBotonOriginal;
+                inputImagenes.disabled = false;
+                dropzone.style.pointerEvents = "";
+                dropzone.style.opacity = "";
+                if (resultado.errorImagen) {
+                    imagenesNuevas = [];
+                    renderNuevas();
+                }
             }
         } catch (error) {
             console.error(error);
             mostrarModal("error", "Error de conexión", "No se pudo completar la operación. Intenta de nuevo.");
-        } finally {
+            enviando = false;
             btnGuardar.disabled = false;
             btnGuardar.textContent = textoBotonOriginal;
+            inputImagenes.disabled = false;
+            dropzone.style.pointerEvents = "";
+            dropzone.style.opacity = "";
         }
     });
 });

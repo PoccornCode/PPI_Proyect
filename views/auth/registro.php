@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once dirname(__DIR__, 2) . '/config/env.php';
 $titulo = "Crear Cuenta";
 $pagina = "registro";
@@ -10,6 +11,7 @@ $pagina = "registro";
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $titulo ?> | Gavel.net</title>
+    <?php include dirname(__DIR__, 2) . '/includes/meta_tags.php'; ?>
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,8 +22,8 @@ $pagina = "registro";
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/forms.css?v=20" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/main.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/forms.css?v=50" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/main.css?v=30" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -62,48 +64,51 @@ $pagina = "registro";
 
                                 <div class="col-md-6">
                                     <label for="nombre" class="form-label text-main-ppi fw-bold">Nombre <span class="req-star">*</span></label>
-                                    <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingresa tu nombre" required>
+                                    <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingresa tu nombre" autocomplete="off" required>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label for="apellido" class="form-label text-main-ppi fw-bold">Apellido <span class="req-star">*</span></label>
-                                    <input type="text" class="form-control" id="apellido" name="apellido" placeholder="Ingresa tu apellido" required>
+                                    <input type="text" class="form-control" id="apellido" name="apellido" placeholder="Ingresa tu apellido" autocomplete="off" required>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label for="correo" class="form-label text-main-ppi fw-bold">Correo Electrónico <span class="req-star">*</span></label>
-                                    <input type="email" class="form-control" id="correo" name="correo" placeholder="correo@ejemplo.com" maxlength="100" required>
+                                    <input type="email" class="form-control" id="correo" name="correo" placeholder="correo@ejemplo.com" maxlength="100" autocomplete="off" required>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label for="telefono" class="form-label text-main-ppi fw-bold">Teléfono <span class="req-star">*</span></label>
-                                    <input type="tel" class="form-control" id="telefono" name="telefono" placeholder="Ej. 7000-0000" maxlength="30" required>
+                                    <input type="tel" class="form-control" id="telefono" name="telefono" placeholder="Ej. 7000-0000" maxlength="30" autocomplete="off" required>
                                 </div>
 
                                 <div class="col-12">
                                     <label for="ubicacion" class="form-label text-main-ppi fw-bold">Ubicación <span class="req-star">*</span></label>
-                                    <input type="text" class="form-control" id="ubicacion" name="ubicacion" placeholder="Ciudad, Departamento" required>
+                                    <input type="text" class="form-control" id="ubicacion" name="ubicacion" placeholder="Ciudad, Departamento" autocomplete="off" required>
                                 </div>
 
                                 <div class="col-12">
                                     <label for="username" class="form-label text-main-ppi fw-bold">Nombre de usuario <span class="req-star">*</span></label>
-                                    <input type="text" class="form-control" id="username" name="username" placeholder="Elige un usuario único" maxlength="50" required>
+                                    <input type="text" class="form-control" id="username" name="nuevo_reg_username" placeholder="Elige un usuario único" maxlength="50" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" required>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label for="contrasenia" class="form-label text-main-ppi fw-bold">Contraseña <span class="req-star">*</span></label>
                                     <div class="password-field-wrapper">
-                                        <input type="password" class="form-control" id="contrasenia" name="contrasenia" placeholder="Ingresa tu contraseña" minlength="8" required>
+                                        <input type="text" class="form-control font-password-masked" id="contrasenia" name="nuevo_reg_pass" placeholder="Ingresa tu contraseña" minlength="8" autocomplete="off" spellcheck="false" data-real-type="password" required>
                                         <button type="button" class="btn-toggle-eye" data-target="contrasenia" tabindex="-1" aria-label="Mostrar u ocultar contraseña">
                                             <i class="bi bi-eye"></i>
                                         </button>
+                                    </div>
+                                    <div class="form-text text-second-ppi mt-1" style="font-size: 0.78rem;">
+                                        Mín. 8 caracteres: mayúscula, minúscula, número y símbolo.
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label for="confirmar_contrasenia" class="form-label text-main-ppi fw-bold">Confirmar Contraseña <span class="req-star">*</span></label>
                                     <div class="password-field-wrapper">
-                                        <input type="password" class="form-control" id="confirmar_contrasenia" name="confirmar_contrasenia" placeholder="Repite tu contraseña" minlength="8" required>
+                                        <input type="text" class="form-control font-password-masked" id="confirmar_contrasenia" name="nuevo_reg_pass_conf" placeholder="Repite tu contraseña" minlength="8" autocomplete="off" spellcheck="false" data-real-type="password" required>
                                         <button type="button" class="btn-toggle-eye" data-target="confirmar_contrasenia" tabindex="-1" aria-label="Mostrar u ocultar contraseña">
                                             <i class="bi bi-eye"></i>
                                         </button>
@@ -144,10 +149,18 @@ $pagina = "registro";
         </div>
     </div>
 
+    <div id="overlayRegistro" class="registro-loading-overlay d-none" role="status" aria-live="polite">
+        <div class="registro-loading-card">
+            <div class="spinner-border registro-loading-spinner mb-3" aria-hidden="true"></div>
+            <h5 class="text-white fw-bold mb-2">Creando tu cuenta...</h5>
+            <p class="text-second-ppi small mb-0">Estamos enviando el código de verificación a tu correo. Esto tomará solo unos segundos.</p>
+        </div>
+    </div>
+
     <?php include "../Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/registro.js?v=7"></script>
+    <script src="<?= BASE_URL ?>assets/js/registro.js?v=15"></script>
 </body>
 
 </html>
