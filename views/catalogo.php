@@ -132,16 +132,8 @@ $total = $catalogo['total'];
                 </div>
             </form>
 
-            <!-- categorias rapidas -->
-            <nav class="catalogo-pills d-flex flex-wrap gap-2 my-4" aria-label="Categorías">
-                <a href="<?= e(urlCatalogo($filtros, ['categoria' => '', 'pagina' => 1])) ?>" class="catalogo-pill <?= $filtros['categoria'] === '' ? 'activa' : '' ?>">Todas</a>
-                <?php foreach ($categorias as $cat): ?>
-                    <a href="<?= e(urlCatalogo($filtros, ['categoria' => $cat['nombre'], 'pagina' => 1])) ?>" class="catalogo-pill <?= $cat['nombre'] === $filtros['categoria'] ? 'activa' : '' ?>"><?= e($cat['nombre']) ?></a>
-                <?php endforeach; ?>
-            </nav>
-
             <!-- resultados -->
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 my-4">
                 <p class="mb-0 text-second-ppi" aria-live="polite">
                     <strong class="text-main-ppi"><?= $total ?></strong> <?= $total === 1 ? 'subasta activa' : 'subastas activas' ?>
                     <?php if ($filtros['estado'] === 'hoy'): ?>
