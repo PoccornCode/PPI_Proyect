@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once dirname(__DIR__, 2) . '/config/env.php';
 $titulo = "Crear Cuenta";
 $pagina = "registro";
@@ -21,7 +22,7 @@ $pagina = "registro";
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/forms.css?v=49" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/forms.css?v=50" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/main.css?v=30" rel="stylesheet">
 </head>
 
@@ -99,6 +100,9 @@ $pagina = "registro";
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
+                                    <div class="form-text text-second-ppi mt-1" style="font-size: 0.78rem;">
+                                        Mín. 8 caracteres: mayúscula, minúscula, número y símbolo.
+                                    </div>
                                 </div>
 
                                 <div class="col-md-6">
@@ -156,7 +160,7 @@ $pagina = "registro";
     <?php include "../Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/registro.js?v=14"></script>
+    <script src="<?= BASE_URL ?>assets/js/registro.js?v=15"></script>
 </body>
 
 </html>

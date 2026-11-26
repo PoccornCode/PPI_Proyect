@@ -131,6 +131,9 @@ CREATE TABLE `sb_subasta` (
   `fecha_final` datetime NOT NULL,
   `estado` varchar(25) NOT NULL DEFAULT 'pendiente',
   `id_producto` int(11) NOT NULL,
+  `tipo_solicitud` enum('nueva','reenvio','apelacion') NOT NULL DEFAULT 'nueva',
+  `motivo_rechazo` text DEFAULT NULL,
+  `nota_vendedor` text DEFAULT NULL,
   PRIMARY KEY (`id_subasta`),
   KEY `fk_subasta_producto` (`id_producto`),
   CONSTRAINT `fk_subasta_producto` FOREIGN KEY (`id_producto`) REFERENCES `sb_producto` (`id_producto`),
@@ -235,7 +238,8 @@ INSERT INTO `sb_producto` (`id_producto`, `nombre`, `descripcion`, `condicion`, 
 (36, 'Reloj Automático Seiko 5 Acero Inoxidable', 'Reloj mecánico automático Seiko 5 de 21 joyas con caja y brazalete de acero inoxidable, esfera oscura con números romanos XII y VI, y fechador doble de día y fecha.', 'Buen estado', 1, 4, @id_vendedor),
 (37, 'Guitarra Acústica Walden D310e Tapa de Abeto', 'Guitarra acústica Walden modelo D310e con tapa de abeto natural, golpeador negro, diapasón de palisandro y 6 cuerdas metálicas recién calibradas.', 'Excelente', 1, 9, @id_vendedor),
 (38, 'Álbum de Monedas Antiguas (24 Piezas)', 'Carpeta roja de colección numismática con hojas plásticas y 24 monedas antiguas de plata, cobre y bronce protegidas individualmente en cartones.', 'Excelente', 1, 7, @id_vendedor),
-(39, 'Cafetera Espresso Italiana de Aluminio', 'Cafetera tipo moka italiana fabricada en aluminio con asa ergonómica negra, válvula de seguridad en la caldera y embudo dosificador metálico interno.', 'Buen estado', 1, 6, @id_vendedor);
+(39, 'Cafetera Espresso Italiana de Aluminio', 'Cafetera tipo moka italiana fabricada en aluminio con asa ergonómica negra, válvula de seguridad en la caldera y embudo dosificador metálico interno.', 'Buen estado', 1, 6, @id_vendedor),
+(40, 'Reloj Cronógrafo Clásico de Acero', 'Reloj de pulsera clásico con caja de acero inoxidable, esfera oscura y brazalete metálico original. Producto recién registrado sin subasta.', 'Como nuevo', 1, 4, @id_vendedor);
 
 INSERT INTO `sb_imagen_producto` (`id_producto`, `principal`, `ruta`) VALUES
 (5, 1, 'subasta_5.jpg'),
@@ -274,35 +278,39 @@ INSERT INTO `sb_imagen_producto` (`id_producto`, `principal`, `ruta`) VALUES
 (38, 1, 'pend_monedas_1.jpg'),
 (38, 0, 'pend_monedas_2.jpg'),
 (39, 1, 'pend_moka_1.jpg'),
-(39, 0, 'pend_moka_2.jpg');
+(39, 0, 'pend_moka_2.jpg'),
+(40, 1, 'pend_seiko_1.jpg');
 
-INSERT INTO `sb_subasta` (`id_subasta`, `precio_inicial`, `incremento_minimo`, `fecha_inicial`, `fecha_final`, `estado`, `id_producto`) VALUES
-(5, 185.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 20 HOUR), 'activa', 5),
-(6, 64.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 17 HOUR), 'activa', 6),
-(7, 38.50, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 18 HOUR), 'activa', 7),
-(8, 120.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 19 HOUR), 'activa', 8),
-(9, 165.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 21 HOUR), 'activa', 9),
-(10, 95.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 142 HOUR), 'activa', 10),
-(11, 72.00, 3.00, NOW(), DATE_ADD(NOW(), INTERVAL 118 HOUR), 'activa', 11),
-(12, 45.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 94 HOUR), 'activa', 12),
-(13, 88.00, 4.00, NOW(), DATE_ADD(NOW(), INTERVAL 70 HOUR), 'activa', 13),
-(14, 82.00, 3.00, NOW(), DATE_ADD(NOW(), INTERVAL 71 HOUR), 'activa', 14),
-(21, 42.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 94 HOUR), 'activa', 21),
-(22, 55.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 118 HOUR), 'activa', 22),
-(23, 68.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 142 HOUR), 'activa', 23),
-(24, 79.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 118 HOUR), 'activa', 24),
-(25, 64.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 94 HOUR), 'activa', 25),
-(26, 115.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 142 HOUR), 'activa', 26),
-(27, 48.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 70 HOUR), 'activa', 27),
-(28, 59.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 96 HOUR), 'pendiente', 28),
-(29, 92.00, 3.00, NOW(), DATE_ADD(NOW(), INTERVAL 120 HOUR), 'pendiente', 29),
-(30, 110.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 120 HOUR), 'pendiente', 30),
-(31, 95.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 96 HOUR), 'pendiente', 31),
-(33, 180.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 144 HOUR), 'pendiente', 33),
-(35, 350.00, 10.00, NOW(), DATE_ADD(NOW(), INTERVAL 120 HOUR), 'pendiente', 35),
-(36, 120.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 96 HOUR), 'pendiente', 36),
-(37, 165.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 120 HOUR), 'pendiente', 37),
-(38, 140.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 144 HOUR), 'pendiente', 38),
-(39, 35.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 72 HOUR), 'pendiente', 39);
+INSERT INTO `sb_subasta` (`id_subasta`, `precio_inicial`, `incremento_minimo`, `fecha_inicial`, `fecha_final`, `estado`, `id_producto`, `tipo_solicitud`, `motivo_rechazo`, `nota_vendedor`) VALUES
+(5, 185.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 20 HOUR), 'activa', 5, 'nueva', NULL, NULL),
+(6, 64.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 17 HOUR), 'activa', 6, 'nueva', NULL, NULL),
+(7, 38.50, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 18 HOUR), 'activa', 7, 'nueva', NULL, NULL),
+(8, 120.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 19 HOUR), 'activa', 8, 'nueva', NULL, NULL),
+(9, 165.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 21 HOUR), 'activa', 9, 'nueva', NULL, NULL),
+(10, 95.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 142 HOUR), 'activa', 10, 'nueva', NULL, NULL),
+(11, 72.00, 3.00, NOW(), DATE_ADD(NOW(), INTERVAL 118 HOUR), 'activa', 11, 'nueva', NULL, NULL),
+(12, 45.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 94 HOUR), 'activa', 12, 'nueva', NULL, NULL),
+(13, 88.00, 4.00, NOW(), DATE_ADD(NOW(), INTERVAL 70 HOUR), 'activa', 13, 'nueva', NULL, NULL),
+(14, 82.00, 3.00, NOW(), DATE_ADD(NOW(), INTERVAL 71 HOUR), 'activa', 14, 'nueva', NULL, NULL),
+(21, 42.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 94 HOUR), 'activa', 21, 'nueva', NULL, NULL),
+(22, 55.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 118 HOUR), 'activa', 22, 'nueva', NULL, NULL),
+(23, 68.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 142 HOUR), 'activa', 23, 'nueva', NULL, NULL),
+(24, 79.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 118 HOUR), 'activa', 24, 'nueva', NULL, NULL),
+(25, 64.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 94 HOUR), 'activa', 25, 'nueva', NULL, NULL),
+(26, 115.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 142 HOUR), 'activa', 26, 'nueva', NULL, NULL),
+(27, 48.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 70 HOUR), 'activa', 27, 'nueva', NULL, NULL),
+(28, 59.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 96 HOUR), 'pendiente', 28, 'nueva', NULL, NULL),
+(29, 92.00, 3.00, NOW(), DATE_ADD(NOW(), INTERVAL 120 HOUR), 'pendiente', 29, 'nueva', NULL, NULL),
+(30, 110.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 120 HOUR), 'pendiente', 30, 'nueva', NULL, NULL),
+(31, 95.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 96 HOUR), 'pendiente', 31, 'nueva', NULL, NULL),
+(33, 180.00, 5.00, DATE_SUB(NOW(), INTERVAL 7 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY), 'finalizada', 33, 'nueva', NULL, NULL),
+(35, 350.00, 10.00, DATE_SUB(NOW(), INTERVAL 7 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY), 'sin_ofertas', 35, 'nueva', NULL, NULL),
+(36, 120.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 96 HOUR), 'cancelada', 36, 'nueva', NULL, NULL),
+(37, 165.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 120 HOUR), 'rechazada', 37, 'nueva', 'Las fotografías no muestran con claridad el estado del artículo. Por favor sube fotos mejor iluminadas.', NULL),
+(38, 140.00, 5.00, NOW(), DATE_ADD(NOW(), INTERVAL 144 HOUR), 'activa', 38, 'nueva', NULL, NULL),
+(39, 35.00, 2.00, NOW(), DATE_ADD(NOW(), INTERVAL 72 HOUR), 'pendiente', 39, 'nueva', NULL, NULL);
+
+INSERT INTO `sb_puja` (`monto`, `fecha`, `id_subasta`, `id_usuario`) VALUES
+(190.00, DATE_SUB(NOW(), INTERVAL 2 DAY), 33, 1);
 
 SET FOREIGN_KEY_CHECKS = 1;

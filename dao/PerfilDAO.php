@@ -3,7 +3,6 @@ require_once __DIR__ . '/../config/conexion.php';
 
 class PerfilDAO
 {
-    // Roles de sb_usuario.id_rol
     const ROL_ADMIN = 1;
     const ROL_USUARIO = 2;
     const ROL_MODERADOR = 3;
@@ -37,7 +36,7 @@ class PerfilDAO
     }
 
    
-    //Productos registrados, subastas activas y subastas pendientes de revisión del usuario.
+    //productos registrados-subastas activas-subastas pendientes de revision
     public function obtenerResumenUsuario($id_usuario)
     {
         $sql = "SELECT COUNT(DISTINCT p.id_producto) AS productos,
@@ -59,7 +58,7 @@ class PerfilDAO
         ];
     }
 
-    //Las subastas activas del usuario que terminan primero, con la puja ms alta.
+    //subastas activas del usuario que terminan primero con la puja ms alta
      
     public function obtenerSubastasActivas($id_usuario, $limite = 3)
     {
@@ -93,7 +92,7 @@ class PerfilDAO
 
     // MODERADOR Y ADMINISTRADOR
        
-    //Estado general de las subastas: pendientes de revisar, activas y cerradas.
+    //estado subastas
 
     public function obtenerResumenModeracion()
     {
@@ -112,7 +111,7 @@ class PerfilDAO
         ];
     }
 
-    //Totales de usuarios para el administrador.
+    //users muestra al admin
 
     public function obtenerResumenUsuariosAdmin()
     {
@@ -131,6 +130,45 @@ class PerfilDAO
             'moderadores' => (int)($fila['moderadores'] ?? 0)
         ];
     }
+
+    // actualiza nombre, apellido, ubicacion y telefono del usuario
+    public function actualizarDatos($id_usuario, $nombre, $apellido, $ubicacion, $telefono)
+    {
+        $this->conexion->begin_transaction();
+        try {
+            $sql = "UPDATE sb_usuario SET nombre = ?, apellido = ?, ubicacion = ? WHERE id_usuario = ?";
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bind_param("sssi", $nombre, $apellido, $ubicacion, $id_usuario);
+            $stmt->execute();
+            $stmt->close();
+ 
+            // el telefono esta en otra tabla, si no tenia uno se inserta
+            $sqlTel = "SELECT id_usuario FROM sb_telefono_usuario WHERE id_usuario = ? LIMIT 1";
+            $stmtTel = $this->conexion->prepare($sqlTel);
+            $stmtTel->bind_param("i", $id_usuario);
+            $stmtTel->execute();
+            $existe = $stmtTel->get_result()->fetch_assoc();
+            $stmtTel->close();
+ 
+            if ($existe) {
+                $sqlUp = "UPDATE sb_telefono_usuario SET telefono = ? WHERE id_usuario = ?";
+            } else {
+                $sqlUp = "INSERT INTO sb_telefono_usuario (telefono, id_usuario) VALUES (?, ?)";
+            }
+            $stmtUp = $this->conexion->prepare($sqlUp);
+            $stmtUp->bind_param("si", $telefono, $id_usuario);
+            $stmtUp->execute();
+            $stmtUp->close();
+ 
+            $this->conexion->commit();
+            return ["estado" => true, "mensaje" => "Tus datos se actualizaron correctamente."];
+        } catch (Throwable $e) {
+            $this->conexion->rollback();
+            error_log("[PerfilDAO] Error al actualizar datos: " . $e->getMessage());
+            return ["estado" => false, "mensaje" => "No se pudieron guardar los cambios. Inténtalo de nuevo."];
+        }
+    }
+
 
     //Contra
     public function cambiarContrasenia($id_usuario, $contraseniaActual, $contraseniaNueva)
@@ -165,7 +203,7 @@ class PerfilDAO
             return ["estado" => false, "mensaje" => "No se pudo actualizar la contraseña. Inténtalo de nuevo."];
         }
 
-        // Si habia codigos de recuperacion sin usar ya no sirven
+        // codigos no sirven pasado el tiempo
         $sqlCod = "UPDATE sb_codigo_verificacion SET utilizado = 1
                    WHERE id_usuario = ? AND tipo = 'recuperacion' AND utilizado = 0";
         $stmtCod = $this->conexion->prepare($sqlCod);

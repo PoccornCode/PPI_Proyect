@@ -19,13 +19,12 @@ $dao = new PerfilDAO();
 $perfil = $dao->obtenerPerfil($id_usuario);
 
 if (!$perfil) {
-    // La sesión apunta a un usuario que ya no existe
     header("Location: " . BASE_URL . "controllers/logout.php");
     exit();
 }
 
 if (!function_exists('e')) {
-    // Escapa texto antes de imprimirlo en el HTML
+    // escapa texto antes de imprimirlo en html
     function e($texto)
     {
         return htmlspecialchars((string)$texto, ENT_QUOTES, 'UTF-8');
@@ -47,13 +46,12 @@ function tiempoRestante($segundos)
     return sprintf('Termina en %02d h %02d min', $horas, $minutos);
 }
 
-// Rol: la base de datos manda (la sesión solo se mantiene al día)
 $rol = (int)$perfil['id_rol'];
 $_SESSION['id_rol'] = $rol;
 
 $esAdmin = $rol === PerfilDAO::ROL_ADMIN;
 $esModerador = $rol === PerfilDAO::ROL_MODERADOR;
-$esPersonal = $esAdmin || $esModerador; // personal de la plataforma
+$esPersonal = $esAdmin || $esModerador; // personal 
 $esUsuario = !$esPersonal;
 
 $rolTextos = [
@@ -65,14 +63,14 @@ $rolTexto = $rolTextos[$rol] ?? ($perfil['rol_nombre'] !== '' ? $perfil['rol_nom
 
 $verificada = (int)$perfil['estado'] === 1;
 
-// Iniciales para el avatar (primera letra del nombre y del apellido)
+// iniciales para el avatar
 $iniciales = mb_strtoupper(mb_substr($perfil['nombre'] ?? '', 0, 1) . mb_substr($perfil['apellido'] ?? '', 0, 1));
 if ($iniciales === '') {
     $iniciales = mb_strtoupper(mb_substr($perfil['username'] ?? 'U', 0, 1));
 }
 
 
-// Datos que se muestran según el rol
+// dts segun rol
 $resumenUsuario = $esUsuario ? $dao->obtenerResumenUsuario($id_usuario) : null;
 $subastas = $esUsuario ? $dao->obtenerSubastasActivas($id_usuario, 3) : [];
 $moderacion = $esPersonal ? $dao->obtenerResumenModeracion() : null;
@@ -89,7 +87,7 @@ if ($esPersonal) {
     $datos['Rol en la plataforma'] = $rolTexto;
 }
 
-// Token para el formulario de cambio de contraseña
+// token para el formulario de cambio de contra
 if (empty($_SESSION['csrf_perfil'])) {
     $_SESSION['csrf_perfil'] = bin2hex(random_bytes(32));
 }
@@ -117,14 +115,14 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/main.css?v=30" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/forms.css?v=41" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/perfil.css?v=2" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/perfil.css?v=6" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi d-flex flex-column min-vh-100">
 
     <?php include "NavBar/nav.php"; ?>
 
-    <!-- Encabezado del perfil -->
+    <!-- encabezado-->
     <section class="perfil-hero" aria-label="Tu perfil">
         <div class="container">
             <div class="d-flex flex-wrap align-items-center gap-4">
@@ -150,11 +148,6 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                 </div>
 
                 <div class="d-flex flex-wrap gap-2">
-                    <?php if ($esPersonal): ?>
-                        <a href="<?= e($urlPanelModeracion) ?>" class="btn btn-primary px-4 py-2 fw-semibold">
-                            <i class="fas fa-shield-alt me-2"></i>Ir al panel de moderación
-                        </a>
-                    <?php endif; ?>
                     <button type="button" class="btn btn-perfil-salir" data-bs-toggle="modal" data-bs-target="#modalConfirmLogout">
                         <i class="fas fa-sign-out-alt me-2"></i>Cerrar sesión
                     </button>
@@ -167,7 +160,7 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
         <div class="container d-flex flex-column gap-5">
 
             <?php if ($esUsuario): ?>
-                <!-- USUARIO COMN: su actividad como comprador y vendedor -->
+                <!-- actividad user -->
                 <section aria-labelledby="titulo-actividad">
                     <h2 id="titulo-actividad" class="fs-4 fw-bold text-main-ppi mb-3">Mi actividad</h2>
                     <div class="row g-3">
@@ -202,40 +195,15 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                 </section>
             <?php endif; ?>
 
-            <?php if ($esPersonal): ?>
-                <!-- MODERADOR Y ADMINISTRADOR:-->
-                <section aria-labelledby="titulo-moderacion">
-                    <h2 id="titulo-moderacion" class="fs-4 fw-bold text-main-ppi mb-3">Moderación de subastas</h2>
-                    <div class="row g-3">
-                        <div class="col-12 col-md-4">
-                            <a href="<?= e($urlPanelModeracion) ?>" class="perfil-acceso <?= $moderacion['pendientes'] > 0 ? 'perfil-acceso-alerta' : '' ?>">
-                                <span class="perfil-acceso-valor"><?= $moderacion['pendientes'] ?></span>
-                                <span class="perfil-acceso-titulo">Por revisar</span>
-                                <span class="perfil-acceso-detalle">Solicitudes esperando decisión</span>
-                            </a>
-                        </div>
-                        <div class="col-12 col-md-4">
-                            <div class="perfil-acceso">
-                                <span class="perfil-acceso-valor"><?= $moderacion['activas'] ?></span>
-                                <span class="perfil-acceso-titulo">Subastas activas</span>
-                                <span class="perfil-acceso-detalle">Publicadas y recibiendo pujas</span>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-4">
-                            <div class="perfil-acceso">
-                                <span class="perfil-acceso-valor"><?= $moderacion['cerradas'] ?></span>
-                                <span class="perfil-acceso-titulo">Subastas cerradas</span>
-                                <span class="perfil-acceso-detalle">Finalizadas o sin ofertas</span>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            <?php endif; ?>
-
             <?php if ($esAdmin): ?>
-                <!-- ADMINISTRADOR -->
+                <!-- amnin redirecciones links -->
                 <section aria-labelledby="titulo-admin">
-                    <h2 id="titulo-admin" class="fs-4 fw-bold text-main-ppi mb-3">Administración</h2>
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                        <h2 id="titulo-admin" class="fs-4 fw-bold text-main-ppi mb-0">Administración</h2>
+                        <a href="<?= e($urlPanelAdmin) ?>" class="btn btn-outline-publish btn-sm px-3 py-2 fw-semibold">
+                            <i class="fas fa-crown me-2"></i>Panel de administración
+                        </a>
+                    </div>
                     <div class="row g-3">
                         <div class="col-6 col-lg-3">
                             <div class="perfil-acceso">
@@ -266,21 +234,51 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                             </a>
                         </div>
                     </div>
-                    <div class="mt-3">
-                        <a href="<?= e($urlPanelAdmin) ?>" class="btn btn-outline-publish px-4 py-2 fw-semibold">
-                            <i class="fas fa-crown me-2"></i>Panel de administración
+                </section>
+            <?php endif; ?>
+
+            <?php if ($esPersonal): ?>
+                <!-- mod y admin-->
+                <section aria-labelledby="titulo-moderacion">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                        <h2 id="titulo-moderacion" class="fs-4 fw-bold text-main-ppi mb-0">Moderación de subastas</h2>
+                        <a href="<?= e($urlPanelModeracion) ?>" class="btn btn-outline-publish btn-sm px-3 py-2 fw-semibold">
+                            <i class="fas fa-shield-alt me-2"></i>Ir al panel de moderación
                         </a>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <a href="<?= e($urlPanelModeracion) ?>" class="perfil-acceso" title="Abrir panel de moderación">
+                                <span class="perfil-acceso-valor"><?= $moderacion['pendientes'] ?></span>
+                                <span class="perfil-acceso-titulo">Por revisar</span>
+                                <span class="perfil-acceso-detalle">Solicitudes esperando decisión</span>
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="perfil-acceso">
+                                <span class="perfil-acceso-valor"><?= $moderacion['activas'] ?></span>
+                                <span class="perfil-acceso-titulo">Subastas activas</span>
+                                <span class="perfil-acceso-detalle">Publicadas y recibiendo pujas</span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="perfil-acceso">
+                                <span class="perfil-acceso-valor"><?= $moderacion['cerradas'] ?></span>
+                                <span class="perfil-acceso-titulo">Subastas cerradas</span>
+                                <span class="perfil-acceso-detalle">Finalizadas o sin ofertas</span>
+                            </div>
+                        </div>
                     </div>
                 </section>
             <?php endif; ?>
 
-            <!-- Datos personales y seguridad -->
+            <!-- dts personales-->
             <div class="row g-4">
                 <section class="col-lg-6" aria-labelledby="titulo-datos">
                     <div class="perfil-card h-100">
                         <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
                             <h2 id="titulo-datos" class="fs-5 fw-bold text-main-ppi mb-0">Datos personales</h2>
-                            <a href="#" class="link-ppi fw-bold d-inline p-0 small" data-proximamente="Editar datos personales">Editar</a>
+                            <a href="#" class="link-ppi fw-bold d-inline p-0 small" data-bs-toggle="modal" data-bs-target="#modalEditarPerfil">Editar</a>
                         </div>
                         <dl class="mb-0">
                             <?php foreach ($datos as $campo => $valor): ?>
@@ -332,7 +330,7 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
 
             <?php if ($esUsuario): ?>
                 <!-- USUARIO COMÚN: sus subastas en curso -->
-                <section aria-labelledby="titulo-subastas">
+                <section id="seccionMisSubastas" aria-labelledby="titulo-subastas" data-subastas-url="<?= BASE_URL ?>controllers/perfil_controller.php">
                     <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
                         <h2 id="titulo-subastas" class="fs-4 fw-bold text-main-ppi mb-0">Mis subastas activas</h2>
                         <a href="<?= BASE_URL ?>views/subastas/mis-productos.php" class="link-ppi fw-bold d-inline p-0 small">Ver mis productos</a>
@@ -357,17 +355,17 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                                 $pujas = (int)$s['total_pujas'];
                                 ?>
                                 <div class="col-12 col-md-6 col-lg-4">
-                                    <article class="perfil-subasta">
+                                    <a href="<?= BASE_URL ?>views/subastas/mis-productos.php" class="perfil-subasta d-block text-decoration-none" data-subasta-id="<?= (int)$s['id_subasta'] ?>" title="Ver en mis productos">
                                         <img src="<?= $imgRuta ?>" alt="<?= e($s['nombre']) ?>" class="perfil-subasta-img" onerror="this.onerror=null; this.src='<?= BASE_URL ?>assets/img/hero-img.jpg';">
                                         <div class="p-3">
                                             <h3 class="fs-6 fw-bold text-main-ppi text-truncate mb-2" title="<?= e($s['nombre']) ?>"><?= e($s['nombre']) ?></h3>
                                             <div class="d-flex justify-content-between align-items-baseline gap-2">
-                                                <span class="precio-ppi fs-5" title="Puja más alta">$<?= number_format((float)$s['precio_actual'], 2) ?></span>
-                                                <span class="tiempo-ppi small"><?= e(tiempoRestante($s['segundos_restantes'])) ?></span>
+                                                <span class="precio-ppi fs-5" data-subasta-precio title="Puja más alta">$<?= number_format((float)$s['precio_actual'], 2) ?></span>
+                                                <span class="tiempo-ppi small" data-segundos-restantes="<?= max(0, (int)$s['segundos_restantes']) ?>"><?= e(tiempoRestante($s['segundos_restantes'])) ?></span>
                                             </div>
-                                            <div class="text-second-ppi small mt-1"><?= $pujas ?> <?= $pujas === 1 ? 'puja' : 'pujas' ?></div>
+                                            <div class="text-second-ppi small mt-1" data-subasta-pujas><?= $pujas ?> <?= $pujas === 1 ? 'puja' : 'pujas' ?></div>
                                         </div>
-                                    </article>
+                                    </a>
                                 </div>
                             <?php endforeach; ?>
                         </div>
@@ -378,14 +376,13 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
         </div>
     </main>
 
-    <!-- Cambiar contraseña -->
+    <!-- Cambiar contra -->
     <div class="modal fade" id="modalCambiarClave" tabindex="-1" aria-labelledby="modalCambiarClaveTitulo" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content modal-content-ppi">
                 <div class="modal-header modal-header-ppi">
-                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2" id="modalCambiarClaveTitulo">
-                        <i class="fas fa-key text-warning fs-5"></i>
-                        <span>Cambiar contraseña</span>
+                    <h5 class="modal-title fw-bold text-white" id="modalCambiarClaveTitulo">
+                        Cambiar contraseña
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
@@ -426,11 +423,78 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
         </div>
     </div>
 
+    <div class="modal fade" id="modalPPI" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-ppi">
+                <div class="modal-header modal-header-ppi">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2" id="modalPPITitulo">
+                        Aviso
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body py-4" id="modalPPICuerpo">
+                    Mensaje
+                </div>
+                <div class="modal-footer modal-footer-ppi">
+                    <button type="button" class="btn btn-ppi-modal btn-sm" id="btnModalPPIAccion" data-bs-dismiss="modal">Entendido</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- modal editar datos -->
+    <div class="modal fade" id="modalEditarPerfil" tabindex="-1" aria-labelledby="modalEditarPerfilTitulo" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-ppi">
+                <div class="modal-header modal-header-ppi">
+                    <h5 class="modal-title fw-bold text-white" id="modalEditarPerfilTitulo">
+                        Editar datos personales
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <form id="formEditarPerfil" method="POST" action="<?= BASE_URL ?>controllers/perfil_controller.php" autocomplete="off" novalidate>
+                        <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="edit_nombre" class="form-label text-main-ppi fw-bold">Nombre <span class="req-star">*</span></label>
+                                <input type="text" class="form-control" id="edit_nombre" name="nombre" maxlength="50" value="<?= e($perfil['nombre']) ?>" required>
+                                <div class="invalid-feedback" id="err_edit_nombre">Ingresa tu nombre.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="edit_apellido" class="form-label text-main-ppi fw-bold">Apellido <span class="req-star">*</span></label>
+                                <input type="text" class="form-control" id="edit_apellido" name="apellido" maxlength="50" value="<?= e($perfil['apellido']) ?>" required>
+                                <div class="invalid-feedback" id="err_edit_apellido">Ingresa tu apellido.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="edit_telefono" class="form-label text-main-ppi fw-bold">Teléfono <span class="req-star">*</span></label>
+                                <input type="tel" class="form-control" id="edit_telefono" name="telefono" placeholder="Ej. 7000-0000" maxlength="9" value="<?= e($perfil['telefono']) ?>" required>
+                                <div class="invalid-feedback" id="err_edit_telefono">Usa el formato 7000-0000.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="edit_ubicacion" class="form-label text-main-ppi fw-bold">Ubicación <span class="req-star">*</span></label>
+                                <input type="text" class="form-control" id="edit_ubicacion" name="ubicacion" placeholder="Ciudad, Departamento" maxlength="100" value="<?= e($perfil['ubicacion']) ?>" required>
+                                <div class="invalid-feedback" id="err_edit_ubicacion">Ingresa tu ubicación.</div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-text text-second-ppi">El correo y el nombre de usuario no se pueden cambiar desde aquí.</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer modal-footer-ppi d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-secondary btn-sm px-3 py-2 fw-semibold" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" form="formEditarPerfil" class="btn btn-primary btn-sm px-3 py-2 fw-semibold" id="btnGuardarDatos">Guardar cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <?php include "Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>assets/js/toast-ppi.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/perfil.js?v=2"></script>
+    <script src="<?= BASE_URL ?>assets/js/perfil.js?v=7"></script>
 </body>
 
 </html>

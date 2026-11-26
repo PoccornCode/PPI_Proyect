@@ -42,7 +42,7 @@ if ($flashToast !== null) {
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/main.css?v=30" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/forms.css?v=49" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/forms.css?v=50" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -152,7 +152,7 @@ if ($flashToast !== null) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>assets/js/toast-ppi.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/login.js?v=6"></script>
+    <script src="<?= BASE_URL ?>assets/js/login.js?v=7"></script>
     <?php if (isset($_GET['verificado']) && $_GET['verificado'] == '1'): ?>
         <script>
             document.addEventListener("DOMContentLoaded", function() {

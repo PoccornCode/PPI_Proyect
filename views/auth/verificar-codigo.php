@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once dirname(__DIR__, 2) . '/config/env.php';
 $titulo = "Verificar Cuenta";
 $pagina = "verificar-cuenta";
@@ -156,7 +157,7 @@ $correoUrl = isset($_GET['correo']) ? trim($_GET['correo']) : '';
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>assets/js/toast-ppi.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/verificar-codigo.js?v=4"></script>
+    <script src="<?= BASE_URL ?>assets/js/verificar-codigo.js?v=5"></script>
 </body>
 
 </html>

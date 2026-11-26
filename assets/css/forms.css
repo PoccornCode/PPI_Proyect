@@ -509,6 +509,7 @@ div:where(.swal2-container).swal2-backdrop-show,
     }
 
     .auth-hero-subtitle,
+    .auth-hero-lead,
     .auth-hero-desc {
         margin-left: auto;
         margin-right: auto;

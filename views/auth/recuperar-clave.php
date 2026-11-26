@@ -60,7 +60,7 @@ if (!empty($_SESSION['id_usuario'])) {
                 <div class="col-lg-6 ps-lg-3">
                     <div class="card auth-card shadow p-4 p-md-5">
 
-                        <!-- PASO 1: SOLICITAR CÓDIGO -->
+                        <!-- soli codigo -->
                         <div id="pasoSolicitar">
                             <h3 class="mb-2 text-center text-main-ppi fw-bold">Recuperar contraseña</h3>
                             <p class="mb-4 text-center text-second-ppi fs-6">Ingresa el correo asociado a tu cuenta</p>
@@ -81,7 +81,7 @@ if (!empty($_SESSION['id_usuario'])) {
                             </form>
                         </div>
 
-                        <!-- PASO 2: VERIFICAR CÓDIGO Y CAMBIAR CONTRASEÑA -->
+                        <!-- verificar codig0 -->
                         <div id="pasoRestablecer" class="d-none">
                             <h3 class="mb-2 text-center text-main-ppi fw-bold">Restablecer contraseña</h3>
                             <p class="mb-3 text-center text-second-ppi fs-6">

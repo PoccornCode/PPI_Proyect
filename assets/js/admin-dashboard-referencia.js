@@ -4,98 +4,9 @@
 (function () {
     'use strict';
 
-    const activateTab = (tab) => window.AdminDashboard?.activateTab(tab);
     const showToast = (msg) => window.AdminDashboard?.notify(msg);
 
-    // =========================================================================
-    // FILTROS EN VIVO — USUARIOS Y SUBASTAS
-    // =========================================================================
-    const userSearchInput = document.getElementById('admUserSearch');
-    const userRoleFilter = document.getElementById('admUserRoleFilter');
-    const usersTableBody = document.getElementById('admUsersTbody');
-    const usersCountLabel = document.getElementById('admUsersCount');
-
-    function filterUsersTable() {
-        if (!usersTableBody) return;
-        const q = (userSearchInput?.value || '').trim().toLowerCase();
-        const role = (userRoleFilter?.value || '').toLowerCase();
-        let visible = 0;
-
-        usersTableBody.querySelectorAll('tr').forEach((row) => {
-            const email = (row.dataset.email || '').toLowerCase();
-            const rowRole = (row.dataset.role || '').toLowerCase();
-            const matchText = !q || email.includes(q);
-            const matchRole = !role || rowRole === role;
-            const show = matchText && matchRole;
-            row.style.display = show ? '' : 'none';
-            if (show) visible++;
-        });
-
-        if (usersCountLabel) {
-            usersCountLabel.textContent = `Mostrando ${visible} usuario${visible === 1 ? '' : 's'}`;
-        }
-    }
-
-    userSearchInput?.addEventListener('input', filterUsersTable);
-    userRoleFilter?.addEventListener('change', filterUsersTable);
-
-    const auctionSearchInput = document.getElementById('admAuctionSearch');
-    const auctionCatFilter = document.getElementById('admAuctionCatFilter');
-    const auctionsTableBody = document.getElementById('admAuctionsTbody');
-    const auctionsCountLabel = document.getElementById('admAuctionsCount');
-
-    function filterAuctionsTable() {
-        if (!auctionsTableBody) return;
-        const q = (auctionSearchInput?.value || '').trim().toLowerCase();
-        const cat = (auctionCatFilter?.value || '').toLowerCase();
-        let visible = 0;
-
-        auctionsTableBody.querySelectorAll('tr').forEach((row) => {
-            const title = (row.dataset.title || '').toLowerCase();
-            const rowCat = (row.dataset.category || '').toLowerCase();
-            const matchText = !q || title.includes(q) || rowCat.includes(q);
-            const matchCat = !cat || rowCat === cat;
-            const show = matchText && matchCat;
-            row.style.display = show ? '' : 'none';
-            if (show) visible++;
-        });
-
-        if (auctionsCountLabel) {
-            auctionsCountLabel.textContent = `Mostrando ${visible} subasta${visible === 1 ? '' : 's'}`;
-        }
-    }
-
-    auctionSearchInput?.addEventListener('input', filterAuctionsTable);
-    auctionCatFilter?.addEventListener('change', filterAuctionsTable);
-
-    // Global topbar search jumps to Usuarios or Subastas if user presses Enter
-    const globalSearch = document.getElementById('admGlobalSearch');
-    if (globalSearch) {
-        globalSearch.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const term = globalSearch.value.trim();
-                if (!term) return;
-                if (term.includes('@')) {
-                    activateTab('usuarios');
-                    if (userSearchInput) {
-                        userSearchInput.value = term;
-                        filterUsersTable();
-                    }
-                } else {
-                    activateTab('subastas');
-                    if (auctionSearchInput) {
-                        auctionSearchInput.value = term;
-                        filterAuctionsTable();
-                    }
-                }
-            }
-        });
-    }
-
-    // =========================================================================
-    // CATEGORÍAS — INTERACCIONES DE DISEÑO / REFERENCIA (SIN BACKEND)
-    // =========================================================================
+    // Categorías en modo referencia (sin backend)
     const catCfg = window.ADM_CATEGORIES_DEMO;
     if (catCfg && document.getElementById('admCatGrid')) {
         const baseUrl = catCfg.baseUrl || '';
@@ -338,9 +249,7 @@
         inputEstado?.addEventListener('change', syncModalEstado);
     }
 
-    // =========================================================================
-    // REPORTES — DISEÑO INTERACTIVO DE REFERENCIA (SIN BACKEND)
-    // =========================================================================
+    // Reportes en modo referencia (sin backend)
     const repSection = document.getElementById('sec-reportes');
     if (repSection) {
         const repPeriodSelect = document.getElementById('admRepPeriod');
@@ -812,9 +721,7 @@
         refreshReports();
     }
 
-    // =========================================================================
-    // CONFIGURACIÓN — INTERACCIONES DE DISEÑO (SIN BACKEND)
-    // =========================================================================
+    // Configuración en modo referencia (sin backend)
     const cfgSection = document.getElementById('sec-configuracion');
     if (cfgSection) {
         const cfgForm = document.getElementById('admCfgForm');
@@ -900,13 +807,6 @@
         syncConditionalRows();
         syncDirtyState();
     }
-
-    // Demo action buttons (edit/delete)
-    document.querySelectorAll('[data-adm-demo-action]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-            showToast(btn.dataset.admDemoAction);
-        });
-    });
 
     // Demo form submit inside modals
     document.querySelectorAll('[data-adm-demo-form]').forEach((form) => {

@@ -62,6 +62,11 @@ $totalListaPendientes = count($subastasPendientes);
                         <td class="fw-semibold"><?= htmlspecialchars($item['precio']) ?></td>
                         <td>
                             <span class="adm-badge adm-badge--pendiente mod-row-status">Pendiente</span>
+                            <?php if (($item['tipo_solicitud'] ?? 'nueva') === 'reenvio'): ?>
+                                <div class="mod-sub-meta mt-1">Reenvío corregido</div>
+                            <?php elseif (($item['tipo_solicitud'] ?? 'nueva') === 'apelacion'): ?>
+                                <div class="mod-sub-meta mt-1">Apelación</div>
+                            <?php endif; ?>
                         </td>
                         <td>
                             <div class="adm-action-group">

@@ -286,7 +286,7 @@ $mod_inicial = $perfilMod['inicial'];
     <script src="<?= $base_url ?>assets/js/sesion-inactividad.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/sesion-inactividad.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/toast-ppi.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/toast-ppi.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/moderador-kpis.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/moderador-kpis.js') ?>"></script>
-    <script src="<?= $base_url ?>assets/js/moderador-paginacion.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/moderador-paginacion.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/paginacion.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/paginacion.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/moderador-filtros.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/moderador-filtros.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/moderador-cola.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/moderador-cola.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/moderador-administrar.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/moderador-administrar.js') ?>"></script>

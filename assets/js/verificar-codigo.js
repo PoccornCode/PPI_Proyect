@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 1000);
     }
 
-    // Envio del formulario de verificacion
+    // envio del formulario de verificacion
     if (form) {
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -107,14 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (res.estado) {
                     inputs.forEach(inp => inp.disabled = true);
-
-                    if (typeof mostrarToast === "function") {
-                        mostrarToast("success", "¡Cuenta Verificada!", res.mensaje || "Cuenta activada con éxito.");
-                    }
-
-                    setTimeout(() => {
-                        window.location.href = "login.php?verificado=1";
-                    }, 1200);
+                    window.location.href = "login.php?verificado=1";
                 } else {
                     inputs.forEach(inp => inp.classList.add("is-invalid"));
                     if (typeof mostrarToast === "function") {
@@ -134,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Botón de reenvío
+    // btn reevio
     if (btnReenviar) {
         btnReenviar.addEventListener("click", async () => {
             const correo = inputCorreo ? inputCorreo.value.trim() : "";

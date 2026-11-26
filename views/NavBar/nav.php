@@ -18,7 +18,7 @@ $categorias_nav = obtenerCategoriasPopularesNav(6);
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Raleway:wght@600;700;800&display=swap" rel="stylesheet">
-<link href="<?php echo $base_url; ?>assets/css/main.css?v=45" rel="stylesheet">
+<link href="<?php echo $base_url; ?>assets/css/main.css?v=47" rel="stylesheet">
 
 <header class="sticky-top navbar-ppi-wrapper" style="background-color: #0c0f0a !important; border-bottom: 2px solid #658807 !important; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7) !important;">
     <nav class="navbar navbar-expand-xl navbar-dark py-2 py-lg-3" style="background-color: transparent !important;">
@@ -32,21 +32,36 @@ $categorias_nav = obtenerCategoriasPopularesNav(6);
                 </span>
             </a>
 
-            <button class="navbar-toggler border-0 p-2 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler border-0 p-2 shadow-none" type="button" id="navDrawerToggler" aria-controls="navDrawer" aria-expanded="false" aria-label="Abrir menú de navegación">
                 <span class="text-main-ppi">
                     <i class="fas fa-bars fs-4"></i>
                 </span>
             </button>
 
-            <div class="collapse navbar-collapse" id="navbarCollapse">
-                <ul class="navbar-nav mx-auto mb-2 mb-xl-0 align-items-xl-center gap-xl-1">
+            <div class="nav-drawer-backdrop d-xl-none" id="navDrawerBackdrop" aria-hidden="true"></div>
+
+            <div class="nav-drawer-panel" id="navDrawer" role="dialog" aria-modal="true" aria-label="Menú de navegación">
+                <div class="nav-drawer-header d-flex d-xl-none align-items-center justify-content-between">
+                    <a href="<?php echo $base_url; ?>index.php" class="d-flex align-items-center gap-2 gavel-brand text-decoration-none">
+                        <i class="fas fa-gavel brand-icon text-third-ppi" style="font-size: 1.25rem; line-height: 1;" aria-hidden="true"></i>
+                        <span class="d-flex align-items-baseline gap-1">
+                            <span class="brand-name text-main-ppi fw-bold" style="font-size: 1.35rem; line-height: 1; font-family: 'Raleway', sans-serif;">Gavel</span>
+                            <span class="brand-tld text-third-ppi fw-bold" style="font-size: 1.1rem; line-height: 1; font-family: 'Raleway', sans-serif;">.net</span>
+                        </span>
+                    </a>
+                    <button type="button" class="nav-drawer-close" id="navDrawerClose" aria-label="Cerrar menú">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <ul class="navbar-nav mx-auto mb-2 mb-xl-0 align-items-xl-center gap-xl-1 nav-drawer-links">
                     <li class="nav-item">
                         <a href="<?php echo $base_url; ?>index.php" class="nav-link link-ppi">Inicio</a>
                     </li>
                     <li class="nav-item">
                         <a href="<?php echo $base_url; ?>views/catalogo.php" class="nav-link link-ppi">Subastas</a>
                     </li>
-                    <li class="nav-item dropdown">
+                    <li class="nav-item dropdown d-none d-xl-block">
                         <a href="<?php echo $base_url; ?>views/categorias.php" class="nav-link link-ppi dropdown-toggle" id="dropdownCategorias" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Categorías
                         </a>
@@ -68,6 +83,22 @@ $categorias_nav = obtenerCategoriasPopularesNav(6);
                             </li>
                         </ul>
                     </li>
+                    <li class="nav-item d-xl-none">
+                        <button type="button" class="nav-link link-ppi nav-drawer-accordion-btn" id="navDrawerCatToggle" aria-expanded="false" aria-controls="navDrawerCategorias">
+                            <span>Categorías</span>
+                            <i class="fas fa-chevron-down nav-drawer-accordion-caret"></i>
+                        </button>
+                        <div class="nav-drawer-sublist" id="navDrawerCategorias" hidden>
+                            <?php foreach ($categorias_nav as $catNav): ?>
+                                <a class="nav-drawer-sublink" href="<?php echo $base_url; ?>views/catalogo.php?categoria=<?= urlencode($catNav['nombre']) ?>">
+                                    <?= htmlspecialchars($catNav['nombre']) ?>
+                                </a>
+                            <?php endforeach; ?>
+                            <a class="nav-drawer-sublink nav-drawer-sublink--all" href="<?php echo $base_url; ?>views/categorias.php">
+                                Ver todas las categorías &rarr;
+                            </a>
+                        </div>
+                    </li>
                     <li class="nav-item">
                         <a href="<?php echo $base_url; ?>views/como-funciona.php" class="nav-link link-ppi">Cómo funciona</a>
                     </li>
@@ -76,7 +107,7 @@ $categorias_nav = obtenerCategoriasPopularesNav(6);
                     </li>
                 </ul>
 
-                <div class="d-flex flex-column flex-xl-row align-items-stretch align-items-xl-center gap-2 pt-3 pt-xl-0 border-top-mobile">
+                <div class="nav-drawer-actions d-flex flex-column flex-xl-row align-items-stretch align-items-xl-center gap-2 pt-3 pt-xl-0 border-top-mobile">
                     <a href="<?php echo $base_url; ?>views/subastas/registro-producto.php" class="btn btn-outline-publish btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center justify-content-center">
                         <i class="fas fa-plus me-1 small"></i>Publicar producto
                     </a>
@@ -85,7 +116,7 @@ $categorias_nav = obtenerCategoriasPopularesNav(6);
                         $nav_primer_nombre = trim(explode(' ', trim($_SESSION['nombre'] ?? 'Usuario'))[0]);
                         $nav_inicial = strtoupper(mb_substr($nav_primer_nombre !== '' ? $nav_primer_nombre : 'U', 0, 1, 'UTF-8'));
                         ?>
-                        <div class="dropdown">
+                        <div class="dropdown d-none d-xl-block">
                             <button class="btn-nav-profile-pill d-inline-flex align-items-center" type="button" id="dropdownPerfil" data-bs-toggle="dropdown" aria-expanded="false" title="Mi Cuenta" aria-label="Menú de cuenta de usuario">
                                 <span class="nav-avatar-circle"><?= htmlspecialchars($nav_inicial) ?></span>
                                 <span class="nav-profile-name"><?= htmlspecialchars($nav_primer_nombre) ?></span>
@@ -132,14 +163,49 @@ $categorias_nav = obtenerCategoriasPopularesNav(6);
                                 </li>
                             </ul>
                         </div>
+
+                        <div class="nav-drawer-user d-xl-none">
+                            <div class="nav-drawer-user-card">
+                                <span class="nav-avatar-circle"><?= htmlspecialchars($nav_inicial) ?></span>
+                                <div class="min-w-0">
+                                    <div class="menu-perfil-name text-truncate">
+                                        <?= htmlspecialchars($_SESSION['nombre'] ?? 'Usuario') ?> <?= htmlspecialchars($_SESSION['apellido'] ?? '') ?>
+                                    </div>
+                                    <div class="menu-perfil-user text-truncate">@<?= htmlspecialchars($_SESSION['username'] ?? 'usuario') ?></div>
+                                </div>
+                            </div>
+                            <div class="nav-drawer-user-links">
+                                <a class="nav-drawer-user-link" href="<?php echo $base_url; ?>views/perfil.php">
+                                    <i class="fas fa-user"></i> Mi Perfil
+                                </a>
+                                <a class="nav-drawer-user-link" href="<?php echo $base_url; ?>views/subastas/mis-productos.php">
+                                    <i class="fas fa-box-open"></i> Mis Productos
+                                </a>
+                                <?php if ((int)($_SESSION['id_rol'] ?? 0) === 1): ?>
+                                    <a class="nav-drawer-user-link" href="<?php echo $base_url; ?>views/admin/dashboard.php">
+                                        <i class="fas fa-crown"></i> Panel de Administración
+                                    </a>
+                                <?php endif; ?>
+                                <?php if (in_array((int)($_SESSION['id_rol'] ?? 0), [1, 3], true)): ?>
+                                    <a class="nav-drawer-user-link" href="<?php echo $base_url; ?>views/moderador/dashboard.php">
+                                        <i class="fas fa-shield-alt"></i> Panel de Moderación
+                                    </a>
+                                <?php endif; ?>
+                                <button type="button" class="nav-drawer-user-link nav-drawer-user-link--logout" data-bs-toggle="modal" data-bs-target="#modalConfirmLogout">
+                                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                </button>
+                            </div>
+                        </div>
                     <?php else: ?>
-                        <a href="<?php echo $base_url; ?>views/auth/login.php" class="btn btn-secondary btn-sm px-3 py-2 fw-semibold">
-                            Iniciar Sesión
-                        </a>
-                        <a href="<?php echo $base_url; ?>views/auth/registro.php" class="btn btn-primary btn-sm px-3 py-2 fw-semibold">
-                            Registrarse
-                        </a>
-                        <a href="<?php echo $url_perfil; ?>" class="btn-nav-profile d-inline-flex align-items-center justify-content-center" title="Iniciar sesión" aria-label="Acceder a cuenta o perfil">
+                        <div class="nav-drawer-auth-grid">
+                            <a href="<?php echo $base_url; ?>views/auth/login.php" class="btn btn-secondary btn-sm px-3 py-2 fw-semibold">
+                                Iniciar Sesión
+                            </a>
+                            <a href="<?php echo $base_url; ?>views/auth/registro.php" class="btn btn-primary btn-sm px-3 py-2 fw-semibold">
+                                Registrarse
+                            </a>
+                        </div>
+                        <a href="<?php echo $url_perfil; ?>" class="btn-nav-profile d-none d-xl-inline-flex align-items-center justify-content-center" title="Iniciar sesión" aria-label="Acceder a cuenta o perfil">
                             <i class="fas fa-user-circle"></i>
                         </a>
                     <?php endif; ?>
@@ -149,6 +215,68 @@ $categorias_nav = obtenerCategoriasPopularesNav(6);
         </div>
     </nav>
 </header>
+
+<script>
+    (function () {
+        const toggler = document.getElementById('navDrawerToggler');
+        const drawer = document.getElementById('navDrawer');
+        const backdrop = document.getElementById('navDrawerBackdrop');
+        const closeBtn = document.getElementById('navDrawerClose');
+        const catToggle = document.getElementById('navDrawerCatToggle');
+        const catList = document.getElementById('navDrawerCategorias');
+
+        if (!toggler || !drawer || !backdrop) return;
+
+        function setDrawerOpen(open) {
+            drawer.classList.toggle('is-open', open);
+            backdrop.classList.toggle('is-open', open);
+            toggler.setAttribute('aria-expanded', open ? 'true' : 'false');
+            document.body.style.overflow = open ? 'hidden' : '';
+        }
+
+        toggler.addEventListener('click', function () {
+            setDrawerOpen(!drawer.classList.contains('is-open'));
+        });
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function () {
+                setDrawerOpen(false);
+            });
+        }
+
+        backdrop.addEventListener('click', function () {
+            setDrawerOpen(false);
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && drawer.classList.contains('is-open')) {
+                setDrawerOpen(false);
+            }
+        });
+
+        if (catToggle && catList) {
+            catToggle.addEventListener('click', function () {
+                const expanded = catToggle.getAttribute('aria-expanded') === 'true';
+                catToggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+                catList.hidden = expanded;
+            });
+        }
+
+        drawer.querySelectorAll('a, [data-bs-toggle="modal"]').forEach(function (el) {
+            el.addEventListener('click', function () {
+                if (window.innerWidth < 1200) {
+                    setDrawerOpen(false);
+                }
+            });
+        });
+
+        window.addEventListener('resize', function () {
+            if (window.innerWidth >= 1200 && drawer.classList.contains('is-open')) {
+                setDrawerOpen(false);
+            }
+        });
+    })();
+</script>
 
 <?php if ($usuario_logueado): ?>
     <div class="modal fade" id="modalConfirmLogout" tabindex="-1" aria-labelledby="modalConfirmLogoutLabel" aria-hidden="true">
