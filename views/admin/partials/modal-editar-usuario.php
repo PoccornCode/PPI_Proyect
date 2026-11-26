@@ -68,7 +68,6 @@ $rolesListaModal = $rolesAdmin ?? [];
                             </div>
 
                             <div class="adm-user-edit-lock-note d-none" id="admUserEditLockNote">
-                                <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
                                 <span id="admUserEditLockNoteText"></span>
                             </div>
                         </div>
