@@ -43,6 +43,45 @@ class CategoriaDAO
         return $categorias;
     }
 
+    public function listarCategoriasAdmin(): array
+    {
+        $categorias = [];
+        if (!$this->conexion || $this->conexion->connect_errno) {
+            return $categorias;
+        }
+
+        $sql = "SELECT
+                    c.id_categoria,
+                    c.nombre,
+                    c.descripcion,
+                    c.imagen,
+                    c.estado,
+                    COUNT(DISTINCT p.id_producto) AS total_productos,
+                    COUNT(DISTINCT s.id_subasta) AS total_subastas
+                FROM sb_categoria c
+                LEFT JOIN sb_producto p ON p.id_categoria = c.id_categoria
+                LEFT JOIN sb_subasta s ON s.id_producto = p.id_producto
+                GROUP BY c.id_categoria, c.nombre, c.descripcion, c.imagen, c.estado
+                ORDER BY c.nombre ASC";
+        $res = $this->conexion->query($sql);
+
+        if ($res) {
+            while ($row = $res->fetch_assoc()) {
+                $categorias[] = [
+                    'id_categoria'    => (int)$row['id_categoria'],
+                    'nombre'          => (string)$row['nombre'],
+                    'descripcion'     => (string)($row['descripcion'] ?? ''),
+                    'imagen'          => !empty($row['imagen']) ? (string)$row['imagen'] : 'assets/img/cat-coleccionables.jpg',
+                    'estado'          => (int)($row['estado'] ?? 1),
+                    'total_subastas'  => (int)($row['total_subastas'] ?? 0),
+                    'total_productos' => (int)($row['total_productos'] ?? 0),
+                ];
+            }
+        }
+
+        return $categorias;
+    }
+
     public function listarPopulares(int $limite = 6, bool $ordenAlfabetico = true): array
     {
         $categorias = [];

@@ -180,7 +180,7 @@ function obtenerDetalleUsuarioAdmin(int $idUsuario, int $idAdminActual = 0): ?ar
 function obtenerCategoriasAdmin(): array
 {
     $dao = new CategoriaDAO();
-    return $dao->listarCategorias();
+    return $dao->listarCategoriasAdmin();
 }
 
 function obtenerSubastasAdmin(string $baseUrl = ''): array
@@ -551,6 +551,20 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
         }
 
         echo json_encode($res, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'categorias') {
+        $categorias = obtenerCategoriasAdmin();
+        echo json_encode([
+            'estado'     => true,
+            'categorias' => $categorias,
+            'resumen'    => [
+                'total'        => count($categorias),
+                'publicadas'   => count(array_filter($categorias, fn($c) => (int)$c['estado'] === 1)),
+                'desactivadas' => count(array_filter($categorias, fn($c) => (int)$c['estado'] === 0)),
+            ],
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
 

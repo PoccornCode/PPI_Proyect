@@ -26,98 +26,7 @@ $adm_username = $perfilAdmin['username'];
 $adm_rol_nombre = $perfilAdmin['rol_nombre'];
 $adm_inicial = $perfilAdmin['inicial'];
 
-$categorias_admin = [
-    [
-        'id_categoria'    => 1,
-        'nombre'          => 'Coleccionables',
-        'descripcion'     => 'Numismática, filatelia, relojes antiguos, figuras de edición limitada y artículos históricos.',
-        'imagen'          => 'assets/img/cat-coleccionables.jpg',
-        'estado'          => 1,
-        'total_subastas'  => 14,
-        'total_productos' => 14,
-    ],
-    [
-        'id_categoria'    => 2,
-        'nombre'          => 'Tecnología',
-        'descripcion'     => 'Equipos de cómputo, cámaras fotográficas, consolas, audio de alta fidelidad y periféricos.',
-        'imagen'          => 'assets/img/cat-tecnologia.jpg',
-        'estado'          => 1,
-        'total_subastas'  => 11,
-        'total_productos' => 11,
-    ],
-    [
-        'id_categoria'    => 3,
-        'nombre'          => 'Arte',
-        'descripcion'     => 'Pinturas al óleo, esculturas, grabados originales, fotografía artística y piezas de autor.',
-        'imagen'          => 'assets/img/cat-arte.jpg',
-        'estado'          => 1,
-        'total_subastas'  => 7,
-        'total_productos' => 7,
-    ],
-    [
-        'id_categoria'    => 4,
-        'nombre'          => 'Joyería',
-        'descripcion'     => 'Relojería fina, anillos de plata y oro, piedras preciosas y accesorios de alta gama.',
-        'imagen'          => 'assets/img/cat-joyeria.jpg',
-        'estado'          => 1,
-        'total_subastas'  => 9,
-        'total_productos' => 9,
-    ],
-    [
-        'id_categoria'    => 5,
-        'nombre'          => 'Moda',
-        'descripcion'     => 'Prendas de diseñador, calzado, bolsos, artículos vintage y accesorios exclusivos.',
-        'imagen'          => 'assets/img/cat-moda.jpg',
-        'estado'          => 1,
-        'total_subastas'  => 6,
-        'total_productos' => 6,
-    ],
-    [
-        'id_categoria'    => 6,
-        'nombre'          => 'Instrumentos Musicales',
-        'descripcion'     => 'Guitarras acústicas y eléctricas, teclados, amplificadores de estudio y equipamiento musical.',
-        'imagen'          => 'assets/img/cat-instrumentos.jpg',
-        'estado'          => 1,
-        'total_subastas'  => 5,
-        'total_productos' => 5,
-    ],
-    [
-        'id_categoria'    => 7,
-        'nombre'          => 'Libros',
-        'descripcion'     => 'Primeras ediciones, libros antiguos, literatura clásica, manuscritos y publicaciones históricas.',
-        'imagen'          => 'assets/img/cat-libros.jpg',
-        'estado'          => 1,
-        'total_subastas'  => 4,
-        'total_productos' => 4,
-    ],
-    [
-        'id_categoria'    => 8,
-        'nombre'          => 'Hogar',
-        'descripcion'     => 'Mobiliario de diseño, iluminación decorativa, cerámica fina, alfombras y artículos para el hogar.',
-        'imagen'          => 'assets/img/cat-hogar.jpg',
-        'estado'          => 1,
-        'total_subastas'  => 3,
-        'total_productos' => 3,
-    ],
-    [
-        'id_categoria'    => 9,
-        'nombre'          => 'Deportes',
-        'descripcion'     => 'Artículos deportivos, equipamiento de ciclismo, aventura y coleccionables deportivos.',
-        'imagen'          => 'assets/img/cat-deportes.jpg',
-        'estado'          => 0,
-        'total_subastas'  => 2,
-        'total_productos' => 2,
-    ],
-    [
-        'id_categoria'    => 10,
-        'nombre'          => 'Vehículos',
-        'descripcion'     => 'Automóviles clásicos, motocicletas, bicicletas de ruta, repuestos originales y accesorios.',
-        'imagen'          => 'assets/img/cat-vehiculos.jpg',
-        'estado'          => 0,
-        'total_subastas'  => 0,
-        'total_productos' => 0,
-    ],
-];
+$categorias_admin = $categoriasAdmin;
 
 $resumen_categorias = [
     'total'        => count($categorias_admin),
@@ -348,7 +257,7 @@ $resumen_categorias = [
                 <?php endforeach; ?>
             </div>
 
-            <div class="adm-cat-empty d-none" id="admCatEmpty">
+            <div class="adm-cat-empty <?= empty($categorias_admin) ? '' : 'd-none' ?>" id="admCatEmpty">
                 <div class="adm-cat-empty-icon"><i class="fa-regular fa-folder-open"></i></div>
                 <h3 class="h6 text-white fw-bold mb-1">No se encontraron categorías</h3>
                 <p class="small mb-3" style="color:#9aa392;">Prueba con otro término de búsqueda o cambia el filtro de estado.</p>
@@ -1113,10 +1022,6 @@ $resumen_categorias = [
         window.ADM_BASE_URL = <?= json_encode($base_url, JSON_UNESCAPED_SLASHES) ?>;
         window.ADM_GRAFICOS_INICIO = <?= json_encode($graficosInicio, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
         window.ADM_USUARIOS_INICIAL = <?= json_encode($usuariosAdminInicial, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
-        window.ADM_CATEGORIES_DEMO = {
-            baseUrl: <?= json_encode($base_url, JSON_UNESCAPED_SLASHES) ?>,
-            categorias: <?= json_encode($categorias_admin, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
-        };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= $base_url ?>assets/js/sesion-inactividad.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/sesion-inactividad.js') ?>"></script>
