@@ -67,9 +67,10 @@ if ($totalUsuarios === 0) {
                 <tbody id="admUsersTbody">
                     <?php if (empty($usuariosLista)): ?>
                         <tr>
-                            <td colspan="5" class="adm-table-empty">
-                                <i class="fa-solid fa-users-slash" aria-hidden="true"></i>
-                                <span>No se encontraron usuarios registrados.</span>
+                            <td colspan="5" class="text-center py-4">
+                                <div class="adm-cat-empty-icon mx-auto"><i class="fa-solid fa-users-slash" aria-hidden="true"></i></div>
+                                <h3 class="h6 text-white fw-bold mb-1">No se encontraron usuarios</h3>
+                                <p class="small mb-0" style="color:#9aa392;">No hay usuarios registrados en este momento.</p>
                             </td>
                         </tr>
                     <?php else: ?>

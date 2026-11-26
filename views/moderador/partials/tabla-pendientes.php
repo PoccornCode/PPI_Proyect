@@ -91,13 +91,14 @@ $totalListaPendientes = count($subastasPendientes);
                     </tr>
                 <?php endforeach; ?>
                 <tr id="modApprovalEmptyRow" class="<?= $totalListaPendientes === 0 ? '' : 'd-none' ?>">
-                    <td colspan="7" class="text-center py-4" style="color: #9aa392;">
-                        <i class="fa-solid <?= $totalListaPendientes === 0 ? 'fa-clipboard-check' : 'fa-magnifying-glass' ?> mb-2 d-block" id="modEmptyRowIcon" style="font-size: 1.25rem; opacity: 0.7;"></i>
-                        <span id="modEmptyRowText">
-                            <?= $totalListaPendientes === 0 ? 'No hay subastas pendientes por validar en este momento.' : 'No se encontraron subastas que coincidan con tu búsqueda.' ?>
-                        </span>
-                        <button type="button" class="btn btn-link btn-sm p-0 ms-2 <?= $totalListaPendientes === 0 ? 'd-none' : '' ?>" id="modClearFiltersBtn" style="color: var(--adm-accent); text-decoration: none;">
-                            Limpiar filtros
+                    <td colspan="7" class="text-center py-4">
+                        <div class="adm-cat-empty-icon mx-auto"><i class="fa-solid <?= $totalListaPendientes === 0 ? 'fa-clipboard-check' : 'fa-gavel' ?>" id="modEmptyRowIcon" aria-hidden="true"></i></div>
+                        <h3 class="h6 text-white fw-bold mb-1">No se encontraron subastas</h3>
+                        <p class="small mb-3" style="color:#9aa392;" id="modEmptyRowText">
+                            <?= $totalListaPendientes === 0 ? 'No hay subastas pendientes por validar en este momento.' : 'Prueba con otro término de búsqueda o cambia los filtros seleccionados.' ?>
+                        </p>
+                        <button type="button" class="mod-btn-sm mod-btn-cancel <?= $totalListaPendientes === 0 ? 'd-none' : '' ?>" id="modClearFiltersBtn">
+                            <i class="fa-solid fa-rotate-left"></i> Limpiar filtros
                         </button>
                     </td>
                 </tr>
