@@ -3419,26 +3419,27 @@ body.admin-body .adm-badge--cancelada {
 #sec-usuarios .adm-table {
     table-layout: fixed;
     width: 100%;
+    min-width: 920px;
 }
 
 #sec-usuarios .adm-table thead th:nth-child(1) {
-    width: 40%;
+    width: 34%;
 }
 
 #sec-usuarios .adm-table thead th:nth-child(2) {
-    width: 22%;
+    width: 23%;
 }
 
 #sec-usuarios .adm-table thead th:nth-child(3) {
-    width: 15%;
+    width: 14%;
 }
 
 #sec-usuarios .adm-table thead th:nth-child(4) {
-    width: 12%;
+    width: 15%;
 }
 
 #sec-usuarios .adm-table thead th:nth-child(5) {
-    width: 11%;
+    width: 14%;
 }
 
 #sec-usuarios .adm-table thead th {
@@ -3454,6 +3455,11 @@ body.admin-body .adm-badge--cancelada {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+#sec-usuarios .adm-table tbody td:nth-child(5) {
+    overflow: visible;
+    text-overflow: clip;
 }
 
 #sec-usuarios .adm-cell-user {
