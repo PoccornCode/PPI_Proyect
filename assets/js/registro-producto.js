@@ -192,6 +192,7 @@ async function cargarProductoid(idProduc) {
         selectCondicion.value = resultado.producto.condicion;
 
         cargarImagenesActuales(resultado.imagenes);
+        imagenes = resultado.imagenes;
     } catch (error) {
         console.error(error);
         mostrarModal("error", "Error de conexión", "No se pudo cargar el producto. Intenta de nuevo.");
@@ -288,6 +289,12 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!validarFormulario()) {
             return;
         }
+
+        if (totalImagenesVisibles() === 0) {
+            mostrarModal("warning", "Fotografías requeridas", "Debes agregar al menos una fotografía del producto.");
+            return;
+        }
+
         enviando = true;
         btnGuardar.disabled = true;
         inputImagenes.disabled = true;

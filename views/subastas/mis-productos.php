@@ -78,6 +78,19 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                     </a>
                 </div>
             <?php else: ?>
+                <div class="d-flex justify-content-end mb-3">
+                    <select id="filtroEstado" class="form-select select-gavel w-auto" aria-label="Filtrar por estado de la subasta">
+                        <option value="todos" selected>Todos los productos</option>
+                        <option value="sin_subasta">Sin subasta</option>
+                        <option value="pendiente">En revisión</option>
+                        <option value="activa">En subasta</option>
+                        <option value="rechazada">Rechazada</option>
+                        <option value="finalizada">Finalizada</option>
+                        <option value="sin_ofertas">Sin ofertas</option>
+                        <option value="cancelada">Cancelada</option>
+                    </select>
+                </div>
+
                 <div class="row g-4">
                     <?php foreach ($productos as $item): ?>
                         <?php
@@ -110,7 +123,7 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                             'motivo_rechazo' => $motivoRechazo,
                         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8');
                         ?>
-                        <div class="col-md-6 col-lg-4 col-xl-3">
+                        <div class="col-md-6 col-lg-4 col-xl-3 item-producto" data-estado="<?= $estadoNorm === '' ? 'sin_subasta' : htmlspecialchars($estadoNorm) ?>">
                             <div class="producto-card">
                                 <div class="producto-img-wrapper">
                                     <img src="<?= $imgRuta ?>" alt="<?= htmlspecialchars($item['nombre']) ?>" onerror="this.onerror=null; this.src='<?= BASE_URL ?>assets/img/hero-img.jpg';">
@@ -187,7 +200,7 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                                                 <i class="fas fa-eye"></i><?= $totalPujas === 0 ? '' : ' Ver detalles' ?>
                                             </button>
                                             <?php if ($totalPujas === 0): ?>
-                                                <button type="button" class="btn btn-eliminar-producto btn-sm flex-grow-1 btn-cancelar-solicitud" data-id-subasta="<?= $idSubasta ?>">
+                                                <button type="button" class="btn btn-eliminar-producto btn-sm flex-grow-1 btn-cancelar-solicitud" data-id-subasta="<?= $idSubasta ?>" data-url="<?= BASE_URL ?>controllers/ControllerProducto.php">
                                                     <i class="fas fa-times"></i> Cancelar solicitud
                                                 </button>
                                             <?php endif; ?>
@@ -221,18 +234,15 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                                         <?php endif; ?>
                                     </div>
 
-                                    <div class="d-flex gap-2 mt-2">
-                                        <?php if (empty($estadoSubasta)): ?>
-                                            <a href="<?= BASE_URL ?>views/subastas/crear-subastas.php?id=<?= (int)$item['id_producto'] ?>" class="btn btn-primary btn-sm flex-grow-1">
-                                                <i class="fas fa-gavel"></i> Subastar
-                                            </a>
-                                        <?php endif; ?>
-                                    </div>
                                 </div>
                             </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
+
+                <p id="sinResultadosFiltro" class="text-second-ppi text-center py-5 mb-0 d-none">
+                    No tienes productos con este estado.
+                </p>
             <?php endif; ?>
 
         </div>
@@ -249,7 +259,7 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>assets/js/toast-ppi.js?v=2"></script>
-    <script src="<?= BASE_URL ?>assets/js/mis-productos.js?v=7"></script>
+    <script src="<?= BASE_URL ?>assets/js/mis-productos.js?v=12"></script>
 
     <?php if (isset($_SESSION['flash_toast'])): ?>
         <?php

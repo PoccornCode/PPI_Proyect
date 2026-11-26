@@ -74,11 +74,17 @@
         $sql = "SELECT p.id_producto, p.nombre, p.descripcion, p.condicion, p.estado,
                     c.nombre AS categoria,
                     img.ruta AS imagen_principal,
-                    s.id_subasta, s.estado AS estado_subasta, s.precio_inicial, s.fecha_inicial, s.fecha_final
+                    s.id_subasta, s.estado AS estado_subasta, s.precio_inicial, s.fecha_inicial, s.fecha_final, s.motivo_rechazo,
+                    (SELECT COUNT(*) FROM sb_puja pu WHERE pu.id_subasta = s.id_subasta) AS total_pujas
                 FROM sb_producto p
                 LEFT JOIN sb_categoria c ON p.id_categoria = c.id_categoria
                 LEFT JOIN sb_imagen_producto img ON p.id_producto = img.id_producto AND img.principal = 1
-                LEFT JOIN sb_subasta s ON p.id_producto = s.id_producto
+                LEFT JOIN (
+                    SELECT id_producto, MAX(id_subasta) AS id_ultima
+                    FROM sb_subasta
+                    GROUP BY id_producto
+                ) u ON u.id_producto = p.id_producto
+                LEFT JOIN sb_subasta s ON s.id_subasta = u.id_ultima
                 WHERE p.id_usuario = ? AND p.estado= 1
                 ORDER BY p.id_producto DESC";
 
@@ -97,7 +103,7 @@
     function obtenerProductoPorId($conexion, $id_producto, $id_usuario){
         $sql = "SELECT p.id_producto, p.nombre, p.descripcion, p.condicion, p.estado, p.id_categoria, img.ruta AS imagen_principal
         FROM sb_producto p LEFT JOIN sb_imagen_producto img ON img.id_producto = p.id_producto AND img.principal = 1
-        WHERE p.id_producto = ? AND p.id_usuario = ?
+        WHERE p.id_producto = ? AND p.id_usuario = ? AND p.estado = 1
         LIMIT 1;";
 
         $stmt = $conexion->prepare($sql);
@@ -137,7 +143,7 @@
         try{
             $conexion->begin_transaction();
 
-            $sqlVerificar= "SELECT 1 FROM sb_producto WHERE id_producto = ? AND id_usuario=? FOR UPDATE;";
+            $sqlVerificar= "SELECT 1 FROM sb_producto WHERE id_producto = ? AND id_usuario=? AND estado = 1 FOR UPDATE;";
             $stmt= $conexion->prepare($sqlVerificar);
             $stmt->bind_param("ii", $id_producto, $id_usuario);
 
@@ -322,4 +328,36 @@
         $stmt->close();
     }
 
+    function cancelarSolicitud($conexion, $id_subasta, $id_usuario){
+        try {
+            $conexion->begin_transaction();
+            $sql= "UPDATE sb_subasta s
+            INNER JOIN sb_producto p ON p.id_producto = s.id_producto
+            SET s.estado = 'cancelada'
+            WHERE s.id_subasta = ? AND p.id_usuario = ? AND p.estado = 1
+            AND s.estado = 'pendiente'
+            AND NOT EXISTS (SELECT 1 FROM sb_puja pu WHERE pu.id_subasta = s.id_subasta);";
+            $stmt=$conexion->prepare($sql);
+            $stmt->bind_param("ii", $id_subasta, $id_usuario);
 
+            if(!$stmt->execute()){
+                throw new RuntimeException('Error al cancelar la subasta: ' . $stmt->error);
+            }  
+            $filasAfectadas=$stmt->affected_rows;
+            $stmt->close();
+            
+            if ($filasAfectadas === 0) {
+                throw new RuntimeException('Esta solicitud ya no se puede cancelar');
+            }
+
+            
+            $conexion->commit();
+            return ['estado' => true, 'mensaje' => 'Solicitud cancelada exitosamente'];
+        } catch (\Throwable $th) {
+            $conexion->rollback();
+            error_log($th->getMessage());
+             return ['estado' => false, 'mensaje' => 'No se pudo cancelar la subasta'];
+        }
+
+
+    }

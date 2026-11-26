@@ -9,6 +9,13 @@ $incremento_minimo= (float)($_POST['incremento_minimo'] ?? 0);
 $dias=(int)($_POST['dias']??0);
 $id_producto = (int)($_POST['id_producto'] ?? 0);
 $id_usuario = (int)($_SESSION['id_usuario'] ?? 0);
+$tipo_solicitud = $_POST['tipo_solicitud'] ?? 'nueva';
+$nota_vendedor  = trim($_POST['nota_vendedor'] ?? '');
+if (!in_array($tipo_solicitud, ['nueva', 'reenvio', 'apelacion'], true)) {
+    $tipo_solicitud = 'nueva';
+}
+
+$nota_vendedor = $nota_vendedor === '' ? null : $nota_vendedor;
 
 function obtenerSubastaDestacadaHome(): ?array
 {
@@ -50,7 +57,12 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
             echo json_encode(['estado' => false, 'mensaje' => 'Revisa los precios y la duración.']);
             exit;
         }
-        echo json_encode((new SubastaDAO())->insertarSubasta($precio_inicial, $incremento_minimo, $dias, $id_producto, $id_usuario));
+        if ($tipo_solicitud === 'apelacion' && $nota_vendedor === null) {
+            echo json_encode(['estado' => false, 'mensaje' => 'Debes explicar el motivo de tu apelación.']);
+            exit;
+        }
+        
+        echo json_encode((new SubastaDAO())->insertarSubasta($precio_inicial, $incremento_minimo, $dias, $id_producto, $id_usuario, $tipo_solicitud, $nota_vendedor));
         exit;
     }
     echo json_encode(['estado' => false, 'mensaje' => 'Opción no válida']);

@@ -92,6 +92,27 @@
         });
     });
 
+    // Filtro por estado de la subasta
+    const filtroEstado = document.getElementById("filtroEstado");
+    const sinResultadosFiltro = document.getElementById("sinResultadosFiltro");
+
+    if (filtroEstado) {
+        filtroEstado.addEventListener("change", function () {
+            const valor = this.value;
+            let visibles = 0;
+
+            document.querySelectorAll(".item-producto").forEach((item) => {
+                const mostrar = valor === "todos" || item.dataset.estado === valor;
+                item.classList.toggle("d-none", !mostrar);
+                if (mostrar) visibles++;
+            });
+
+            if (sinResultadosFiltro) {
+                sinResultadosFiltro.classList.toggle("d-none", visibles > 0);
+            }
+        });
+    }
+
     // Modal publicar / reenviar / apelar subasta
     const modalSubastaEl = document.getElementById("modalPublicarSubasta");
     const formSubasta = document.getElementById("formPublicarSubasta");
@@ -106,6 +127,7 @@
     const tipoSelect = document.getElementById("subastaTipoSolicitud");
     const notaLabel = document.getElementById("subastaNotaLabel");
     const notaInput = document.getElementById("subastaNotaVendedor");
+    const notaWrap = document.getElementById("subastaNotaWrap");
 
     function actualizarLabelNota() {
         if (!tipoSelect || !notaLabel || !notaInput) return;
@@ -151,21 +173,106 @@
             }
 
             actualizarLabelNota();
+            notaWrap.classList.toggle("d-none", estadoAnterior !== "rechazada");
             modalSubasta.show();
         });
     });
 
+    // Máscara de moneda: solo números, se escriben como centavos (igual que en crear-subastas)
+    function mascaraMoneda(campo) {
+        if (!campo) return;
+        campo.addEventListener("input", () => {
+            const digitos = campo.value.replace(/\D/g, "").slice(0, 10);
+            const centavos = Number(digitos || "0");
+            campo.value = (centavos / 100).toFixed(2);
+        });
+    }
+
+    const inputPrecioInicial = document.getElementById("subastaPrecioInicial");
+    const inputIncremento = document.getElementById("subastaIncremento");
+    mascaraMoneda(inputPrecioInicial);
+    mascaraMoneda(inputIncremento);
+
     if (formSubasta) {
-        formSubasta.addEventListener("submit", function (e) {
+        const btnEnviarSubasta = document.getElementById("btnEnviarSubasta");
+        const textoBotonSubasta = btnEnviarSubasta.textContent;
+        let enviandoSubasta = false;
+
+        formSubasta.addEventListener("submit", async function (e) {
             e.preventDefault();
-            if (modalSubasta) modalSubasta.hide();
-            mostrarToast("info", "Vista previa", "Modo demostración: aquí se enviaría la solicitud a revisión.", 3000);
+            if (enviandoSubasta) return;
+
+            if (Number(inputPrecioInicial.value) <= 0 || Number(inputIncremento.value) <= 0) {
+                mostrarToast("warning", "Campos incompletos", "El precio inicial y el incremento deben ser mayores a 0.", 4000);
+                return;
+            }
+
+            enviandoSubasta = true;
+            btnEnviarSubasta.disabled = true;
+            btnEnviarSubasta.textContent = "Procesando...";
+
+            try {
+                const datosForm = new FormData(formSubasta);
+                const respuesta = await fetch(formSubasta.action, { method: "POST", body: datosForm });
+
+                if (!respuesta.ok) {
+                    throw new Error("Error HTTP: " + respuesta.status);
+                }
+
+                const resultado = await respuesta.json();
+
+                if (resultado.estado) {
+                    if (modalSubasta) modalSubasta.hide();
+                    mostrarToast("success", "¡Subasta enviada!", "Tu subasta quedó en revisión.", 2000);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1200);
+                    return;
+                }
+
+                mostrarToast("error", "No se pudo enviar", resultado.mensaje, 4000);
+            } catch (error) {
+                console.error(error);
+                mostrarToast("error", "Error de conexión", "No se pudo completar la operación. Intenta de nuevo.", 4000);
+            }
+
+            enviandoSubasta = false;
+            btnEnviarSubasta.disabled = false;
+            btnEnviarSubasta.textContent = textoBotonSubasta;
         });
     }
 
     // Cancelar solicitud pendiente
     document.querySelectorAll(".btn-cancelar-solicitud").forEach((btn) => {
-        btn.addEventListener("click", function () {
+        btn.addEventListener("click", async function () {
+            btn.disabled = true;
+
+            try {
+                const datosForm = new FormData();
+                datosForm.append("opcion", "cancelarSubasta");
+                datosForm.append("id_subasta", btn.dataset.idSubasta);
+                const respuesta = await fetch(btn.dataset.url, { method: "POST", body: datosForm });
+
+                if (!respuesta.ok) {
+                    throw new Error("Error HTTP: " + respuesta.status);
+                }
+
+                const resultado = await respuesta.json();
+                if (resultado.estado) {
+                    mostrarToast("success", "Subasta cancelada!", resultado.mensaje, 2000);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1200);
+                    return;
+                }
+
+                mostrarToast("error", "No se pudo cancelar", resultado.mensaje, 4000);
+            } catch (error) {
+                console.error(error);
+                mostrarToast("error", "Error de conexión", "No se pudo completar la operación. Intenta de nuevo.", 4000);
+            }
+
+            btn.disabled = false;
             mostrarToast("info", "Vista previa", "Modo demostración: aquí se cancelaría la solicitud pendiente.", 3000);
         });
     });
@@ -176,10 +283,13 @@
     const eliminarNombreEl = document.getElementById("eliminarNombreProducto");
     const btnConfirmarEliminar = document.getElementById("btnConfirmarEliminarProducto");
 
+    let formEliminarActual = null;
+
     document.querySelectorAll(".form-eliminar").forEach((form) => {
         form.addEventListener("submit", function (e) {
             e.preventDefault();
             if (!modalEliminar) return;
+            formEliminarActual = form;
             const nombre = (form.dataset.nombre || "").trim();
             if (eliminarNombreEl) {
                 eliminarNombreEl.textContent = nombre !== "" ? `"${nombre}"` : "este producto";
@@ -189,9 +299,36 @@
     });
 
     if (btnConfirmarEliminar) {
-        btnConfirmarEliminar.addEventListener("click", function () {
-            if (modalEliminar) modalEliminar.hide();
-            mostrarToast("info", "Vista previa", "Modo demostración: el producto no fue eliminado.", 3000);
+        btnConfirmarEliminar.addEventListener("click", async function () {
+            if (!formEliminarActual) return;
+            btnConfirmarEliminar.disabled = true;
+
+            try {
+                const datosForm = new FormData(formEliminarActual);
+                const respuesta = await fetch(formEliminarActual.action, { method: "POST", body: datosForm });
+
+                if (!respuesta.ok) {
+                    throw new Error("Error HTTP: " + respuesta.status);
+                }
+
+                const resultado = await respuesta.json();
+                if (modalEliminar) modalEliminar.hide();
+
+                if (resultado.estado) {
+                    mostrarToast("success", "¡Producto eliminado!", resultado.mensaje, 2000);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1200);
+                    return;
+                }
+
+                mostrarToast("error", "No se pudo eliminar", resultado.mensaje, 4000);
+            } catch (error) {
+                console.error(error);
+                mostrarToast("error", "Error de conexión", "No se pudo completar la operación. Intenta de nuevo.", 4000);
+            }
+
+            btnConfirmarEliminar.disabled = false;
         });
     }
 })();

@@ -9,9 +9,9 @@
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <form id="formPublicarSubasta" autocomplete="off">
+            <form id="formPublicarSubasta" action="<?= BASE_URL ?>controllers/subasta_controller.php" method="POST" autocomplete="off">
                 <div class="modal-body py-3">
-                    <input type="hidden" name="opcion" value="crear">
+                    <input type="hidden" name="opcion" value="insertar">
                     <input type="hidden" name="id_producto" id="subastaIdProducto" value="">
 
                     <p class="text-main-ppi fw-semibold mb-3" id="subastaNombreProducto"></p>
@@ -32,15 +32,15 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label for="subastaPrecioInicial" class="form-label text-main-ppi fw-bold small">Precio inicial ($)</label>
-                            <input type="number" step="0.01" min="0.01" class="form-control" id="subastaPrecioInicial" name="precio_inicial" placeholder="Ej. 25.00" required>
+                            <input type="text" class="form-control" id="subastaPrecioInicial" name="precio_inicial" inputmode="numeric" value="0.00" required>
                         </div>
                         <div class="col-md-6">
                             <label for="subastaIncremento" class="form-label text-main-ppi fw-bold small">Incremento mínimo ($)</label>
-                            <input type="number" step="0.01" min="0.01" class="form-control" id="subastaIncremento" name="incremento_minimo" placeholder="Ej. 2.00" required>
+                            <input type="text" class="form-control" id="subastaIncremento" name="incremento_minimo" inputmode="numeric" value="0.00" required>
                         </div>
                         <div class="col-12">
                             <label for="subastaDuracion" class="form-label text-main-ppi fw-bold small">Duración</label>
-                            <select class="form-select select-gavel" id="subastaDuracion" name="duracion_dias">
+                            <select class="form-select select-gavel" id="subastaDuracion" name="dias">
                                 <option value="1">1 día</option>
                                 <option value="3">3 días</option>
                                 <option value="5">5 días</option>

@@ -171,7 +171,7 @@ class SubastaDAO
         return sprintf('%02d:%02d:%02d', $horas, $minutos, $segs);
     }
 
-    public function insertarSubasta($precio_inicial, $incremento_minimo, $dias, $id_producto, $id_usuario){
+    public function insertarSubasta($precio_inicial, $incremento_minimo, $dias, $id_producto, $id_usuario, $tipo_solicitud = 'nueva', $nota_vendedor = null){
         try {
             $this->conexion->begin_transaction();
             $sqlVerficar="SELECT p.id_producto FROM sb_producto p

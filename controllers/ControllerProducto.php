@@ -13,6 +13,7 @@
     $opcion= $_POST['opcion']??'';
     $id_usuario = (int)($_SESSION['id_usuario'] ?? 0);
     $id_producto = (int)($_POST['id_producto'] ?? $_GET['id'] ?? 0);
+    $id_subasta = (int)($_POST['id_subasta'] ?? $_GET['id'] ?? 0);
     $idrutasEliminar = array_values(  // vuelve a numerar los índices desde 0
         array_unique( // quita los valores repetidos
             array_map('intval', // convierte cada valor a número entero
@@ -20,6 +21,12 @@
             )
         )
     );
+    $tipo_solicitud = $_POST['tipo_solicitud'] ?? 'nueva';
+    $nota_vendedor  = trim($_POST['nota_vendedor'] ?? '');
+
+    if (!in_array($tipo_solicitud, ['nueva', 'reenvio', 'apelacion'], true)) {
+        $tipo_solicitud = 'nueva';
+    }
 
     function subirImagenes(?array $archivos): array{ // que la funcion siempre devuelve y el array ? es que puede ser null 
         $carpeta = __DIR__ . '/../uploads/productos/';
@@ -92,6 +99,12 @@
         exit;
     }
 
+       if($opcion=="cancelarSubasta"){
+        $resultado = cancelarSolicitud($conexion, $id_subasta, $id_usuario);
+        echo json_encode($resultado);
+        exit;
+    }
+
     if ($opcion === "eliminar") {
         $resultado = eliminar($conexion, $id_producto, $id_usuario);
         echo json_encode($resultado);
@@ -145,6 +158,8 @@
         }
         echo json_encode($resultado);
     }
+
+ 
 
    
     
