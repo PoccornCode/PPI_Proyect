@@ -1,4 +1,7 @@
 <?php
+if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+    session_start();
+}
 http_response_code(500);
 
 require_once __DIR__ . '/config/env.php';
@@ -13,6 +16,7 @@ $pagina = "500";
     <meta charset="utf-8">
     <title><?= $titulo ?> | Gavel.net</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <?php include __DIR__ . '/includes/meta_tags.php'; ?>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

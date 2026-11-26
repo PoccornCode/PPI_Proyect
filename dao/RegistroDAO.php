@@ -129,18 +129,25 @@ class RegistroDAO
 
             $envio = Mailer::enviarCodigoVerificacion($correo, $nombre, $codigo);
 
+            if (empty($envio['exito'])) {
+                return [
+                    "estado" => true,
+                    "mensaje" => "Usuario registrado, pero hubo un problema al enviar el correo. Intenta reenviar el código desde la pantalla de verificación.",
+                    "correo" => $correo
+                ];
+            }
+
             return [
                 "estado" => true,
                 "mensaje" => "Usuario registrado. Te enviamos un código de verificación a tu correo.",
-                "correo" => $correo,
-                "modo_mail" => $envio['modo'] ?? 'smtp',
-                "codigo_dev" => ($envio['modo'] === 'dev' || empty(SMTP_USER) || SMTP_PASS === 'tu_contraseña_aqui') ? $codigo : null
+                "correo" => $correo
             ];
         } catch (Throwable $e) {
             $this->conexion->rollback();
+            error_log("[RegistroDAO] Error al registrar usuario: " . $e->getMessage());
             return [
                 "estado" => false,
-                "mensaje" => "Error al registrar el usuario: " . $e->getMessage()
+                "mensaje" => "Ocurrió un error al registrar el usuario. Intenta nuevamente."
             ];
         }
     }
@@ -152,15 +159,14 @@ class RegistroDAO
         if (!$usuario) {
             return [
                 "estado" => false,
-                "mensaje" => "No se encontró ningún usuario asociado a este correo."
+                "mensaje" => "El código ingresado es incorrecto o ha expirado."
             ];
         }
 
         if ((int)$usuario['estado'] === 1) {
             return [
-                "estado" => true,
-                "ya_activo" => true,
-                "mensaje" => "Esta cuenta ya se encuentra verificada y activa."
+                "estado" => false,
+                "mensaje" => "El código ingresado es incorrecto o ha expirado."
             ];
         }
 
@@ -235,42 +241,75 @@ class RegistroDAO
             ];
         } catch (Throwable $e) {
             $this->conexion->rollback();
+            error_log("[RegistroDAO] Error al activar cuenta: " . $e->getMessage());
             return [
                 "estado" => false,
-                "mensaje" => "Error al activar la cuenta: " . $e->getMessage()
+                "mensaje" => "Ocurrió un error al activar la cuenta. Intenta nuevamente."
             ];
         }
     }
 
 
-    public function reenviarCodigo($correo, $tipo = 'registro')
+    public function reenviarCodigo($correo, $tipo = 'registro', $minutosValidez = 15)
     {
-        $usuario = $this->obtenerUsuarioPorCorreo($correo);
-        if (!$usuario) {
-            return [
-                "estado" => false,
-                "mensaje" => "No se encontró ningún usuario con ese correo electrónico."
-            ];
-        }
+        $mensajeGenerico = "Si el correo está registrado y pendiente de verificación, recibirás un nuevo código.";
 
-        if ((int)$usuario['estado'] === 1) {
+        $usuario = $this->obtenerUsuarioPorCorreo($correo);
+        if (!$usuario || (int)$usuario['estado'] === 1) {
             return [
                 "estado" => true,
-                "ya_activo" => true,
-                "mensaje" => "Tu cuenta ya está verificada y activa. Puedes iniciar sesión."
+                "mensaje" => $mensajeGenerico,
+                "correo" => $correo
             ];
         }
 
         $id_usuario = (int)$usuario['id_usuario'];
-        $codigo = $this->generarCodigoVerificacion($id_usuario, $tipo, 15);
+
+        // Rate limit en backend: mínimo 60 segundos entre reenvíos
+        $sqlLast = "SELECT expira_en
+                    FROM sb_codigo_verificacion
+                    WHERE id_usuario = ? AND tipo = ?
+                    ORDER BY id_codigo DESC
+                    LIMIT 1";
+        $stmtLast = $this->conexion->prepare($sqlLast);
+        $stmtLast->bind_param("is", $id_usuario, $tipo);
+        $stmtLast->execute();
+        $resLast = $stmtLast->get_result();
+        $ultimo = $resLast->fetch_assoc();
+        $stmtLast->close();
+
+        if ($ultimo) {
+            $creadoEn = strtotime($ultimo['expira_en']) - ($minutosValidez * 60);
+            $transcurrido = time() - $creadoEn;
+            if ($transcurrido >= 0 && $transcurrido < 60) {
+                $espera = 60 - $transcurrido;
+                return [
+                    "estado" => false,
+                    "mensaje" => "Por favor espera {$espera} segundos antes de solicitar un nuevo código."
+                ];
+            }
+        }
+
+        $codigo = $this->generarCodigoVerificacion($id_usuario, $tipo, $minutosValidez);
         $envio = Mailer::enviarCodigoVerificacion($correo, $usuario['nombre'], $codigo);
+
+        if (empty($envio['exito'])) {
+            $sqlFail = "UPDATE sb_codigo_verificacion SET utilizado = 1 WHERE id_usuario = ? AND tipo = ? AND utilizado = 0";
+            $stmtFail = $this->conexion->prepare($sqlFail);
+            $stmtFail->bind_param("is", $id_usuario, $tipo);
+            $stmtFail->execute();
+            $stmtFail->close();
+
+            return [
+                "estado" => false,
+                "mensaje" => "No se pudo reenviar el correo de verificación. Intenta nuevamente más tarde."
+            ];
+        }
 
         return [
             "estado" => true,
-            "mensaje" => "Hemos reenviado un nuevo código a tu correo.",
-            "correo" => $correo,
-            "modo_mail" => $envio['modo'] ?? 'smtp',
-            "codigo_dev" => ($envio['modo'] === 'dev' || empty(SMTP_USER) || SMTP_PASS === 'tu_contraseña_aqui') ? $codigo : null
+            "mensaje" => $mensajeGenerico,
+            "correo" => $correo
         ];
     }
 }

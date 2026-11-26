@@ -86,6 +86,25 @@ $base_url = BASE_URL;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
         }
 
+        @media (max-width: 575.98px) {
+            .role-switch-container {
+                display: flex;
+                width: 100%;
+                max-width: 340px;
+                margin-left: auto;
+                margin-right: auto;
+                flex-wrap: nowrap;
+            }
+
+            .role-switch-btn {
+                flex: 1 1 0;
+                padding: 8px 12px;
+                font-size: 0.85rem;
+                white-space: nowrap;
+                text-align: center;
+            }
+        }
+
         .step-card {
             background-color: #0f110e;
             border: 1px solid #1c2217;
