@@ -17,6 +17,7 @@ const montoInicial = document.getElementById("dato-monto-inicial"),
     chatFeed = document.getElementById("chat-feed"),
     montoInput = document.getElementById("monto-input"),
     btnPujar = document.getElementById("btnPujar")
+let resultadoSesion = null
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {
@@ -27,7 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             method: "POST",
             body: datos
         });
-        let resultadoSesion, datosSesion = new FormData();
+        let datosSesion = new FormData();
         datosSesion.append("opcion", "consultarSesion")
         const respuestaSesion = await fetch(ruta_controller, {
             method: "POST",
@@ -182,14 +183,18 @@ btnPujar.addEventListener("click",async function (){
 
     let datos = new FormData()
     datos.append("opcion", "guardarPuja")
+    datos.append("id_subasta",id_subasta)
+    datos.append("id_usuario",resultadoSesion.idUsuario)
+    datos.append("monto_puja",255)
+
 
     const respuesta = await fetch(ruta_controller, {
         method: "POST",
         body: datos
     })
-    resultado = await respuestaSesion.json()
+    resultado = await respuesta.json()
 
-    mostrarModal(resultado.titulo,resultado.mensaje);
+    mostrarModal(resultado.estado,resultado.mensaje);
 })
 
 

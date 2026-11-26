@@ -5,13 +5,13 @@ require_once __DIR__ . '/../config/conexion.php';
 class subastaDao
 {
     private $conexion;
-    public function __construct()
-    {
+    public function __construct(){
         global $conexion;
         $this->conexion = $conexion;
     }
 
-    public function getSubastaDao($id){
+    public function getSubastaDao($id)
+    {
         $sql = "SELECT sb.precio_inicial,sb.incremento_minimo,sb.fecha_inicial,sb.fecha_final,
                 sb.estado, sbp.nombre,sbp.descripcion,sbp.condicion,
                 sbu.username as nombreU, sbc.nombre as nombreC,sbp.id_producto
@@ -75,13 +75,68 @@ class subastaDao
                 ],
                 "pujas" => $datos3,
                 "rutasImg" => $rutas,
-                "postores"=>(int)$res4->fetch_column()
+                "postores" => (int) $res4->fetch_column()
             ];
         }
         $this->conexion->close();
     }
 
-    public function guardarPuja(){
+    public function guardarPuja($monto, $idUsuario, $idSubasta)
+    {
+        $begin = $this->conexion->begin_transaction();
+        try {
+            $sql = "SELECT sb.precio_inicial,sb.incremento_minimo,sb.fecha_inicial,sb.fecha_final,
+                    sb.estado, sbp.nombre,sbp.descripcion,sbp.condicion,
+                    sbu.username as nombreU, sbc.nombre as nombreC,sbp.id_producto
+                    FROM sb_subasta sb
+                    JOIN sb_producto sbp ON sb.id_producto = sbp.id_producto
+                    JOIN sb_usuario sbU ON sbu.id_usuario = sbp.id_usuario
+                    JOIN sb_categoria sbc ON sbc.id_categoria = sbp.id_categoria
+                    WHERE sb.id_subasta = ? FOR UPDATE";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bind_param("i", $idSubasta);
+            $stmt->execute();
+            $res = $stmt->get_result();
+            $datos = $res->fetch_assoc();
+            $stmt->close();
+
+            if ($datos["estado"] === "activa") {
+                $sql = "SELECT MAX(monto) as monto FROM sb_puja WHERE id_subasta = ?";
+                $st = $this->conexion->prepare($sql);
+                $st->bind_param("i", $idSubasta);
+                $st->execute();
+                $res2 = $st->get_result();
+                $resultado = $res2->fetch_assoc();
+
+                if ($resultado["monto"] > $monto) {
+                    return [
+                        "estado" => false,
+                        "mensaje" => "hay una puja nueva"
+                    ];
+                } else {
+                    $sql2 = "INSERT INTO sb_puja (monto,fecha,id_subasta,id_usuario)
+                            VALUES (?,NOW(),?,?)";
+                    $st2 = $this->conexion->prepare($sql2);
+                    $st2->bind_param("dii", $monto, $idSubasta, $idUsuario);
+                    if ($st2->execute()) {
+                        $this->conexion->commit();
+                        return [
+                            "estado" => true,
+                            "mensaje" => "Puja realizada correctamente"
+                            ];
+                    } else {
+                        $this->conexion->rollback();
+                        return [
+                            "estado" => false,
+                            "mensaje" => "No se pudo realizar la puja"
+                        ];
+                    }
+                }
+            }
+        } catch (e) {
+            $this->conexion->rollback();
+        }
         return [];
     }
 }

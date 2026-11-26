@@ -9,7 +9,9 @@ $fecha_inicial = trim($_POST['fecha_inicial'] ?? '');
 $fecha_final = trim($_POST['fecha_final'] ?? '');
 $estado = trim($_POST['estado'] ?? 0);
 $id_producto = trim($_POST['id_producto'] ?? 0);
+$id_usuario = trim($_POST['id_usuario'] ??'0');
 $option = trim($_POST['opcion']??'');
+$monto = trim($_POST['monto_puja']??'0');
 
 $dao = new subastaDao();
 
@@ -25,8 +27,7 @@ if($option == 'consultarSesion'){
     );
 }
 if($option == 'guardarPuja'){
-    $respuesta = $dao->guardarPuja();
+    $respuesta = $dao->guardarPuja($monto,$id_usuario,$id_subasta);
     echo json_encode($respuesta);
 }
-
 ?>
