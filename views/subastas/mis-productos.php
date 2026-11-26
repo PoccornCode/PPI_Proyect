@@ -200,7 +200,7 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                                                 <i class="fas fa-eye"></i><?= $totalPujas === 0 ? '' : ' Ver detalles' ?>
                                             </button>
                                             <?php if ($totalPujas === 0): ?>
-                                                <button type="button" class="btn btn-eliminar-producto btn-sm flex-grow-1 btn-cancelar-solicitud" data-id-subasta="<?= $idSubasta ?>" data-url="<?= BASE_URL ?>controllers/ControllerProducto.php">
+                                                <button type="button" class="btn btn-eliminar-producto btn-sm flex-grow-1 btn-cancelar-solicitud" data-id-subasta="<?= $idSubasta ?>" data-url="<?= BASE_URL ?>controllers/ControllerProducto.php" data-nombre="<?= htmlspecialchars($item['nombre']) ?>">
                                                     <i class="fas fa-times"></i> Cancelar solicitud
                                                 </button>
                                             <?php endif; ?>
@@ -250,8 +250,8 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
 
     <?php include __DIR__ . "/partials/modal-detalle-producto.php"; ?>
     <?php include __DIR__ . "/partials/modal-publicar-subasta.php"; ?>
-    <?php include __DIR__ . "/partials/modal-eliminar-producto.php"; ?>
-
+    <?php include __DIR__ . "/partials/modal-eliminar-producto"; ?>
+    <?php include __DIR__ . "/partials/modal-cancelar-solicitud.php"; ?>
     <?php include __DIR__ . "/../Footer/footer.php"; ?>
 
     <script>
@@ -259,7 +259,7 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>assets/js/toast-ppi.js?v=2"></script>
-    <script src="<?= BASE_URL ?>assets/js/mis-productos.js?v=12"></script>
+    <script src="<?= BASE_URL ?>assets/js/mis-productos.js?v=14"></script>
 
     <?php if (isset($_SESSION['flash_toast'])): ?>
         <?php

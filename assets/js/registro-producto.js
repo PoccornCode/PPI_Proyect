@@ -192,7 +192,6 @@ async function cargarProductoid(idProduc) {
         selectCondicion.value = resultado.producto.condicion;
 
         cargarImagenesActuales(resultado.imagenes);
-        imagenes = resultado.imagenes;
     } catch (error) {
         console.error(error);
         mostrarModal("error", "Error de conexión", "No se pudo cargar el producto. Intenta de nuevo.");

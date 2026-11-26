@@ -178,7 +178,6 @@
         });
     });
 
-    // Máscara de moneda: solo números, se escriben como centavos (igual que en crear-subastas)
     function mascaraMoneda(campo) {
         if (!campo) return;
         campo.addEventListener("input", () => {
@@ -242,24 +241,45 @@
         });
     }
 
-    // Cancelar solicitud pendiente
+    // Cancelar solicitud pendiente (con modal de confirmación)
+    const modalCancelarEl = document.getElementById("modalCancelarSolicitud");
+    const modalCancelar = modalCancelarEl ? new bootstrap.Modal(modalCancelarEl) : null;
+    const cancelarNombreEl = document.getElementById("cancelarNombreProducto");
+    const btnConfirmarCancelar = document.getElementById("btnConfirmarCancelarSolicitud");
+
+    let btnCancelarActual = null;
     document.querySelectorAll(".btn-cancelar-solicitud").forEach((btn) => {
-        btn.addEventListener("click", async function () {
-            btn.disabled = true;
+        btn.addEventListener("click", function () {
+            if (!modalCancelar) return;
+            btnCancelarActual = btn;
+            const nombre = (btn.dataset.nombre || "").trim();
+            if (cancelarNombreEl) {
+                cancelarNombreEl.textContent = nombre !== "" ? `"${nombre}"` : "este producto";
+            }
+            modalCancelar.show();
+        });
+    });
+
+    if (btnConfirmarCancelar) {
+        btnConfirmarCancelar.addEventListener("click", async function () {
+            if (!btnCancelarActual) return;
+            btnConfirmarCancelar.disabled = true;
 
             try {
                 const datosForm = new FormData();
                 datosForm.append("opcion", "cancelarSubasta");
-                datosForm.append("id_subasta", btn.dataset.idSubasta);
-                const respuesta = await fetch(btn.dataset.url, { method: "POST", body: datosForm });
+                datosForm.append("id_subasta", btnCancelarActual.dataset.idSubasta);
+                const respuesta = await fetch(btnCancelarActual.dataset.url, { method: "POST", body: datosForm });
 
                 if (!respuesta.ok) {
                     throw new Error("Error HTTP: " + respuesta.status);
                 }
 
                 const resultado = await respuesta.json();
+                if (modalCancelar) modalCancelar.hide();
+
                 if (resultado.estado) {
-                    mostrarToast("success", "Subasta cancelada!", resultado.mensaje, 2000);
+                    mostrarToast("success", "¡Solicitud cancelada!", resultado.mensaje, 2000);
                     setTimeout(() => {
                         window.location.reload();
                     }, 1200);
@@ -272,10 +292,9 @@
                 mostrarToast("error", "Error de conexión", "No se pudo completar la operación. Intenta de nuevo.", 4000);
             }
 
-            btn.disabled = false;
-            mostrarToast("info", "Vista previa", "Modo demostración: aquí se cancelaría la solicitud pendiente.", 3000);
+            btnConfirmarCancelar.disabled = false;
         });
-    });
+    }
 
     // Eliminar producto (solo sin subasta)
     const modalEliminarEl = document.getElementById("modalEliminarProducto");

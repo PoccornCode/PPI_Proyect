@@ -192,10 +192,23 @@ class SubastaDAO
                 return ['estado' => false, 'mensaje' => 'El producto no existe o no pertenece al usuario'];
             }
 
-            $sql="INSERT INTO sb_subasta (precio_inicial, incremento_minimo, fecha_inicial, fecha_final, id_producto)
-            VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL ? DAY), ?);";
+            //Por si un usuario mañoso abre 2 pestañas ytrata de insertar 2 subastasas
+            $sqlAbierta = "SELECT 1 FROM sb_subasta WHERE id_producto = ? AND estado IN ('pendiente', 'activa') LIMIT 1;";
+            $stmt = $this->conexion->prepare($sqlAbierta);
+            $stmt->bind_param("i", $id_producto);
+            $stmt->execute();
+            $yaTiene = $stmt->get_result()->num_rows > 0;
+            $stmt->close();
+
+            if ($yaTiene) {
+                $this->conexion->rollback();
+                return ['estado' => false, 'mensaje' => 'Este producto ya tiene una subasta en revisión o activa.'];
+            }
+
+            $sql="INSERT INTO sb_subasta (precio_inicial, incremento_minimo, fecha_inicial, fecha_final, id_producto, tipo_solicitud, nota_vendedor)
+            VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL ? DAY), ?, ?, ?);";
             $stmt=$this->conexion->prepare($sql);
-            $stmt->bind_param("ddii", $precio_inicial, $incremento_minimo, $dias, $id_producto);
+            $stmt->bind_param("ddiiss", $precio_inicial, $incremento_minimo, $dias, $id_producto, $tipo_solicitud, $nota_vendedor);
             if (!$stmt->execute()) {
                 throw new RuntimeException('Error al crear la subasta: ' . $stmt->error);
             }

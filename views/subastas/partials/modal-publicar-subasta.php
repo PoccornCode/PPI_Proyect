@@ -26,6 +26,7 @@
                         <select class="form-select select-gavel" id="subastaTipoSolicitud" name="tipo_solicitud">
                             <option value="reenvio">Corregir y reenviar a revisión</option>
                             <option value="apelacion">Apelar decisión del moderador</option>
+                            <option value="nueva" hidden>Nueva solicitud</option>
                         </select>
                     </div>
 
