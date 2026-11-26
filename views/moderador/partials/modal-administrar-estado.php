@@ -80,3 +80,32 @@ $opcionesEstadoModal = [
         </div>
     </div>
 </div>
+
+<!-- MODAL CONFIRMAR CAMBIO DE ESTADO (MODERADOR) -->
+<div class="modal fade adm-modal" id="modalConfirmarAdministrarEstado" tabindex="-1" aria-labelledby="modalConfirmarAdministrarEstadoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered adm-user-confirm-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold text-white m-0" id="modalConfirmarAdministrarEstadoLabel">
+                    Confirmar cambio de estado
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p class="adm-user-confirm-intro mb-3" id="modManageConfirmIntro">
+                    Revisa el cambio antes de actualizar la subasta.
+                </p>
+                <div class="adm-user-confirm-list" id="modManageConfirmList"></div>
+            </div>
+            <div class="modal-footer justify-content-end gap-2">
+                <button type="button" class="mod-btn-sm mod-btn-cancel px-3" id="modManageConfirmBackBtn" style="height:36px; font-size:0.86rem;">
+                    Volver a editar
+                </button>
+                <button type="button" class="adm-btn-primary" id="modManageConfirmSaveBtn" style="height:36px; font-size:0.86rem;">
+                    <i class="fa-solid fa-check"></i>
+                    <span id="modManageConfirmSaveBtnText">Confirmar y guardar</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

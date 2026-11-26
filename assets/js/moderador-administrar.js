@@ -371,8 +371,18 @@
     const modalMotivoLabel = document.getElementById('modManageMotivoLabel');
     const modalMotivoInput = document.getElementById('modManageMotivo');
     const modalInstance = modalEl && window.bootstrap ? new window.bootstrap.Modal(modalEl) : null;
+
+    const confirmModalEl = document.getElementById('modalConfirmarAdministrarEstado');
+    const confirmIntroEl = document.getElementById('modManageConfirmIntro');
+    const confirmListEl = document.getElementById('modManageConfirmList');
+    const confirmBackBtn = document.getElementById('modManageConfirmBackBtn');
+    const confirmSaveBtn = document.getElementById('modManageConfirmSaveBtn');
+    const confirmSaveTextEl = document.getElementById('modManageConfirmSaveBtnText');
+    const confirmModalInstance = confirmModalEl && window.bootstrap ? new window.bootstrap.Modal(confirmModalEl) : null;
+
     let activeSubastaId = 0;
     let activeCurrentStatus = '';
+    let activeItemTitle = '';
 
     function obtenerEstadoSeleccionadoModal() {
         const checked = modalList?.querySelector('input[name="modManageStatusRadio"]:checked');
@@ -407,18 +417,38 @@
 
     modalList?.addEventListener('change', sincronizarEstadoModal);
 
-    modalSaveBtn?.addEventListener('click', async () => {
+    async function ejecutarGuardadoEstadoModal() {
         const nuevoEstado = obtenerEstadoSeleccionadoModal();
         if (!activeSubastaId || !nuevoEstado || nuevoEstado === activeCurrentStatus) return;
         const motivo = (nuevoEstado === 'rechazada' || nuevoEstado === 'cancelada')
             ? (modalMotivoInput?.value || '').trim()
             : '';
-        const res = await actualizarEstadoSubasta(activeSubastaId, nuevoEstado, activeCurrentStatus, modalSaveBtn, motivo);
-        if (res.ok && modalInstance) {
-            modalInstance.hide();
+
+        if (confirmBackBtn) confirmBackBtn.disabled = true;
+        if (confirmSaveTextEl) confirmSaveTextEl.textContent = 'Guardando...';
+
+        const res = await actualizarEstadoSubasta(activeSubastaId, nuevoEstado, activeCurrentStatus, confirmSaveBtn || modalSaveBtn, motivo);
+
+        if (confirmBackBtn) confirmBackBtn.disabled = false;
+        if (confirmSaveTextEl) confirmSaveTextEl.textContent = 'Confirmar y guardar';
+
+        if (res.ok) {
+            confirmModalInstance?.hide();
+            modalInstance?.hide();
         } else if (res.conflicto && res.estadoActual) {
             activeCurrentStatus = res.estadoActual;
-            if (res.estadoActual === 'finalizada') {
+            if (confirmModalEl && confirmModalInstance) {
+                if (res.estadoActual !== 'finalizada') {
+                    confirmModalEl.addEventListener('hidden.bs.modal', () => {
+                        modalList?.querySelectorAll('input[name="modManageStatusRadio"]').forEach((input) => {
+                            input.checked = input.value === activeCurrentStatus;
+                        });
+                        sincronizarEstadoModal();
+                        modalInstance?.show();
+                    }, { once: true });
+                }
+                confirmModalInstance.hide();
+            } else if (res.estadoActual === 'finalizada') {
                 modalInstance?.hide();
             } else {
                 modalList?.querySelectorAll('input[name="modManageStatusRadio"]').forEach((input) => {
@@ -426,6 +456,76 @@
                 });
                 sincronizarEstadoModal();
             }
+        }
+    }
+
+    function abrirConfirmacionEstadoModal() {
+        const nuevoEstado = obtenerEstadoSeleccionadoModal();
+        if (!activeSubastaId || !nuevoEstado || nuevoEstado === activeCurrentStatus) return;
+        if (!confirmModalEl || !confirmModalInstance) {
+            ejecutarGuardadoEstadoModal();
+            return;
+        }
+
+        const antesTxt = BADGE_MAP[activeCurrentStatus]?.texto || activeCurrentStatus;
+        const despuesTxt = BADGE_MAP[nuevoEstado]?.texto || nuevoEstado;
+        const motivo = (nuevoEstado === 'rechazada' || nuevoEstado === 'cancelada')
+            ? (modalMotivoInput?.value || '').trim()
+            : '';
+
+        if (confirmIntroEl) {
+            confirmIntroEl.innerHTML = `¿Deseas aplicar el siguiente cambio en la subasta <strong class="text-white">${escHtml(activeItemTitle || `#${activeSubastaId}`)}</strong>?`;
+        }
+
+        if (confirmListEl) {
+            let html = `
+                <div class="adm-user-confirm-row">
+                    <span class="adm-user-confirm-label">Estado</span>
+                    <div class="adm-user-confirm-values">
+                        <span class="adm-user-confirm-old">${escHtml(antesTxt)}</span>
+                        <i class="fa-solid fa-arrow-right adm-user-confirm-arrow" aria-hidden="true"></i>
+                        <span class="adm-user-confirm-new">${escHtml(despuesTxt)}</span>
+                    </div>
+                </div>
+            `;
+            if (motivo) {
+                html += `
+                    <div class="adm-user-confirm-row">
+                        <span class="adm-user-confirm-label">Motivo</span>
+                        <div class="adm-user-confirm-values">
+                            <span class="adm-user-confirm-new">${escHtml(motivo)}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            confirmListEl.innerHTML = html;
+        }
+
+        if (confirmSaveBtn) confirmSaveBtn.disabled = false;
+        if (confirmBackBtn) confirmBackBtn.disabled = false;
+        if (confirmSaveTextEl) confirmSaveTextEl.textContent = 'Confirmar y guardar';
+
+        if (modalEl && modalInstance && modalEl.classList.contains('show')) {
+            modalEl.addEventListener('hidden.bs.modal', () => {
+                confirmModalInstance.show();
+            }, { once: true });
+            modalInstance.hide();
+        } else {
+            confirmModalInstance.show();
+        }
+    }
+
+    modalSaveBtn?.addEventListener('click', abrirConfirmacionEstadoModal);
+    confirmSaveBtn?.addEventListener('click', ejecutarGuardadoEstadoModal);
+    confirmBackBtn?.addEventListener('click', () => {
+        if (!confirmModalEl || !confirmModalInstance) return;
+        if (confirmModalEl.classList.contains('show')) {
+            confirmModalEl.addEventListener('hidden.bs.modal', () => {
+                modalInstance?.show();
+            }, { once: true });
+            confirmModalInstance.hide();
+        } else {
+            modalInstance?.show();
         }
     });
 
@@ -487,6 +587,7 @@
 
             const badgeInfo = BADGE_MAP[activeCurrentStatus];
             const itemTitle = editBtn.dataset.item || '';
+            activeItemTitle = itemTitle;
             if (modalItemName) {
                 modalItemName.textContent = badgeInfo && activeCurrentStatus === 'sin_ofertas'
                     ? `${itemTitle} · Estado actual: ${badgeInfo.texto}`

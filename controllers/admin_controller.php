@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../dao/AdminDAO.php';
 require_once __DIR__ . '/../dao/ModeradorDAO.php';
+require_once __DIR__ . '/../dao/CategoriaDAO.php';
 require_once __DIR__ . '/../helpers/sesion_inactividad.php';
 require_once __DIR__ . '/../helpers/kpi_helper.php';
 
@@ -176,6 +177,42 @@ function obtenerDetalleUsuarioAdmin(int $idUsuario, int $idAdminActual = 0): ?ar
     return $dao->obtenerDetalleUsuarioAdmin($idUsuario, $idAdminActual);
 }
 
+function obtenerCategoriasAdmin(): array
+{
+    $dao = new CategoriaDAO();
+    return $dao->listarCategorias();
+}
+
+function obtenerSubastasAdmin(string $baseUrl = ''): array
+{
+    $modDao = new ModeradorDAO();
+    $modDao->inactivarSubastasVencidas();
+
+    $dao = new AdminDAO();
+    return $dao->listarSubastasAdmin($baseUrl);
+}
+
+function obtenerDetalleSubastaAdmin(int $idSubasta, string $baseUrl = ''): ?array
+{
+    $modDao = new ModeradorDAO();
+    $modDao->inactivarSubastasVencidas();
+
+    $dao = new AdminDAO();
+    return $dao->obtenerDetalleSubastaAdmin($idSubasta, $baseUrl);
+}
+
+function moderarSubastaAdmin(int $idSubasta, string $decision, ?string $motivo = null): array
+{
+    $modDao = new ModeradorDAO();
+    return $modDao->moderarSubasta($idSubasta, $decision, $motivo);
+}
+
+function cambiarEstadoSubastaAdmin(int $idSubasta, string $nuevoEstado, ?string $estadoEsperado = null, ?string $motivo = null): array
+{
+    $modDao = new ModeradorDAO();
+    return $modDao->cambiarEstadoSubasta($idSubasta, $nuevoEstado, $estadoEsperado, $motivo);
+}
+
 if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -238,6 +275,67 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
             'estado' => true,
             'data'   => obtenerUsuariosAdmin($busqueda, $idRol, $pagina, $porPagina, $estadoFiltro),
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'subastas') {
+        echo json_encode([
+            'estado'   => true,
+            'subastas' => obtenerSubastasAdmin(BASE_URL),
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'subasta_detalle') {
+        $idSubasta = (int)($_GET['id_subasta'] ?? $_POST['id_subasta'] ?? 0);
+        if ($idSubasta <= 0) {
+            http_response_code(400);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'ID de subasta no válido.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $detalle = obtenerDetalleSubastaAdmin($idSubasta, BASE_URL);
+        if (!$detalle) {
+            http_response_code(404);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'No se encontró la subasta solicitada.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        echo json_encode([
+            'estado'  => true,
+            'subasta' => $detalle,
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'subasta_moderar') {
+        $idSubasta = (int)($_POST['id_subasta'] ?? 0);
+        $decision = (string)($_POST['decision'] ?? '');
+        $motivo = isset($_POST['motivo']) ? (string)$_POST['motivo'] : null;
+
+        $resultado = moderarSubastaAdmin($idSubasta, $decision, $motivo);
+        if (!$resultado['estado']) {
+            http_response_code(400);
+        }
+
+        echo json_encode($resultado, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'subasta_cambiar_estado') {
+        $idSubasta = (int)($_POST['id_subasta'] ?? 0);
+        $nuevoEstado = (string)($_POST['nuevo_estado'] ?? '');
+        $estadoEsperado = isset($_POST['estado_esperado']) ? (string)$_POST['estado_esperado'] : null;
+        $motivo = isset($_POST['motivo']) ? (string)$_POST['motivo'] : null;
+
+        $resultado = cambiarEstadoSubastaAdmin($idSubasta, $nuevoEstado, $estadoEsperado, $motivo);
+        echo json_encode($resultado, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
 

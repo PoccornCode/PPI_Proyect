@@ -55,7 +55,14 @@ class AdminDAO
         }
 
         $sql = "SELECT
-                    (SELECT COUNT(*) FROM sb_subasta WHERE LOWER(estado) = 'pendiente') AS subastas_pendientes,
+                    (SELECT COUNT(*)
+                     FROM sb_subasta s
+                     INNER JOIN (
+                         SELECT MAX(id_subasta) AS max_id
+                         FROM sb_subasta
+                         GROUP BY id_producto
+                     ) ult ON s.id_subasta = ult.max_id
+                     WHERE LOWER(s.estado) = 'pendiente') AS subastas_pendientes,
                     (SELECT COUNT(*) FROM sb_contacto WHERE estado = 0) AS contactos_pendientes";
         $res = $this->conexion->query($sql);
         if ($res && ($row = $res->fetch_assoc())) {
@@ -135,21 +142,26 @@ class AdminDAO
         }
 
         $sqlSubastas = "SELECT
-                SUM(CASE WHEN LOWER(estado) = 'activa' AND fecha_final > NOW() THEN 1 ELSE 0 END) AS activas,
-                SUM(CASE WHEN LOWER(estado) = 'pendiente' THEN 1 ELSE 0 END) AS pendientes,
-                MAX(CASE WHEN LOWER(estado) = 'activa' AND fecha_final > NOW() THEN fecha_inicial ELSE NULL END) AS ultima_activa,
-                MAX(CASE WHEN LOWER(estado) = 'pendiente' THEN fecha_inicial ELSE NULL END) AS ultima_pendiente,
-                SUM(CASE WHEN LOWER(estado) = 'activa' AND fecha_final > NOW()
-                              AND fecha_inicial >= DATE_SUB(NOW(), INTERVAL {$dias} DAY) THEN 1 ELSE 0 END) AS activas_actual,
-                SUM(CASE WHEN LOWER(estado) = 'activa'
-                              AND fecha_inicial >= DATE_SUB(NOW(), INTERVAL {$dobleDias} DAY)
-                              AND fecha_inicial < DATE_SUB(NOW(), INTERVAL {$dias} DAY) THEN 1 ELSE 0 END) AS activas_anterior,
-                SUM(CASE WHEN LOWER(estado) = 'pendiente'
-                              AND fecha_inicial >= DATE_SUB(NOW(), INTERVAL {$dias} DAY) THEN 1 ELSE 0 END) AS pendientes_actual,
-                SUM(CASE WHEN LOWER(estado) = 'pendiente'
-                              AND fecha_inicial >= DATE_SUB(NOW(), INTERVAL {$dobleDias} DAY)
-                              AND fecha_inicial < DATE_SUB(NOW(), INTERVAL {$dias} DAY) THEN 1 ELSE 0 END) AS pendientes_anterior
-            FROM sb_subasta";
+                SUM(CASE WHEN LOWER(s.estado) = 'activa' AND s.fecha_final > NOW() THEN 1 ELSE 0 END) AS activas,
+                SUM(CASE WHEN LOWER(s.estado) = 'pendiente' THEN 1 ELSE 0 END) AS pendientes,
+                MAX(CASE WHEN LOWER(s.estado) = 'activa' AND s.fecha_final > NOW() THEN s.fecha_inicial ELSE NULL END) AS ultima_activa,
+                MAX(CASE WHEN LOWER(s.estado) = 'pendiente' THEN s.fecha_inicial ELSE NULL END) AS ultima_pendiente,
+                SUM(CASE WHEN LOWER(s.estado) = 'activa' AND s.fecha_final > NOW()
+                              AND s.fecha_inicial >= DATE_SUB(NOW(), INTERVAL {$dias} DAY) THEN 1 ELSE 0 END) AS activas_actual,
+                SUM(CASE WHEN LOWER(s.estado) = 'activa'
+                              AND s.fecha_inicial >= DATE_SUB(NOW(), INTERVAL {$dobleDias} DAY)
+                              AND s.fecha_inicial < DATE_SUB(NOW(), INTERVAL {$dias} DAY) THEN 1 ELSE 0 END) AS activas_anterior,
+                SUM(CASE WHEN LOWER(s.estado) = 'pendiente'
+                              AND s.fecha_inicial >= DATE_SUB(NOW(), INTERVAL {$dias} DAY) THEN 1 ELSE 0 END) AS pendientes_actual,
+                SUM(CASE WHEN LOWER(s.estado) = 'pendiente'
+                              AND s.fecha_inicial >= DATE_SUB(NOW(), INTERVAL {$dobleDias} DAY)
+                              AND s.fecha_inicial < DATE_SUB(NOW(), INTERVAL {$dias} DAY) THEN 1 ELSE 0 END) AS pendientes_anterior
+            FROM sb_subasta s
+            INNER JOIN (
+                SELECT MAX(id_subasta) AS max_id
+                FROM sb_subasta
+                GROUP BY id_producto
+            ) ult ON s.id_subasta = ult.max_id";
         if ($res = $this->conexion->query($sqlSubastas)) {
             if ($row = $res->fetch_assoc()) {
                 $resumen['activas'] = (int)($row['activas'] ?? 0);
@@ -165,14 +177,14 @@ class AdminDAO
 
         $resumen['serie_usuarios']   = $this->obtenerSerieEn7Tramos('sb_usuario', 'fecha_registro', $dias);
         $resumen['serie_pujas']      = $this->obtenerSerieEn7Tramos('sb_puja', 'fecha', $dias);
-        $resumen['serie_activas']    = $this->obtenerSerieEn7Tramos('sb_subasta', 'fecha_inicial', $dias, "LOWER(estado) = 'activa' AND fecha_final > NOW()");
-        $resumen['serie_pendientes'] = $this->obtenerSerieEn7Tramos('sb_subasta', 'fecha_inicial', $dias, "LOWER(estado) = 'pendiente'");
+        $resumen['serie_activas']    = $this->obtenerSerieEn7Tramos('sb_subasta', 'fecha_inicial', $dias, "LOWER(t.estado) = 'activa' AND t.fecha_final > NOW()", true);
+        $resumen['serie_pendientes'] = $this->obtenerSerieEn7Tramos('sb_subasta', 'fecha_inicial', $dias, "LOWER(t.estado) = 'pendiente'", true);
 
         return $resumen;
     }
 
     // Divide el rango de días en 7 tramos iguales para dibujar las barras del sparkline
-    private function obtenerSerieEn7Tramos(string $tabla, string $columnaFecha, int $dias, string $filtroExtra = ''): array
+    private function obtenerSerieEn7Tramos(string $tabla, string $columnaFecha, int $dias, string $filtroExtra = '', bool $soloUltimaSubasta = false): array
     {
         $serie = array_fill(0, 7, 0);
         $ahora = time();
@@ -180,10 +192,13 @@ class AdminDAO
         $duracionTramo = max(1, ($dias * 86400) / 7);
         $inicioSql = date('Y-m-d H:i:s', $inicioTs);
 
+        $joinUltima = $soloUltimaSubasta
+            ? " INNER JOIN (SELECT MAX(id_subasta) AS max_id FROM sb_subasta GROUP BY id_producto) ult ON t.id_subasta = ult.max_id"
+            : '';
         $whereExtra = $filtroExtra !== '' ? " AND {$filtroExtra}" : '';
-        $sql = "SELECT {$columnaFecha} AS fecha_evento
-                FROM {$tabla}
-                WHERE {$columnaFecha} >= '{$inicioSql}'{$whereExtra}";
+        $sql = "SELECT t.{$columnaFecha} AS fecha_evento
+                FROM {$tabla} t{$joinUltima}
+                WHERE t.{$columnaFecha} >= '{$inicioSql}'{$whereExtra}";
 
         $res = $this->conexion->query($sql);
         if ($res) {
@@ -279,11 +294,16 @@ class AdminDAO
 
         if ($this->conexion && !$this->conexion->connect_errno) {
             $sql = "SELECT
-                        SUM(CASE WHEN LOWER(estado) = 'activa' AND fecha_final > NOW() THEN 1 ELSE 0 END) AS activas,
-                        SUM(CASE WHEN LOWER(estado) = 'pendiente' THEN 1 ELSE 0 END) AS pendientes,
-                        SUM(CASE WHEN LOWER(estado) IN ('finalizada', 'sin_ofertas') THEN 1 ELSE 0 END) AS finalizadas,
-                        SUM(CASE WHEN LOWER(estado) IN ('cancelada', 'rechazada') THEN 1 ELSE 0 END) AS canceladas
-                    FROM sb_subasta";
+                        SUM(CASE WHEN LOWER(s.estado) = 'activa' AND s.fecha_final > NOW() THEN 1 ELSE 0 END) AS activas,
+                        SUM(CASE WHEN LOWER(s.estado) = 'pendiente' THEN 1 ELSE 0 END) AS pendientes,
+                        SUM(CASE WHEN LOWER(s.estado) IN ('finalizada', 'sin_ofertas') THEN 1 ELSE 0 END) AS finalizadas,
+                        SUM(CASE WHEN LOWER(s.estado) IN ('cancelada', 'rechazada') THEN 1 ELSE 0 END) AS canceladas
+                    FROM sb_subasta s
+                    INNER JOIN (
+                        SELECT MAX(id_subasta) AS max_id
+                        FROM sb_subasta
+                        GROUP BY id_producto
+                    ) ult ON s.id_subasta = ult.max_id";
             if ($res = $this->conexion->query($sql)) {
                 if ($row = $res->fetch_assoc()) {
                     $conteos['activas']     = (int)($row['activas'] ?? 0);
@@ -1168,6 +1188,11 @@ class AdminDAO
                        COUNT(pu.id_puja) AS total_pujas,
                        COALESCE(MAX(pu.monto), s.precio_inicial) AS precio_actual
                 FROM sb_subasta s
+                INNER JOIN (
+                    SELECT MAX(id_subasta) AS max_id
+                    FROM sb_subasta
+                    GROUP BY id_producto
+                ) ult ON s.id_subasta = ult.max_id
                 INNER JOIN sb_producto p ON s.id_producto = p.id_producto
                 LEFT JOIN sb_categoria c ON p.id_categoria = c.id_categoria
                 LEFT JOIN sb_puja pu ON s.id_subasta = pu.id_subasta
@@ -1195,14 +1220,7 @@ class AdminDAO
             if ($rutaImagen === '') {
                 $rutaImagen = 'assets/img/cat-coleccionables.jpg';
             }
-
-            if (strpos($rutaImagen, 'http://') === 0 || strpos($rutaImagen, 'https://') === 0) {
-                $imagenUrl = $rutaImagen;
-            } elseif (strpos($rutaImagen, 'uploads/') === 0 || strpos($rutaImagen, 'assets/') === 0) {
-                $imagenUrl = $baseUrl . ltrim($rutaImagen, '/');
-            } else {
-                $imagenUrl = $baseUrl . 'uploads/productos/' . ltrim($rutaImagen, '/');
-            }
+            $imagenUrl = $this->normalizarRutaImagenAdmin($rutaImagen, $baseUrl);
 
             $subastas[] = [
                 'id_subasta'      => (int)$row['id_subasta'],
@@ -1236,5 +1254,298 @@ class AdminDAO
         }
 
         return sprintf('%02d:%02d:%02d', $horas, $minutos, $segs);
+    }
+
+    private function normalizarRutaImagenAdmin(string $ruta, string $baseUrl = ''): string
+    {
+        $ruta = trim($ruta);
+        if ($ruta === '') {
+            return '';
+        }
+        if (strpos($ruta, 'http://') === 0 || strpos($ruta, 'https://') === 0) {
+            return $ruta;
+        }
+        if (strpos($ruta, 'uploads/') === 0 || strpos($ruta, 'assets/') === 0) {
+            return $baseUrl . ltrim($ruta, '/');
+        }
+        return $baseUrl . 'uploads/productos/' . ltrim($ruta, '/');
+    }
+
+    public function obtenerDetalleSubastaAdmin(int $idSubasta, string $baseUrl = ''): ?array
+    {
+        if ($idSubasta <= 0 || !$this->conexion || $this->conexion->connect_errno) {
+            return null;
+        }
+
+        $sql = "SELECT s.id_subasta,
+                       s.precio_inicial,
+                       s.incremento_minimo,
+                       s.fecha_inicial,
+                       s.fecha_final,
+                       s.estado,
+                       s.tipo_solicitud,
+                       s.motivo_rechazo,
+                       s.nota_vendedor,
+                       TIMESTAMPDIFF(SECOND, NOW(), s.fecha_final) AS segundos_restantes,
+                       p.id_producto,
+                       p.nombre AS titulo,
+                       p.descripcion,
+                       p.condicion,
+                       COALESCE(c.nombre, 'General') AS categoria,
+                       c.imagen AS categoria_imagen,
+                       u.username,
+                       u.nombre AS vendedor_nombre,
+                       u.apellido AS vendedor_apellido,
+                       COUNT(pu.id_puja) AS total_pujas,
+                       COALESCE(MAX(pu.monto), s.precio_inicial) AS precio_actual
+                FROM sb_subasta s
+                INNER JOIN sb_producto p ON s.id_producto = p.id_producto
+                LEFT JOIN sb_categoria c ON p.id_categoria = c.id_categoria
+                LEFT JOIN sb_usuario u ON p.id_usuario = u.id_usuario
+                LEFT JOIN sb_puja pu ON s.id_subasta = pu.id_subasta
+                WHERE s.id_subasta = ?
+                GROUP BY s.id_subasta, s.precio_inicial, s.incremento_minimo,
+                         s.fecha_inicial, s.fecha_final, s.estado,
+                         s.tipo_solicitud, s.motivo_rechazo, s.nota_vendedor,
+                         p.id_producto, p.nombre, p.descripcion, p.condicion,
+                         c.nombre, c.imagen,
+                         u.username, u.nombre, u.apellido
+                LIMIT 1";
+
+        $stmt = $this->conexion->prepare($sql);
+        if (!$stmt) {
+            return null;
+        }
+        $stmt->bind_param('i', $idSubasta);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $row = $res ? $res->fetch_assoc() : null;
+        $stmt->close();
+
+        if (!$row) {
+            return null;
+        }
+
+        $idProducto = (int)($row['id_producto'] ?? 0);
+        $imagenes = [];
+        if ($idProducto > 0) {
+            $sqlImg = "SELECT ruta
+                       FROM sb_imagen_producto
+                       WHERE id_producto = ?
+                       ORDER BY principal DESC, id_imagen_producto ASC";
+            $stmtImg = $this->conexion->prepare($sqlImg);
+            if ($stmtImg) {
+                $stmtImg->bind_param('i', $idProducto);
+                $stmtImg->execute();
+                $resImg = $stmtImg->get_result();
+                while ($imgRow = $resImg->fetch_assoc()) {
+                    $url = $this->normalizarRutaImagenAdmin((string)($imgRow['ruta'] ?? ''), $baseUrl);
+                    if ($url !== '') {
+                        $imagenes[] = $url;
+                    }
+                }
+                $stmtImg->close();
+            }
+        }
+
+        if (empty($imagenes)) {
+            $fallback = $this->normalizarRutaImagenAdmin((string)($row['categoria_imagen'] ?? ''), $baseUrl);
+            if ($fallback === '') {
+                $fallback = $this->normalizarRutaImagenAdmin('assets/img/cat-coleccionables.jpg', $baseUrl);
+            }
+            if ($fallback !== '') {
+                $imagenes[] = $fallback;
+            }
+        }
+
+        $etiquetasEstado = [
+            'pendiente'   => ['clase' => 'adm-badge--pendiente', 'texto' => 'Pendiente'],
+            'activa'      => ['clase' => 'adm-badge--activa', 'texto' => 'Activa'],
+            'finalizada'  => ['clase' => 'adm-badge--finalizada', 'texto' => 'Finalizada'],
+            'sin_ofertas' => ['clase' => 'adm-badge--sin-ofertas', 'texto' => 'Sin ofertas'],
+            'rechazada'   => ['clase' => 'adm-badge--rechazada', 'texto' => 'Rechazada'],
+            'cancelada'   => ['clase' => 'adm-badge--cancelada', 'texto' => 'Cancelada'],
+        ];
+
+        $estadoRaw = strtolower(trim((string)($row['estado'] ?? 'pendiente')));
+        $badge = $etiquetasEstado[$estadoRaw] ?? ['clase' => 'adm-badge--pendiente', 'texto' => ucfirst($estadoRaw)];
+
+        $username = trim((string)($row['username'] ?? ''));
+        $nombreVendedor = trim(($row['vendedor_nombre'] ?? '') . ' ' . ($row['vendedor_apellido'] ?? ''));
+        $vendedor = $username !== ''
+            ? '@' . ltrim($username, '@')
+            : ($nombreVendedor !== '' ? $nombreVendedor : 'Sin vendedor');
+
+        $precioInicialNum = (float)($row['precio_inicial'] ?? 0);
+        $precioActualNum = (float)($row['precio_actual'] ?? $precioInicialNum);
+        $incrementoNum = (float)($row['incremento_minimo'] ?? 0);
+        $totalPujas = (int)($row['total_pujas'] ?? 0);
+        $segundos = max(0, (int)($row['segundos_restantes'] ?? 0));
+
+        if ($estadoRaw === 'activa') {
+            $tiempoTexto = $this->formatearTiempoRestante($segundos);
+        } elseif ($estadoRaw === 'pendiente') {
+            $tiempoTexto = 'Por validar';
+        } else {
+            $tiempoTexto = $badge['texto'];
+        }
+
+        $condicion = trim((string)($row['condicion'] ?? '')) ?: 'No especificada';
+        $totalFotos = count($imagenes);
+        $etiquetaFotos = $totalFotos === 1 ? '1 foto' : $totalFotos . ' fotos';
+
+        $specs = [
+            ['label' => 'Categoría', 'value' => (string)($row['categoria'] ?? 'General')],
+            ['label' => 'Vendedor', 'value' => $vendedor],
+            ['label' => 'Precio actual', 'value' => '$' . number_format($precioActualNum, 2, '.', ',')],
+            ['label' => 'Precio base', 'value' => '$' . number_format($precioInicialNum, 2, '.', ',') . ' (inc. $' . number_format($incrementoNum, 2, '.', ',') . ')'],
+            ['label' => 'Condición', 'value' => $condicion . ' (' . $etiquetaFotos . ')'],
+            ['label' => 'Pujas / Tiempo', 'value' => $totalPujas . ($totalPujas === 1 ? ' puja' : ' pujas') . ' · ' . $tiempoTexto],
+        ];
+
+        $tipoSolicitud = strtolower(trim((string)($row['tipo_solicitud'] ?? 'nueva')));
+        $notaVendedor = trim((string)($row['nota_vendedor'] ?? ''));
+        $motivoRechazo = trim((string)($row['motivo_rechazo'] ?? ''));
+
+        if ($tipoSolicitud === 'reenvio') {
+            $specs[] = ['label' => 'Tipo de solicitud', 'value' => 'Reenvío corregido'];
+        } elseif ($tipoSolicitud === 'apelacion') {
+            $specs[] = ['label' => 'Tipo de solicitud', 'value' => 'Apelación'];
+        }
+        if ($notaVendedor !== '') {
+            $specs[] = ['label' => 'Nota del vendedor', 'value' => $notaVendedor];
+        }
+        if ($motivoRechazo !== '') {
+            $specs[] = ['label' => 'Motivo de rechazo', 'value' => $motivoRechazo];
+        }
+
+        return [
+            'id_subasta'      => $idSubasta,
+            'codigo'          => 'SUB-' . str_pad((string)$idSubasta, 3, '0', STR_PAD_LEFT),
+            'titulo'          => (string)($row['titulo'] ?? ''),
+            'descripcion'     => trim((string)($row['descripcion'] ?? '')) ?: 'Sin descripción registrada.',
+            'condicion'       => $condicion,
+            'categoria'       => (string)($row['categoria'] ?? 'General'),
+            'vendedor'        => $vendedor,
+            'estado_raw'      => $estadoRaw,
+            'estado_texto'    => $badge['texto'],
+            'estado_clase'    => $badge['clase'],
+            'imagenes'        => $imagenes,
+            'specs'           => $specs,
+        ];
+    }
+
+    public function listarSubastasAdmin(string $baseUrl = ''): array
+    {
+        $subastas = [];
+        if (!$this->conexion || $this->conexion->connect_errno) {
+            return $subastas;
+        }
+
+        $sql = "SELECT s.id_subasta,
+                       s.precio_inicial,
+                       s.incremento_minimo,
+                       s.fecha_inicial,
+                       s.fecha_final,
+                       s.estado,
+                       TIMESTAMPDIFF(SECOND, NOW(), s.fecha_final) AS segundos_restantes,
+                       p.id_producto,
+                       p.nombre AS titulo,
+                       p.condicion,
+                       COALESCE(c.nombre, 'General') AS categoria,
+                       c.imagen AS categoria_imagen,
+                       u.username,
+                       u.nombre AS vendedor_nombre,
+                       u.apellido AS vendedor_apellido,
+                       (SELECT img.ruta
+                        FROM sb_imagen_producto img
+                        WHERE img.id_producto = p.id_producto
+                        ORDER BY img.principal DESC, img.id_imagen_producto ASC
+                        LIMIT 1) AS imagen_ruta,
+                       COUNT(pu.id_puja) AS total_pujas,
+                       COALESCE(MAX(pu.monto), s.precio_inicial) AS precio_actual
+                FROM sb_subasta s
+                INNER JOIN (
+                    SELECT MAX(id_subasta) AS max_id
+                    FROM sb_subasta
+                    GROUP BY id_producto
+                ) ult ON s.id_subasta = ult.max_id
+                INNER JOIN sb_producto p ON s.id_producto = p.id_producto
+                LEFT JOIN sb_categoria c ON p.id_categoria = c.id_categoria
+                LEFT JOIN sb_usuario u ON p.id_usuario = u.id_usuario
+                LEFT JOIN sb_puja pu ON s.id_subasta = pu.id_subasta
+                GROUP BY s.id_subasta, s.precio_inicial, s.incremento_minimo,
+                         s.fecha_inicial, s.fecha_final, s.estado,
+                         p.id_producto, p.nombre, p.condicion,
+                         c.nombre, c.imagen,
+                         u.username, u.nombre, u.apellido
+                ORDER BY s.id_subasta DESC";
+
+        $res = $this->conexion->query($sql);
+        if (!$res) {
+            return $subastas;
+        }
+
+        $etiquetasEstado = [
+            'pendiente'   => ['clase' => 'adm-badge--pendiente', 'texto' => 'Pendiente'],
+            'activa'      => ['clase' => 'adm-badge--activa', 'texto' => 'Activa'],
+            'finalizada'  => ['clase' => 'adm-badge--finalizada', 'texto' => 'Finalizada'],
+            'sin_ofertas' => ['clase' => 'adm-badge--sin-ofertas', 'texto' => 'Sin ofertas'],
+            'rechazada'   => ['clase' => 'adm-badge--rechazada', 'texto' => 'Rechazada'],
+            'cancelada'   => ['clase' => 'adm-badge--cancelada', 'texto' => 'Cancelada'],
+        ];
+
+        while ($row = $res->fetch_assoc()) {
+            $idSubasta = (int)($row['id_subasta'] ?? 0);
+            $estadoRaw = strtolower(trim((string)($row['estado'] ?? 'pendiente')));
+            $badge = $etiquetasEstado[$estadoRaw] ?? ['clase' => 'adm-badge--pendiente', 'texto' => ucfirst($estadoRaw)];
+
+            $username = trim((string)($row['username'] ?? ''));
+            $nombreVendedor = trim(($row['vendedor_nombre'] ?? '') . ' ' . ($row['vendedor_apellido'] ?? ''));
+            $vendedor = $username !== ''
+                ? '@' . ltrim($username, '@')
+                : ($nombreVendedor !== '' ? $nombreVendedor : 'Sin vendedor');
+
+            $precioInicialNum = (float)($row['precio_inicial'] ?? 0);
+            $precioActualNum = (float)($row['precio_actual'] ?? $precioInicialNum);
+            $totalPujas = (int)($row['total_pujas'] ?? 0);
+            $segundos = max(0, (int)($row['segundos_restantes'] ?? 0));
+
+            if ($estadoRaw === 'activa') {
+                $tiempoTexto = $this->formatearTiempoRestante($segundos);
+            } elseif ($estadoRaw === 'pendiente') {
+                $tiempoTexto = 'Por validar';
+            } else {
+                $tiempoTexto = $badge['texto'];
+            }
+
+            $rutaImagen = trim((string)($row['imagen_ruta'] ?? ''));
+            if ($rutaImagen === '') {
+                $rutaImagen = trim((string)($row['categoria_imagen'] ?? ''));
+            }
+            if ($rutaImagen === '') {
+                $rutaImagen = 'assets/img/cat-coleccionables.jpg';
+            }
+            $imagenUrl = $this->normalizarRutaImagenAdmin($rutaImagen, $baseUrl);
+
+            $subastas[] = [
+                'id_subasta'      => $idSubasta,
+                'codigo'          => 'SUB-' . str_pad((string)$idSubasta, 3, '0', STR_PAD_LEFT),
+                'titulo'          => (string)($row['titulo'] ?? ''),
+                'condicion'       => (string)($row['condicion'] ?? ''),
+                'categoria'       => (string)($row['categoria'] ?? 'General'),
+                'vendedor'        => $vendedor,
+                'precio_actual'   => '$' . number_format($precioActualNum, 2, '.', ','),
+                'precio_base'     => '$' . number_format($precioInicialNum, 2, '.', ','),
+                'total_pujas'     => $totalPujas,
+                'tiempo_restante' => $tiempoTexto,
+                'estado_raw'      => $estadoRaw,
+                'estado_texto'    => $badge['texto'],
+                'estado_clase'    => $badge['clase'],
+                'img'             => $imagenUrl,
+            ];
+        }
+
+        return $subastas;
     }
 }

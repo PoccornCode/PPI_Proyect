@@ -59,21 +59,26 @@ class ModeradorDAO
         }
 
         $sqlTotales = "SELECT
-                SUM(CASE WHEN LOWER(estado) = 'activa' AND fecha_final > NOW() THEN 1 ELSE 0 END) AS activas,
-                SUM(CASE WHEN LOWER(estado) = 'pendiente' THEN 1 ELSE 0 END) AS pendientes,
-                MAX(CASE WHEN LOWER(estado) = 'activa' AND fecha_final > NOW() THEN fecha_inicial ELSE NULL END) AS ultima_activa,
-                MAX(CASE WHEN LOWER(estado) = 'pendiente' THEN fecha_inicial ELSE NULL END) AS ultima_pendiente,
-                SUM(CASE WHEN LOWER(estado) = 'activa' AND fecha_final > NOW()
-                              AND fecha_inicial >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) AS activas_ultimos_7d,
-                SUM(CASE WHEN LOWER(estado) = 'activa'
-                              AND fecha_inicial >= DATE_SUB(NOW(), INTERVAL 14 DAY)
-                              AND fecha_inicial < DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) AS activas_7d_anteriores,
-                SUM(CASE WHEN LOWER(estado) = 'pendiente'
-                              AND fecha_inicial >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) AS pendientes_ultimos_7d,
-                SUM(CASE WHEN LOWER(estado) = 'pendiente'
-                              AND fecha_inicial >= DATE_SUB(NOW(), INTERVAL 14 DAY)
-                              AND fecha_inicial < DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) AS pendientes_7d_anteriores
-            FROM sb_subasta";
+                SUM(CASE WHEN LOWER(s.estado) = 'activa' AND s.fecha_final > NOW() THEN 1 ELSE 0 END) AS activas,
+                SUM(CASE WHEN LOWER(s.estado) = 'pendiente' THEN 1 ELSE 0 END) AS pendientes,
+                MAX(CASE WHEN LOWER(s.estado) = 'activa' AND s.fecha_final > NOW() THEN s.fecha_inicial ELSE NULL END) AS ultima_activa,
+                MAX(CASE WHEN LOWER(s.estado) = 'pendiente' THEN s.fecha_inicial ELSE NULL END) AS ultima_pendiente,
+                SUM(CASE WHEN LOWER(s.estado) = 'activa' AND s.fecha_final > NOW()
+                              AND s.fecha_inicial >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) AS activas_ultimos_7d,
+                SUM(CASE WHEN LOWER(s.estado) = 'activa'
+                              AND s.fecha_inicial >= DATE_SUB(NOW(), INTERVAL 14 DAY)
+                              AND s.fecha_inicial < DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) AS activas_7d_anteriores,
+                SUM(CASE WHEN LOWER(s.estado) = 'pendiente'
+                              AND s.fecha_inicial >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) AS pendientes_ultimos_7d,
+                SUM(CASE WHEN LOWER(s.estado) = 'pendiente'
+                              AND s.fecha_inicial >= DATE_SUB(NOW(), INTERVAL 14 DAY)
+                              AND s.fecha_inicial < DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) AS pendientes_7d_anteriores
+            FROM sb_subasta s
+            INNER JOIN (
+                SELECT MAX(id_subasta) AS max_id
+                FROM sb_subasta
+                GROUP BY id_producto
+            ) ult ON s.id_subasta = ult.max_id";
 
         $res = $this->conexion->query($sqlTotales);
         if ($res && ($row = $res->fetch_assoc())) {
@@ -174,6 +179,11 @@ class ModeradorDAO
                        c.nombre AS categoria, c.imagen AS categoria_imagen,
                        u.username, u.nombre AS vendedor_nombre, u.apellido AS vendedor_apellido
                 FROM sb_subasta s
+                INNER JOIN (
+                    SELECT MAX(id_subasta) AS max_id
+                    FROM sb_subasta
+                    GROUP BY id_producto
+                ) ult ON s.id_subasta = ult.max_id
                 INNER JOIN sb_producto p ON s.id_producto = p.id_producto
                 LEFT JOIN sb_categoria c ON p.id_categoria = c.id_categoria
                 LEFT JOIN sb_usuario u ON p.id_usuario = u.id_usuario
@@ -246,7 +256,8 @@ class ModeradorDAO
         try {
             $this->conexion->begin_transaction();
 
-            $sqlSelect = "SELECT s.id_subasta, s.estado, s.fecha_inicial, s.fecha_final, p.nombre AS titulo
+            $sqlSelect = "SELECT s.id_subasta, s.id_producto, s.estado, s.fecha_inicial, s.fecha_final, p.nombre AS titulo,
+                                 (SELECT MAX(s2.id_subasta) FROM sb_subasta s2 WHERE s2.id_producto = s.id_producto) AS max_id_subasta
                           FROM sb_subasta s
                           INNER JOIN sb_producto p ON s.id_producto = p.id_producto
                           WHERE s.id_subasta = ?
@@ -260,6 +271,11 @@ class ModeradorDAO
             if (!$subasta) {
                 $this->conexion->rollback();
                 return ['estado' => false, 'mensaje' => 'La subasta seleccionada no existe.'];
+            }
+
+            if ((int)($subasta['max_id_subasta'] ?? 0) > $idSubasta) {
+                $this->conexion->rollback();
+                return ['estado' => false, 'conflicto' => true, 'mensaje' => 'Esta subasta fue reemplazada por un reenvío más reciente y no puede modificarse.'];
             }
 
             if (strtolower((string)$subasta['estado']) !== 'pendiente') {
@@ -327,6 +343,11 @@ class ModeradorDAO
                        c.nombre AS categoria, c.imagen AS categoria_imagen,
                        u.username, u.nombre AS vendedor_nombre, u.apellido AS vendedor_apellido
                 FROM sb_subasta s
+                INNER JOIN (
+                    SELECT MAX(id_subasta) AS max_id
+                    FROM sb_subasta
+                    GROUP BY id_producto
+                ) ult ON s.id_subasta = ult.max_id
                 INNER JOIN sb_producto p ON s.id_producto = p.id_producto
                 LEFT JOIN sb_categoria c ON p.id_categoria = c.id_categoria
                 LEFT JOIN sb_usuario u ON p.id_usuario = u.id_usuario
@@ -382,7 +403,8 @@ class ModeradorDAO
         try {
             $this->conexion->begin_transaction();
 
-            $sqlSelect = "SELECT s.id_subasta, s.estado, s.fecha_inicial, s.fecha_final, p.nombre AS titulo
+            $sqlSelect = "SELECT s.id_subasta, s.id_producto, s.estado, s.fecha_inicial, s.fecha_final, p.nombre AS titulo,
+                                 (SELECT MAX(s2.id_subasta) FROM sb_subasta s2 WHERE s2.id_producto = s.id_producto) AS max_id_subasta
                           FROM sb_subasta s
                           INNER JOIN sb_producto p ON s.id_producto = p.id_producto
                           WHERE s.id_subasta = ?
@@ -396,6 +418,11 @@ class ModeradorDAO
             if (!$subasta) {
                 $this->conexion->rollback();
                 return ['estado' => false, 'mensaje' => 'La subasta seleccionada no existe.'];
+            }
+
+            if ((int)($subasta['max_id_subasta'] ?? 0) > $idSubasta) {
+                $this->conexion->rollback();
+                return ['estado' => false, 'conflicto' => true, 'mensaje' => 'Esta subasta fue reemplazada por un reenvío más reciente y no puede modificarse.'];
             }
 
             $estadoActual = strtolower((string)$subasta['estado']);
@@ -454,12 +481,25 @@ class ModeradorDAO
                     $stmtUp->bind_param('i', $idSubasta);
                 }
             } elseif ($nuevoEstado === 'pendiente') {
-                $sqlUpdate = "UPDATE sb_subasta
-                              SET estado = 'pendiente',
-                                  fecha_inicial = NOW()
-                              WHERE id_subasta = ?";
-                $stmtUp = $this->conexion->prepare($sqlUpdate);
-                $stmtUp->bind_param('i', $idSubasta);
+                $finTs = strtotime((string)$subasta['fecha_final']) ?: 0;
+                if ($finTs <= time()) {
+                    $inicioTs = strtotime((string)$subasta['fecha_inicial']) ?: time();
+                    $duracionSeg = max(86400, ($finTs > $inicioTs) ? ($finTs - $inicioTs) : 86400);
+                    $sqlUpdate = "UPDATE sb_subasta
+                                  SET estado = 'pendiente',
+                                      fecha_inicial = NOW(),
+                                      fecha_final = DATE_ADD(NOW(), INTERVAL ? SECOND)
+                                  WHERE id_subasta = ?";
+                    $stmtUp = $this->conexion->prepare($sqlUpdate);
+                    $stmtUp->bind_param('ii', $duracionSeg, $idSubasta);
+                } else {
+                    $sqlUpdate = "UPDATE sb_subasta
+                                  SET estado = 'pendiente',
+                                      fecha_inicial = NOW()
+                                  WHERE id_subasta = ?";
+                    $stmtUp = $this->conexion->prepare($sqlUpdate);
+                    $stmtUp->bind_param('i', $idSubasta);
+                }
             } else {
                 $motivoLimpio = $motivo !== null ? trim($motivo) : null;
                 if ($motivoLimpio === '') {
