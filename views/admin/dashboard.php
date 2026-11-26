@@ -183,20 +183,11 @@ $resumen_categorias = [
                         <span class="adm-search-divider" aria-hidden="true"></span>
                         <input type="search" id="admCatSearch" placeholder="Buscar categoría por nombre o descripción..." aria-label="Buscar categoría">
                     </div>
-                </div>
-
-                <div class="adm-cat-filter-pills" role="tablist" aria-label="Filtrar categorías por estado">
-                    <button type="button" class="adm-cat-filter-pill active" data-cat-filter="todas" role="tab" aria-selected="true">
-                        Todas <span class="adm-cat-pill-count" id="catCountTodas"><?= (int)$resumen_categorias['total'] ?></span>
-                    </button>
-                    <button type="button" class="adm-cat-filter-pill" data-cat-filter="publicadas" role="tab" aria-selected="false">
-                        <span class="adm-cat-dot adm-cat-dot--pub"></span>
-                        Publicadas <span class="adm-cat-pill-count" id="catCountPublicadas"><?= (int)$resumen_categorias['publicadas'] ?></span>
-                    </button>
-                    <button type="button" class="adm-cat-filter-pill" data-cat-filter="desactivadas" role="tab" aria-selected="false">
-                        <span class="adm-cat-dot adm-cat-dot--off"></span>
-                        Desactivadas <span class="adm-cat-pill-count" id="catCountDesactivadas"><?= (int)$resumen_categorias['desactivadas'] ?></span>
-                    </button>
+                    <select class="adm-select-filter" id="admCatStatusFilter" aria-label="Filtrar categorías por estado">
+                        <option value="todas">Todos los estados</option>
+                        <option value="publicadas">Publicadas</option>
+                        <option value="desactivadas">Desactivadas</option>
+                    </select>
                 </div>
             </div>
 
@@ -209,7 +200,11 @@ $resumen_categorias = [
                         : 'Sin descripción registrada.';
                     $totalSub = (int)$cat['total_subastas'];
                 ?>
-                    <article class="adm-cat-card-v2 <?= $esActiva ? '' : 'is-inactive' ?>" data-id="<?= (int)$cat['id_categoria'] ?>">
+                    <article class="adm-cat-card-v2 <?= $esActiva ? '' : 'is-inactive' ?>"
+                        data-id="<?= (int)$cat['id_categoria'] ?>"
+                        data-nombre="<?= htmlspecialchars($cat['nombre']) ?>"
+                        data-descripcion="<?= htmlspecialchars($descTexto) ?>"
+                        data-estado="<?= $esActiva ? 'publicadas' : 'desactivadas' ?>">
                         <div class="adm-cat-cover">
                             <img src="<?= htmlspecialchars($imgUrl) ?>" alt="<?= htmlspecialchars($cat['nombre']) ?>" loading="lazy">
                         </div>
@@ -258,10 +253,10 @@ $resumen_categorias = [
             </div>
 
             <div class="adm-cat-empty <?= empty($categorias_admin) ? '' : 'd-none' ?>" id="admCatEmpty">
-                <div class="adm-cat-empty-icon"><i class="fa-regular fa-folder-open"></i></div>
-                <h3 class="h6 text-white fw-bold mb-1">No se encontraron categorías</h3>
-                <p class="small mb-3" style="color:#9aa392;">Prueba con otro término de búsqueda o cambia el filtro de estado.</p>
-                <button type="button" class="mod-btn-sm mod-btn-cancel" id="btnCatResetFilters">
+                <div class="adm-cat-empty-icon"><i class="fa-regular fa-folder-open" id="admCatEmptyIcon"></i></div>
+                <h3 class="h6 text-white fw-bold mb-1" id="admCatEmptyTitle">No se encontraron categorías</h3>
+                <p class="small mb-3" style="color:#9aa392;" id="admCatEmptyText">Prueba con otro término de búsqueda o cambia el filtro de estado.</p>
+                <button type="button" class="mod-btn-sm mod-btn-cancel <?= empty($categorias_admin) ? 'd-none' : '' ?>" id="btnCatResetFilters">
                     <i class="fa-solid fa-rotate-left"></i> Limpiar filtros
                 </button>
             </div>
@@ -1035,6 +1030,7 @@ $resumen_categorias = [
     <script src="<?= $base_url ?>assets/js/admin-subastas.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-subastas.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-subasta-detalle.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-subasta-detalle.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-subasta-estado.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-subasta-estado.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/admin-categorias.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-categorias.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-dashboard.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-dashboard.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-dashboard-referencia.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-dashboard-referencia.js') ?>"></script>
 </body>
