@@ -2771,7 +2771,7 @@ body.admin-body .adm-badge--cancelada {
 
 .adm-modal .modal-header,
 .adm-modal .modal-footer {
-    border-color: var(--adm-border-soft);
+    border-color: rgba(255, 255, 255, 0.04);
 }
 
 .adm-modal .form-control,
@@ -2899,7 +2899,7 @@ body.admin-body .adm-badge--cancelada {
 
 .adm-user-detail-divider {
     height: 1px;
-    background-color: rgba(255, 255, 255, 0.07);
+    background-color: rgba(255, 255, 255, 0.035);
 }
 
 .adm-user-detail-activity {
@@ -3016,16 +3016,36 @@ body.admin-body .adm-badge--cancelada {
     font-size: 1.05rem;
 }
 
+#modalEditarUsuario .modal-content {
+    background-color: #111211;
+    border-color: #232523;
+}
+
+#modalEditarUsuario .modal-header,
+#modalEditarUsuario .modal-footer {
+    border-color: transparent;
+}
+
 #modalEditarUsuario .adm-user-detail-divider {
-    margin: 0;
+    display: none;
+}
+
+#modalEditarUsuario .adm-user-detail-body {
+    gap: 18px;
 }
 
 #modalEditarUsuario .adm-user-edit-section {
-    gap: 6px;
+    gap: 8px;
+}
+
+#modalEditarUsuario .form-label {
+    color: #a3a6a1 !important;
 }
 
 #modalEditarUsuario .form-control,
 #modalEditarUsuario .form-select {
+    background-color: #171817;
+    border-color: #282a28;
     padding-top: 0.42rem;
     padding-bottom: 0.42rem;
     font-size: 0.875rem;
