@@ -16,8 +16,10 @@ const montoInicial = document.getElementById("dato-monto-inicial"),
     imagenesMiniaturas = document.getElementById("miniaturas"),
     chatFeed = document.getElementById("chat-feed"),
     montoInput = document.getElementById("monto-input"),
-    btnPujar = document.getElementById("btnPujar")
-let resultadoSesion = null
+    btnPujar = document.getElementById("btnPujar"),
+    chatResumen = document.getElementById("chat-resumen")
+
+let resultadoSesion = null, resultadoPujas = null
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {
@@ -69,6 +71,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             },
             estadoDato = resultado.datos.estado
 
+        refrescarPujas()
         let estadoClass = new Map()
         estadoClass.set("activa", { class: "status-activa", text: "Subasta Activa" })
         estadoClass.set("pendiente", { class: "status-none", text: "Pendiente" })
@@ -79,7 +82,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         montoInicial.textContent = "$ " + resultado.datos.precio_inicial
         datoIncremento.textContent = "$ " + resultado.datos.dato_incremento
-        datoPujaActual.textContent = "$ " + resultado.pujas[0][0]
         //datos para llenar la fecha y hora inicial
         datoFechaInicio.textContent = `${fechaInicioComp.fecha.dia}-${fechaInicioComp.fecha.mes}-${fechaInicioComp.fecha.anio}`
         datoHoraInicio.textContent = `${fechaInicioComp.hora.hora}:${fechaInicioComp.hora.minutos}`
@@ -101,7 +103,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         vendedorAvatar.textContent = String(resultado.datos.nombreU).slice(0, 2)
         // posicionamiento de fotografias
         imagenPrincipal.src = ruta_base_img + resultado.rutasImg[0]
-        datoPostores.textContent = resultado.postores
+
         rutasImagenes = resultado.rutasImg
         if (resultado.rutasImg.length > 1) {
             resultado.rutasImg.forEach((i, index) => {
@@ -123,55 +125,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         }
 
-        if (resultado.pujas.length > 0) {
-            resultado.pujas.forEach((puja, index) => {
-                // alert(resultado.pujas.length)
-                // alert(puja.length)
-                // alert(chatFeed.id)
-                const msg_card = document.createElement("div"),
-                    avatar = document.createElement("div"),
-                    chatBurbuja = document.createElement("div"),
-                    chatMeta = document.createElement("div"),
-                    chatUsuario = document.createElement("span"),
-                    chatMonto = document.createElement("span")
-
-                msg_card.classList.add("chat-msg")
-                if (puja[2] == resultadoSesion.idUsuario) {
-                    msg_card.classList.add("chat-msg-mio")
-                    chatUsuario.textContent = "Tú"
-                }
-                else {
-                    avatar.classList.add("avatar-ppi")
-                    msg_card.append(avatar)
-                    avatar.textContent = String(puja[3]).slice(0, 2)
-                    chatUsuario.textContent = puja[3]
-                }
-                chatBurbuja.classList.add("chat-burbuja")
-                chatMeta.append(chatUsuario)
-                if (index == 0) {
-                    chatBurbuja.classList.add("chat-tag-lider")
-                    let tag = document.createElement("span"),
-                        icon = document.createElement("i")
-                    icon.classList.add("fas")
-                    icon.classList.add("fa-crown")
-                    tag.textContent = "Puja lider "
-                    tag.append(icon)
-                    tag.classList.add("span-puja-lider")
-
-                    chatMeta.appendChild(tag)
-                }
-                // avatar.classList.add("avatar-chat")
-                msg_card.append(chatBurbuja)
-                chatMeta.classList.add("chat-meta")
-                chatBurbuja.append(chatMeta)
-                chatUsuario.classList.add("chat-usuario")
-                chatMonto.textContent = "$  " + puja[0]
-                chatMonto.classList.add("chat-monto")
-                chatBurbuja.append(chatMonto)
-                chatFeed.appendChild(msg_card)
-
-            })
-        }
     } catch (error) {
         // Swal.close();
 
@@ -179,23 +132,107 @@ document.addEventListener("DOMContentLoaded", async () => {
 }
 )
 
-btnPujar.addEventListener("click",async function (){
+btnPujar.addEventListener("click", async function () {
 
     let datos = new FormData()
     datos.append("opcion", "guardarPuja")
-    datos.append("id_subasta",id_subasta)
-    datos.append("id_usuario",resultadoSesion.idUsuario)
-    datos.append("monto_puja",255)
-
-
+    datos.append("id_subasta", id_subasta)
+    datos.append("id_usuario", resultadoSesion.idUsuario)
+    datos.append("monto_puja", montoInput.value)
     const respuesta = await fetch(ruta_controller, {
         method: "POST",
         body: datos
     })
     resultado = await respuesta.json()
-
-    mostrarModal(resultado.estado,resultado.mensaje);
+    dibujarPujas(true)
+    mostrarModal(resultado.tipo, resultado.titulo, resultado.mensaje);
 })
+
+let ultimasPujsa = 1
+async function refrescarPujas() {
+    try {
+        // alert("se refresco")
+        let datos = new FormData();
+        datos.append("opcion", "consultarPujas")
+        datos.append("id_subasta", id_subasta)
+        const respuestaSesion = await fetch(ruta_controller, {
+            method: "POST",
+            body: datos
+        })
+        resultadoPujas = await respuestaSesion.json()
+
+        if (resultadoPujas.length != ultimasPujsa) {
+            ultimasPujsa = resultadoPujas.length
+            dibujarPujas(false)
+        }
+    }
+    finally {
+        setTimeout(refrescarPujas, 2000)
+    }
+}
+
+
+async function dibujarPujas(consultar) {
+
+    if (consultar) {
+        let datos = new FormData();
+        datos.append("opcion", "consultarPujas")
+        datos.append("id_subasta", id_subasta)
+        const respuestaSesion = await fetch(ruta_controller, {
+            method: "POST",
+            body: datos
+        })
+        resultadoPujas = await respuestaSesion.json()
+    }
+
+    if (resultadoPujas.pujas.length > 0) {
+        datoPujaActual.textContent = "$ " + resultadoPujas.pujas[0][0]
+        datoPostores.textContent = resultadoPujas.postores
+        chatResumen.textContent = `${resultadoPujas.pujas.length} pujas . ${resultadoPujas.postores} postores`
+        chatFeed.innerHTML = ""
+        resultadoPujas.pujas.forEach((puja, index) => {
+            // alert(resultado.pujas.length)
+            // alert(puja.length)
+            // alert(chatFeed.id)
+            const msg_card = document.createElement("div"),
+                avatar = document.createElement("div"),
+                chatBurbuja = document.createElement("div"),
+                chatMeta = document.createElement("div"),
+                chatUsuario = document.createElement("span"),
+                chatMonto = document.createElement("span"),
+                chatTagLider = document.createElement("span")
+
+            msg_card.classList.add("chat-msg")
+            if (puja[2] == resultadoSesion.idUsuario) {
+                msg_card.classList.add("chat-msg-mio")
+                chatUsuario.textContent = "Tú"
+            }
+            else {
+                avatar.classList.add("avatar-ppi")
+                msg_card.append(avatar)
+                avatar.textContent = String(puja[3]).slice(0, 2)
+                chatUsuario.textContent = puja[3]
+            }
+            if (index == 0) {
+                chatTagLider.textContent = "Puja Lider"
+                chatTagLider.classList.add("span-puja-lider")
+                chatMeta.appendChild(chatTagLider)
+            }
+            chatBurbuja.classList.add("chat-burbuja")
+            chatMeta.append(chatUsuario)
+            // avatar.classList.add("avatar-chat")
+            msg_card.append(chatBurbuja)
+            chatMeta.classList.add("chat-meta")
+            chatBurbuja.append(chatMeta)
+            chatUsuario.classList.add("chat-usuario")
+            chatMonto.textContent = "$  " + puja[0]
+            chatMonto.classList.add("chat-monto")
+            chatBurbuja.append(chatMonto)
+            chatFeed.appendChild(msg_card)
+
+        })
+    }
+}
 
 
 let modalInstance = null;

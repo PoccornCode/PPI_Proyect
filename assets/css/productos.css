@@ -210,12 +210,12 @@ main {
     max-width: 100%;
 }
 .span-puja-lider{
-  margin-left: auto;
-  padding: 3px 20px 3px 20px;
-  background-color: #080708;
-  color: rgb(255, 187, 0);
-  border-radius: 5px;
-  border: rgb(255,187,0) solid 1px;
+  /* margin-left: auto; */
+  /* padding: 3px 20px 3px 20px; */
+  /* background-color: #3d4f1c; */
+  color: #759d2a;
+  /* border-radius: 5px; */
+  /* border: #53692b; solid 1px; */
 }
 .chat-msg-mio {
     align-self: flex-end;

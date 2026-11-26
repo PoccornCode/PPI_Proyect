@@ -5,11 +5,39 @@ require_once __DIR__ . '/../config/conexion.php';
 class subastaDao
 {
     private $conexion;
-    public function __construct(){
+    public function __construct()
+    {
         global $conexion;
         $this->conexion = $conexion;
     }
+    public function getPujas($id)
+    {
+        $sql3 = "SELECT sbp.monto, sbp.fecha, sbp.id_usuario,
+                sbu.username
+                FROM sb_puja sbp
+                JOIN sb_usuario sbu ON sbu.id_usuario = sbp.id_usuario
+                WHERE sbp.id_subasta = ?
+                ORDER BY sbp.monto DESC";
+        $stmt3 = $this->conexion->prepare($sql3);
+        $stmt3->bind_param("i", $id);
+        $stmt3->execute();
+        $res3 = $stmt3->get_result();
+        $datos3 = $res3->fetch_all(PDO::FETCH_ASSOC);
+        $stmt3->close();
 
+        $sql4 = "SELECT COUNT(DISTINCT id_usuario) FROM sb_puja 
+                WHERE id_subasta = ?";
+        $stmt4 = $this->conexion->prepare($sql4);
+        $stmt4->bind_param("i", $id);
+        $stmt4->execute();
+        $res4 = $stmt4->get_result();
+        $stmt4->close();
+
+        return [
+            "pujas" => $datos3,
+            "postores" => (int) $res4->fetch_column()
+        ];
+    }
     public function getSubastaDao($id)
     {
         $sql = "SELECT sb.precio_inicial,sb.incremento_minimo,sb.fecha_inicial,sb.fecha_final,
@@ -36,26 +64,7 @@ class subastaDao
         $rutas = array_column($datos2, "ruta");
         $stmt2->close();
 
-        $sql3 = "SELECT sbp.monto, sbp.fecha, sbp.id_usuario,
-                sbu.username
-                FROM sb_puja sbp
-                JOIN sb_usuario sbu ON sbu.id_usuario = sbp.id_usuario
-                WHERE sbp.id_subasta = ?
-                ORDER BY sbp.monto DESC";
-        $stmt3 = $this->conexion->prepare($sql3);
-        $stmt3->bind_param("i", $id);
-        $stmt3->execute();
-        $res3 = $stmt3->get_result();
-        $datos3 = $res3->fetch_all(PDO::FETCH_ASSOC);
-        $stmt3->close();
 
-        $sql4 = "SELECT COUNT(DISTINCT id_usuario) FROM sb_puja 
-                WHERE id_subasta = ?";
-        $stmt4 = $this->conexion->prepare($sql4);
-        $stmt4->bind_param("i", $id);
-        $stmt4->execute();
-        $res4 = $stmt4->get_result();
-        $stmt4->close();
 
         if (1 > 0) {
             return [
@@ -73,9 +82,7 @@ class subastaDao
                     "nombreC" => $datos["nombreC"],
                     "datoPostores" => $datos["nombreC"]
                 ],
-                "pujas" => $datos3,
-                "rutasImg" => $rutas,
-                "postores" => (int) $res4->fetch_column()
+                "rutasImg" => $rutas
             ];
         }
         $this->conexion->close();
@@ -112,7 +119,9 @@ class subastaDao
                 if ($resultado["monto"] > $monto) {
                     return [
                         "estado" => false,
-                        "mensaje" => "hay una puja nueva"
+                        "tipo" => "danger",
+                        "titulo" => "¡Te superaron!",
+                        "mensaje" => "hay una puja nueva que supera la ingresas"
                     ];
                 } else {
                     $sql2 = "INSERT INTO sb_puja (monto,fecha,id_subasta,id_usuario)
@@ -123,21 +132,36 @@ class subastaDao
                         $this->conexion->commit();
                         return [
                             "estado" => true,
+                            "tipo" => "success",
+                            "titulo" => "¡Hecho!",
                             "mensaje" => "Puja realizada correctamente"
-                            ];
+                        ];
                     } else {
                         $this->conexion->rollback();
                         return [
                             "estado" => false,
+                            "tipo" => "error",
+                            "titulo" => "¡Error!",
                             "mensaje" => "No se pudo realizar la puja"
                         ];
                     }
                 }
             }
-        } catch (e) {
+        } catch (mysqli_sql_exception $e) {
             $this->conexion->rollback();
+            return [
+                "estado" => false,
+                "tipo" => "error",
+                "titulo" => "¡Alerta!",
+                "mensaje" => $e->getMessage()
+            ];
         }
-        return [];
+        return [
+            "estado" => false,
+            "tipo" => "error",
+            "titulo" => "!Error¡",
+            "mensaje" => "¡Algo ha sucedido! Por favor recarga la pagina"
+        ];
     }
 }
 

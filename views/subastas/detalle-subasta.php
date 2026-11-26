@@ -60,46 +60,29 @@ if (!function_exists('e')) {
                         <div class="text-center mt-2 mb-4">
                             <h3 class="text-main-ppi">Detalles de la subasta</h3>
                         </div>
-
-
                         <div class="detalle-foto m-2">
                             <img id="foto-principal" alt="">
-                            <!-- <div class="p-3 text-center aria-hidden">
-                                <i class="bi bi-image d-block" style="font-size: 5rem;"></i>
-                                <span class="small text-second-ppi">Foto del producto</span>
-                            </div> -->
                         </div>
-
                         <div id="miniaturas" class="mt-4 m-2"
                             style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px;">
                         </div>
-
-
-
-
                         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 m-2"
-                        id="subasta-categoria-estado">
-                            
-                            
+                            id="subasta-categoria-estado">
                         </div>
-
-                        <h1 id="subasta-producto-nombre" class="detalle-titulo text-main-ppi m-2">Nombre del Producto</h1>
+                        <h1 id="subasta-producto-nombre" class="detalle-titulo text-main-ppi m-2">Nombre del Producto
+                        </h1>
                         <div class="mb-3 m-2">
                             <span class="badge-condicion">Condición: <span id="subasta-condicion">—</span></span>
                         </div>
                         <p id="subasta-descripcion" class="text-main-ppi mb-4 m-2">Descripcion</p>
 
                         <div class="detalle-vendedor mb-4">
-                            <div id="vendedor-avatar" class="avatar-ppi" aria-hidden="true">?</div>
+                            <div id="vendedor-avatar" class="avatar-ppi">?</div>
                             <div class="flex-grow-1">
                                 <div class="small text-second-ppi">Vendedor</div>
                                 <div id="vendedor-nombre" class="fw-bold text-main-ppi">—</div>
                             </div>
-                            <!-- <div class="small text-second-ppi">
-                                <i class="fas fa-map-marker-alt me-1"></i><span id="vendedor-ubicacion">—</span>
-                            </div> -->
                         </div>
-
                         <h2 class="section-title">Detalles de la subasta</h2>
                         <div class="row g-3">
                             <div class="col-6 col-md-4">
@@ -152,10 +135,8 @@ if (!function_exists('e')) {
 
                     </section>
                 </div>
-
                 <div class="col-lg-4">
-                    <section class="card-gavel chat-panel h-100" aria-label="Pujas">
-
+                    <section class="card-gavel chat-panel h-100">
                         <div class="chat-header">
                             <div>
                                 <h2 class="h5 text-main-ppi fw-bold mb-0">Pujas realizadas</h2>
@@ -165,39 +146,32 @@ if (!function_exists('e')) {
                                 <span class="status-dot"></span>En vivo
                             </span>
                         </div>
-
-                        <div id="chat-feed" class="chat-feed" role="log" aria-live="polite"
-                            aria-label="Historial de pujas">
+                        <div id="chat-feed" class="chat-feed">
                         </div>
-
                         <form id="formPuja" class="chat-composer" method="POST" autocomplete="off" novalidate>
                             <div class="d-flex flex-wrap align-items-baseline justify-content-between gap-2 mb-2">
                                 <label for="monto" class="form-label text-main-ppi fw-bold mb-0">Tu puja</label>
                             </div>
-
                             <div class="input-group">
                                 <span class="input-group-text addon-gavel">$</span>
-                                <input type="number" class="form-control" id="monto-input" name="monto" step="0.01" min="0"
-                                    inputmode="decimal" placeholder="0.00" required>
+                                <input type="number" class="form-control" id="monto-input" name="monto" step="0.01"
+                                    min="0" inputmode="decimal" placeholder="0.00" required>
                                 <button type="button" id="btnPujar" class="btn btn-primary fw-bold px-4">
                                     <i class="fas fa-gavel me-2"></i>Pujar
                                 </button>
                             </div>
-
                             <p id="puja-ayuda" class="small text-second-ppi mt-3 mb-0">
                                 <i class="fas fa-info-circle me-1"></i>Tu puja debe superar la puja actual por al menos
                                 el
                                 incremento mínimo. Las pujas no se pueden retirar.
                             </p>
                         </form>
-
                     </section>
                 </div>
 
             </div>
         </div>
     </main>
-
     <div class="modal fade" id="modalPPI" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content modal-content-ppi">
@@ -205,30 +179,27 @@ if (!function_exists('e')) {
                     <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2" id="modalPPITitulo">
                         Aviso
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body py-4" id="modalPPICuerpo">
                     Mensaje
                 </div>
                 <div class="modal-footer modal-footer-ppi">
-                    <button type="button" class="btn btn-ppi-modal btn-sm" id="btnModalPPIAccion" data-bs-dismiss="modal">Entendido</button>
+                    <button type="button" class="btn btn-ppi-modal btn-sm" id="btnModalPPIAccion"
+                        data-bs-dismiss="modal">Entendido</button>
                 </div>
             </div>
         </div>
     </div>
-
-
     <?php include dirname(__DIR__, 1) . "/Footer/footer.php"; ?>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const id_subasta = <?= (int) $id ?>,
             ruta_controller = "<?= BASE_URL ?>controllers/detalleSubastaController.php",
-            ruta_base_img = "<?php BASE_URL?>uploads/productos/"
-
+            ruta_base_img = "<?php BASE_URL ?>uploads/productos/"
     </script>
-    <script src="<?=BASE_URL?>assets/js/toast-ppi.js?v=2"></script>
-    <script src="<?=BASE_URL?>assets/js/detalleSubasta.js"></script>
+    <script src="<?= BASE_URL ?>assets/js/toast-ppi.js?v=2"></script>
+    <script src="<?= BASE_URL ?>assets/js/detalleSubasta.js"></script>
 </body>
-
 </html>
