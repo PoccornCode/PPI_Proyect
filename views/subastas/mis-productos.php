@@ -147,6 +147,14 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                                             </button>
                                         </form>
                                     </div>
+
+                                    <div class="d-flex gap-2 mt-2">
+                                        <?php if (empty($estadoSubasta)): ?>
+                                            <a href="<?= BASE_URL ?>views/subastas/crear-subastas.php?id=<?= (int)$item['id_producto'] ?>" class="btn btn-primary btn-sm flex-grow-1">
+                                                <i class="fas fa-gavel"></i> Subastar
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                             </div>
                         </div>

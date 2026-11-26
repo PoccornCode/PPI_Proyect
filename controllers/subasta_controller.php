@@ -1,5 +1,14 @@
 <?php
 require_once __DIR__ . '/../dao/SubastaDAO.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$precio_inicial= (float)($_POST['precio_inicial'] ?? 0);
+$incremento_minimo= (float)($_POST['incremento_minimo'] ?? 0);
+$dias=(int)($_POST['dias']??0);
+$id_producto = (int)($_POST['id_producto'] ?? 0);
+$id_usuario = (int)($_SESSION['id_usuario'] ?? 0);
 
 function obtenerSubastaDestacadaHome(): ?array
 {
@@ -23,7 +32,7 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     header("Content-Type: application/json; charset=UTF-8");
     header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
     header("Pragma: no-cache");
-    $opcion = $_GET['opcion'] ?? 'home';
+    $opcion = $_POST['opcion'] ?? $_GET['opcion'] ?? 'home';
 
     if ($opcion === 'home') {
         $destacada = obtenerSubastaDestacadaHome();
@@ -36,6 +45,18 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
         exit;
     }
 
+    if ($opcion === "insertar") {
+        if ($precio_inicial <= 0 || $incremento_minimo <= 0 || $dias < 1 || $dias > 30) {
+            echo json_encode(['estado' => false, 'mensaje' => 'Revisa los precios y la duración.']);
+            exit;
+        }
+        echo json_encode((new SubastaDAO())->insertarSubasta($precio_inicial, $incremento_minimo, $dias, $id_producto, $id_usuario));
+        exit;
+    }
     echo json_encode(['estado' => false, 'mensaje' => 'Opción no válida']);
     exit;
 }
+
+
+
+
