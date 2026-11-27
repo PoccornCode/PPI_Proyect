@@ -197,7 +197,7 @@ if ($id_producto > 0) {
         const RUTA_IMAGENES = "<?= BASE_URL ?>uploads/productos/";
     </script>
     <script src="<?= BASE_URL ?>assets/js/toast-ppi.js?v=2"></script>
-    <script src="<?= BASE_URL ?>assets/js/registro-producto.js?v=4"></script>
+    <script src="<?= BASE_URL ?>assets/js/registro-producto.js?v=9"></script>
 </body>
 
 </html>

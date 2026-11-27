@@ -13,6 +13,7 @@
     $opcion= $_POST['opcion']??'';
     $id_usuario = (int)($_SESSION['id_usuario'] ?? 0);
     $id_producto = (int)($_POST['id_producto'] ?? $_GET['id'] ?? 0);
+    $id_subasta = (int)($_POST['id_subasta'] ?? 0);
     $idrutasEliminar = array_values(  // vuelve a numerar los índices desde 0
         array_unique( // quita los valores repetidos
             array_map('intval', // convierte cada valor a número entero
@@ -20,6 +21,7 @@
             )
         )
     );
+
 
     function subirImagenes(?array $archivos): array{ // que la funcion siempre devuelve y el array ? es que puede ser null 
         $carpeta = __DIR__ . '/../uploads/productos/';
@@ -87,8 +89,19 @@
             exit;
         }
 
+        if (tieneSubastaEn($conexion, $id_producto, ['activa', 'finalizada'])) {
+            echo json_encode(['estado' => false, 'mensaje' => 'Este producto está en subasta o ya fue vendido y no se puede modificar.']);
+            exit;
+        }
+
         $fotos = obtenerImagenesProducto($conexion, $id_producto);
         echo json_encode(['estado' => true, 'producto' => $producto, 'imagenes' => $fotos]);
+        exit;
+    }
+
+       if($opcion==="cancelarSubasta"){
+        $resultado = cancelarSolicitud($conexion, $id_subasta, $id_usuario);
+        echo json_encode($resultado);
         exit;
     }
 
@@ -103,7 +116,18 @@
         exit;
     }
 
+    $condicionesValidas = ['Nuevo', 'Como nuevo', 'Excelente', 'Buen estado', 'Aceptable', 'Para repuestos o restauración'];
+    if (!in_array($condicion, $condicionesValidas, true)) {
+        echo json_encode(['estado' => false, 'mensaje' => 'La condición seleccionada no es válida.']);
+        exit;
+    }
+
     if($opcion==="guardar"){
+        if (!$imagenes || empty($imagenes['name'][0])) {
+            echo json_encode(['estado' => false, 'mensaje' => 'Debes subir al menos una imagen del producto.']);
+            exit;
+        }
+        
         try {
             $rutas = subirImagenes($imagenes);
         } catch (Throwable $e) {
@@ -145,6 +169,8 @@
         }
         echo json_encode($resultado);
     }
+
+ 
 
    
     
