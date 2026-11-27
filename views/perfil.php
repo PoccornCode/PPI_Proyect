@@ -497,7 +497,7 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>assets/js/toast-ppi.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/perfil.js?v=7"></script>
+    <script src="<?= BASE_URL ?>assets/js/perfil.js?v=8"></script>
 </body>
 
 </html>

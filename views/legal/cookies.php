@@ -89,8 +89,8 @@ $base_url = BASE_URL;
                 <p class="legal-text">
                     Puedes borrar o bloquear las cookies desde las opciones de configuración de tu navegador en cualquier momento. <span class="legal-important">Ten en cuenta que si desactivas las cookies de sesión, no podrás iniciar sesión ni enviar ofertas en vivo</span>.
                 </p>
-                <div class="pt-3 pb-5">
-                    <button type="button" class="btn btn-outline-publish px-4 py-2 fw-semibold me-2" onclick="if(window.resetCookieConsent){ window.resetCookieConsent(); } else { alert('Configuración reiniciada'); }">
+                <div class="pt-3 pb-5 d-flex flex-wrap gap-3">
+                    <button type="button" class="btn btn-outline-publish px-4 py-2 fw-semibold" onclick="if(window.resetCookieConsent){ window.resetCookieConsent(); } else { alert('Configuración reiniciada'); }">
                         Restablecer aviso de cookies
                     </button>
                     <a href="<?= $base_url ?>views/legal/privacidad.php" class="btn btn-dark border-secondary px-4 py-2 text-light">
