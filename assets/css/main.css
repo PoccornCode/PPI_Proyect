@@ -948,3 +948,67 @@ h6.text-main-ppi {
         color: #ffffff;
     }
 }
+
+#modalConfirmar .modal-content {
+    background-color: #151813;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.8);
+    padding: 0.35rem;
+}
+
+#modalConfirmar .modal-header {
+    border-bottom: none;
+    padding: 1.25rem 1.4rem 0.5rem;
+}
+
+#modalConfirmar .modal-title {
+    font-family: 'Raleway', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+#modalConfirmar .modal-body {
+    padding: 0.4rem 1.4rem 1.2rem;
+}
+
+#modalConfirmar .modal-footer {
+    border-top: none;
+    padding: 0.25rem 1.4rem 1.25rem;
+}
+
+#modalConfirmar .btn-logout-modal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1.15rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#modalConfirmar .btn-logout-cancel {
+    background-color: #262924;
+    color: #e4e8e1;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+#modalConfirmar .btn-logout-cancel:hover {
+    background-color: #32362f;
+    color: #ffffff;
+}
+
+/* Botón principal (en verde Gavel #658807 para pujar, o #c9656f si lo quieres rosado como en la foto) */
+#modalConfirmar .btn-logout-confirm {
+    background-color: #658807;
+    color: #ffffff;
+    border: none;
+}
+
+#modalConfirmar .btn-logout-confirm:hover {
+    background-color: #779f09;
+}
