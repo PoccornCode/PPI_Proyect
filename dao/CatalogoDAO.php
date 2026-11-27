@@ -17,9 +17,61 @@ class CatalogoDAO
         }
     }
 
+    public function cerrarVencidas(): void
+    {
+        $sql = "UPDATE sb_subasta s
+                SET s.estado = CASE
+                    WHEN EXISTS (SELECT 1 FROM sb_puja p WHERE p.id_subasta = s.id_subasta)
+                        THEN 'finalizada'
+                    ELSE 'sin_ofertas'
+                END
+                WHERE LOWER(s.estado) = 'activa'
+                  AND s.fecha_final <= NOW()";
+        $this->conexion->query($sql);
+    }
+
+    public function obtenerGanador(int $id_subasta): ?array
+    {
+        $sql = "SELECT p.id_puja,
+                       p.monto AS monto_ganador,
+                       u.id_usuario AS id_ganador,
+                       u.nombre,
+                       u.apellido,
+                       u.username,
+                       u.email,
+                       u.telefono
+                FROM sb_puja p
+                INNER JOIN sb_usuario u ON u.id_usuario = p.id_usuario
+                WHERE p.id_subasta = ?
+                ORDER BY p.monto DESC, p.id_puja ASC
+                LIMIT 1";
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->bind_param("i", $id_subasta);
+        $stmt->execute();
+        $ganador = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        if (!$ganador) {
+            return null;
+        }
+
+        return [
+            'id_puja'       => (int)$ganador['id_puja'],
+            'id_ganador'    => (int)$ganador['id_ganador'],
+            'monto_ganador' => (float)$ganador['monto_ganador'],
+            'nombre'        => $ganador['nombre'] ?? '',
+            'apellido'      => $ganador['apellido'] ?? '',
+            'username'      => $ganador['username'] ?? '',
+            'email'         => $ganador['email'] ?? '',
+            'telefono'      => $ganador['telefono'] ?? '',
+        ];
+    }
+
     // subastas activas del catalogo con los filtros que lleguen
     public function listar(array $filtros, int $limite, int $offset): array
     {
+        $this->cerrarVencidas();
+
         $lista = [];
         [$where, $tipos, $params] = $this->armarFiltros($filtros);
 
@@ -81,6 +133,8 @@ class CatalogoDAO
     // cuantas subastas hay para paginar
     public function contar(array $filtros): int
     {
+        $this->cerrarVencidas();
+
         [$where, $tipos, $params] = $this->armarFiltros($filtros);
 
         $sql = "SELECT COUNT(*) AS total
@@ -103,6 +157,8 @@ class CatalogoDAO
     // una subasta con todos sus datos (para views/subasta.php)
     public function obtenerSubasta(int $id): ?array
     {
+        $this->cerrarVencidas();
+
         $sql = "SELECT s.id_subasta, s.estado, s.precio_inicial, s.incremento_minimo,
                        s.fecha_inicial, s.fecha_final,
                        TIMESTAMPDIFF(SECOND, NOW(), s.fecha_final) AS segundos_restantes,
@@ -133,12 +189,14 @@ class CatalogoDAO
         $segundos = (int)$f['segundos_restantes'];
         $tienePujas = (int)$f['total_pujas'] > 0;
         $incremento = (float)($f['incremento_minimo'] ?? 1);
+        $estado = strtolower((string)$f['estado']);
+        $terminada = $segundos <= 0 || $estado !== 'activa';
 
         return [
             'id'              => (int)$f['id_subasta'],
             'id_producto'     => (int)$f['id_producto'],
             'id_vendedor'     => (int)$f['id_vendedor'],
-            'estado'          => strtolower((string)$f['estado']),
+            'estado'          => $estado,
             'titulo'          => $f['titulo'],
             'descripcion'     => $f['descripcion'] ?? '',
             'condicion'       => $f['condicion'] ?? '',
@@ -152,9 +210,10 @@ class CatalogoDAO
             'puja_minima'     => number_format($tienePujas ? (float)$f['precio_actual'] + $incremento : (float)$f['precio_inicial'], 2, '.', ','),
             'inicio'          => $f['fecha_inicial'] ? date('d/m/Y', strtotime($f['fecha_inicial'])) : '',
             'cierre'          => $f['fecha_final'] ? date('d/m/Y H:i', strtotime($f['fecha_final'])) : '',
-            'terminada'       => $segundos <= 0 || $f['estado'] !== 'activa',
+            'terminada'       => $terminada,
             'tiempo'          => $this->textoTiempo($segundos),
             'fecha_final_iso' => date('c', time() + max(0, $segundos)),
+            'ganador'         => ($terminada && $tienePujas) ? $this->obtenerGanador((int)$f['id_subasta']) : null,
         ];
     }
 

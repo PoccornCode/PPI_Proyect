@@ -113,21 +113,40 @@ document.addEventListener("DOMContentLoaded", async () => {
         vendedorName.textContent = resultado.datos.nombreU;
         vendedorAvatar.textContent = String(resultado.datos.nombreU).slice(0, 2);
 
+        
         imagenPrincipal.src = ruta_base_img + resultado.rutasImg[0];
         rutasImagenes = resultado.rutasImg;
+        
+        const contadorFotos = document.getElementById("contador-fotos");
+        const totalFotos = resultado.rutasImg.length;
+        if (contadorFotos && totalFotos > 0) {
+            contadorFotos.textContent = `1 / ${totalFotos}`;
+            contadorFotos.classList.remove("d-none");
+        }
 
-        if (resultado.rutasImg.length > 1) {
+        if (totalFotos > 1) {
             resultado.rutasImg.forEach((i, index) => {
                 const item = document.createElement("button");
+                item.type = "button";
                 item.classList.add("btn-miniaturas");
                 item.style.backgroundImage = `url(${(ruta_base_img + i)})`;
                 item.style.backgroundSize = "cover";
                 item.style.backgroundPosition = "center";
-                item.style.opacity = 0.8;
+                item.style.opacity = index === 0 ? 1 : 0.7;
                 imagenesMiniaturas.append(item);
 
                 item.addEventListener("click", () => {
                     imagenPrincipal.src = ruta_base_img + resultado.rutasImg[index];
+
+                    if (contadorFotos) {
+                        contadorFotos.textContent = `${index + 1} / ${totalFotos}`;
+                    }
+
+                    // Resaltar miniatura activa
+                    imagenesMiniaturas.querySelectorAll(".btn-miniaturas").forEach(btn => {
+                        btn.style.opacity = 0.7;
+                    });
+                    item.style.opacity = 1;
                 });
             });
         }
@@ -252,9 +271,9 @@ async function dibujarPujas(consultar) {
                 chatUsuario.textContent = "Tú";
             } else {
                 avatar.classList.add("avatar-ppi");
+                avatar.innerHTML = '<i class="fas fa-user"></i>';
                 msg_card.append(avatar);
-                avatar.textContent = String(puja[3]).slice(0, 2);
-                chatUsuario.textContent = puja[3];
+                chatUsuario.textContent = "Postor";
             }
 
             if (index == 0) {

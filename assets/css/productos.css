@@ -19,7 +19,20 @@ main {
   justify-content: center;
   color: #3f4538;
 }
-
+.contador-fotos-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background-color: rgba(20, 25, 17, 0.9);
+    color: #d6ddd0;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    backdrop-filter: blur(4px);
+    z-index: 2;
+}
 .btn-miniaturas {
   width: 72px;
   height: 72px;
@@ -423,20 +436,11 @@ main {
 }
 
 .status-badge.status-revision {
-<<<<<<< HEAD
-  color: #d4a03c;
-}
-
-.status-badge.status-revision .status-dot {
-  background-color: #d4a03c;
-  box-shadow: 0 0 6px rgba(212, 160, 60, 0.4);
-=======
     color: #b89b5e;
 }
 
 .status-badge.status-revision .status-dot {
     background-color: #b89b5e;
->>>>>>> develop
 }
 
 .status-badge.status-activa {

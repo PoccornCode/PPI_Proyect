@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../dao/CatalogoDAO.php';
 
+
 // lee y limpia lo que llega por la URL 
 function obtenerFiltrosCatalogo(): array
 {
@@ -25,6 +26,7 @@ function obtenerFiltrosCatalogo(): array
 function obtenerCatalogo(array $filtros, int $pagina): array
 {
     $dao = new CatalogoDAO();
+    $dao->cerrarVencidas();
     $porPagina = CatalogoDAO::POR_PAGINA;
 
     $total = $dao->contar($filtros);

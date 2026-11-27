@@ -30,7 +30,7 @@ if (!function_exists('e')) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <?php include $dirnameMain . '/includes/meta_tags.php'; ?>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -65,6 +65,7 @@ if (!function_exists('e')) {
                                 </div>
                                 <div class="detalle-foto m-2">
                                     <img id="foto-principal" alt="">
+                                    <span id="contador-fotos" class="contador-fotos-badge d-none">1 / 1</span>
                                 </div>
                                 <div id="miniaturas" class="mt-4 m-2"
                                     style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px;">
@@ -87,19 +88,21 @@ if (!function_exists('e')) {
                                 </div>
                                 <div id="chat-feed" class="chat-feed"></div>
                                 <form id="formPuja" class="chat-composer" method="POST" autocomplete="off" novalidate>
-                                    <div class="d-flex flex-wrap align-items-baseline justify-content-between gap-2 mb-2">
+                                    <div
+                                        class="d-flex flex-wrap align-items-baseline justify-content-between gap-2 mb-2">
                                         <label for="monto" class="form-label text-main-ppi fw-bold mb-0">Tu puja</label>
                                     </div>
                                     <div class="input-group">
                                         <span class="input-group-text addon-gavel">$</span>
-                                        <input type="number" class="form-control" id="monto-input" name="monto" step="0.01"
-                                            min="0" inputmode="decimal" placeholder="0.00" required>
+                                        <input type="number" class="form-control" id="monto-input" name="monto"
+                                            step="0.01" min="0" inputmode="decimal" placeholder="0.00" required>
                                         <button type="button" id="btnPujar" class="btn btn-primary fw-bold px-4">
                                             <i class="fas fa-gavel me-2"></i>Pujar
                                         </button>
                                     </div>
                                     <p id="puja-ayuda" class="small text-second-ppi mt-3 mb-0">
-                                        <i class="fas fa-info-circle me-1"></i>Tu puja debe superar la puja actual por al
+                                        <i class="fas fa-info-circle me-1"></i>Tu puja debe superar la puja actual por
+                                        al
                                         menos
                                         el
                                         incremento mínimo. Las pujas no se pueden retirar.
@@ -111,7 +114,8 @@ if (!function_exists('e')) {
                             <section class="card-gavel detalle-panel h-100 p-3">
                                 <div class="row g-3">
                                     <div class="col-lg-7">
-                                        <h1 id="subasta-producto-nombre" class="detalle-titulo text-main-ppi m-2">Nombre del
+                                        <h1 id="subasta-producto-nombre" class="detalle-titulo text-main-ppi m-2">Nombre
+                                            del
                                             Producto
                                         </h1>
                                         <div class="mb-3 m-2">
@@ -133,7 +137,8 @@ if (!function_exists('e')) {
                                         <div class="row g-3">
                                             <div class="col-6 col-md-6">
                                                 <div class="detalle-dato">
-                                                    <div class="detalle-dato-label"><i class="fas fa-dollar-sign"></i>Monto
+                                                    <div class="detalle-dato-label"><i
+                                                            class="fas fa-dollar-sign"></i>Monto
                                                         inicial
                                                     </div>
                                                     <label id="dato-monto-inicial" class="detalle-dato-valor">—</label>
@@ -142,7 +147,8 @@ if (!function_exists('e')) {
                                             </div>
                                             <div class="col-6 col-md-6">
                                                 <div class="detalle-dato destacado">
-                                                    <div class="detalle-dato-label"><i class="fas fa-gavel"></i>Puja actual
+                                                    <div class="detalle-dato-label"><i class="fas fa-gavel"></i>Puja
+                                                        actual
                                                     </div>
                                                     <label id="dato-puja-actual" class="detalle-dato-valor">—</label>
                                                     <div id="dato-lider" class="detalle-dato-sub">Puja reciente</div>
@@ -150,7 +156,8 @@ if (!function_exists('e')) {
                                             </div>
                                             <div class="col-6 col-md-6">
                                                 <div class="detalle-dato">
-                                                    <div class="detalle-dato-label"><i class="fas fa-plus-circle"></i>Incremento
+                                                    <div class="detalle-dato-label"><i
+                                                            class="fas fa-plus-circle"></i>Incremento
                                                         mínimo
                                                     </div>
                                                     <label id="dato-incremento" class="detalle-dato-valor">—</label>
@@ -159,15 +166,18 @@ if (!function_exists('e')) {
                                             </div>
                                             <div class="col-6 col-md-6">
                                                 <div class="detalle-dato">
-                                                    <div class="detalle-dato-label"><i class="fas fa-users"></i>Postores</div>
+                                                    <div class="detalle-dato-label"><i class="fas fa-users"></i>Postores
+                                                    </div>
                                                     <div id="dato-postores" class="detalle-dato-valor">—</div>
-                                                    <div id="dato-total-pujas" class="detalle-dato-sub">Cantidad de interesados
+                                                    <div id="dato-total-pujas" class="detalle-dato-sub">Cantidad de
+                                                        interesados
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="col-6 col-md-6">
                                                 <div class="detalle-dato">
-                                                    <div class="detalle-dato-label"><i class="far fa-calendar-alt"></i>Fecha de
+                                                    <div class="detalle-dato-label"><i
+                                                            class="far fa-calendar-alt"></i>Fecha de
                                                         inicio
                                                     </div>
                                                     <div id="dato-inicio" class="detalle-dato-valor">—</div>
@@ -176,7 +186,8 @@ if (!function_exists('e')) {
                                             </div>
                                             <div class="col-6 col-md-6">
                                                 <div class="detalle-dato">
-                                                    <div class="detalle-dato-label"><i class="far fa-calendar-check"></i>Fecha
+                                                    <div class="detalle-dato-label"><i
+                                                            class="far fa-calendar-check"></i>Fecha
                                                         de
                                                         cierre
                                                     </div>
@@ -215,29 +226,32 @@ if (!function_exists('e')) {
         </div>
     </div>
     <div class="modal fade" id="modalConfirmar" tabindex="-1" aria-labelledby="modalConfirmarLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold text-white m-0" id="modalConfirmarLabel">
-                    Confirmar
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body py-2">
-                <p class="mb-0" id="modalConfirmarMensaje" style="color: #d6ddd0; font-size: 0.93rem; line-height: 1.55;">
-                </p>
-            </div>
-            <div class="modal-footer justify-content-end gap-2">
-                <button type="button" class="btn-logout-modal btn-logout-cancel" data-bs-dismiss="modal" id="btnConfirmarCancelar">
-                    Cancelar
-                </button>
-                <button type="button" class="btn-logout-modal btn-logout-confirm" id="btnConfirmarAceptar">
-                    <i class="fas fa-check"></i> Confirmar
-                </button>
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-white m-0" id="modalConfirmarLabel">
+                        Confirmar
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body py-2">
+                    <p class="mb-0" id="modalConfirmarMensaje"
+                        style="color: #d6ddd0; font-size: 0.93rem; line-height: 1.55;">
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-end gap-2">
+                    <button type="button" class="btn-logout-modal btn-logout-cancel" data-bs-dismiss="modal"
+                        id="btnConfirmarCancelar">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn-logout-modal btn-logout-confirm" id="btnConfirmarAceptar">
+                        <i class="fas fa-check"></i> Confirmar
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
     <?php include dirname(__DIR__, 1) . "/Footer/footer.php"; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
