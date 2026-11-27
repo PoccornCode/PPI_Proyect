@@ -27,6 +27,7 @@ class ProductoAdminDAO
                     p.descripcion,
                     p.condicion,
                     p.estado,
+                    p.id_categoria,
                     COALESCE(c.nombre, 'General') AS categoria,
                     COALESCE(u.username, '') AS username,
                     (
@@ -86,6 +87,7 @@ class ProductoAdminDAO
                     p.descripcion,
                     p.condicion,
                     p.estado,
+                    p.id_categoria,
                     COALESCE(c.nombre, 'General') AS categoria,
                     COALESCE(u.username, '') AS username,
                     TRIM(CONCAT(COALESCE(u.nombre, ''), ' ', COALESCE(u.apellido, ''))) AS vendedor_nombre
@@ -150,6 +152,7 @@ class ProductoAdminDAO
                 ? (string)$row['descripcion']
                 : 'Sin descripción registrada.',
             'condicion'    => $condicion,
+            'id_categoria' => (int)($row['id_categoria'] ?? 0),
             'categoria'    => $categoria,
             'vendedor'     => $vendedorTag,
             'estado_raw'   => $activo ? '1' : '0',
@@ -163,6 +166,47 @@ class ProductoAdminDAO
                 ['label' => 'Estado', 'value' => $estadoTexto],
             ],
         ];
+    }
+
+    public function actualizarProducto(
+        int $idProducto,
+        string $nombre,
+        string $descripcion,
+        string $condicion,
+        int $idCategoria,
+        int $estado
+    ): array {
+        if ($idProducto <= 0 || !$this->conexion || $this->conexion->connect_errno) {
+            return ['estado' => false, 'mensaje' => 'Datos inválidos o sin conexión.'];
+        }
+
+        $nombre = trim($nombre);
+        $descripcion = trim($descripcion);
+        $condicion = trim($condicion);
+        $estado = $estado === 1 ? 1 : 0;
+
+        if ($nombre === '' || $idCategoria <= 0 || $condicion === '') {
+            return ['estado' => false, 'mensaje' => 'Nombre, categoría y condición son obligatorios.'];
+        }
+
+        $sql = "UPDATE sb_producto
+                SET nombre = ?, descripcion = ?, condicion = ?, id_categoria = ?, estado = ?
+                WHERE id_producto = ?
+                LIMIT 1";
+        $stmt = $this->conexion->prepare($sql);
+        if (!$stmt) {
+            return ['estado' => false, 'mensaje' => 'No se pudo preparar la actualización.'];
+        }
+
+        $stmt->bind_param('sssiii', $nombre, $descripcion, $condicion, $idCategoria, $estado, $idProducto);
+        $ok = $stmt->execute();
+        $stmt->close();
+
+        if (!$ok) {
+            return ['estado' => false, 'mensaje' => 'No se pudo actualizar el producto.'];
+        }
+
+        return ['estado' => true, 'mensaje' => 'Producto actualizado correctamente.'];
     }
 
     private function resolverUrlImagen(string $ruta, string $baseUrl): string

@@ -14,6 +14,18 @@ function obtenerDetalleProductoAdmin(int $idProducto, string $baseUrl = ''): ?ar
     return $dao->obtenerDetalleProducto($idProducto, $baseUrl);
 }
 
+function actualizarProductoAdmin(
+    int $idProducto,
+    string $nombre,
+    string $descripcion,
+    string $condicion,
+    int $idCategoria,
+    int $estado
+): array {
+    $dao = new ProductoAdminDAO();
+    return $dao->actualizarProducto($idProducto, $nombre, $descripcion, $condicion, $idCategoria, $estado);
+}
+
 if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -66,6 +78,31 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
             'estado'   => true,
             'producto' => $producto,
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'actualizar') {
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+            http_response_code(405);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'Método no permitido.',
+            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            exit;
+        }
+
+        $idProducto = (int)($_POST['id_producto'] ?? 0);
+        $nombre = (string)($_POST['nombre'] ?? '');
+        $descripcion = (string)($_POST['descripcion'] ?? '');
+        $condicion = (string)($_POST['condicion'] ?? '');
+        $idCategoria = (int)($_POST['id_categoria'] ?? 0);
+        $estado = (int)($_POST['estado'] ?? 0);
+
+        $resultado = actualizarProductoAdmin($idProducto, $nombre, $descripcion, $condicion, $idCategoria, $estado);
+        if (!$resultado['estado']) {
+            http_response_code(400);
+        }
+        echo json_encode($resultado, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
 

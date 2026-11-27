@@ -3616,8 +3616,136 @@ body.admin-body .adm-badge--cancelada {
     padding: 10px 18px;
 }
 
-#modalDetalleSubasta .modal-dialog {
+#modalDetalleSubasta .modal-dialog,
+#modalDetalleProducto .modal-dialog {
     max-width: 940px;
+}
+
+#sec-productos .adm-table-responsive {
+    min-height: 362px;
+}
+
+#sec-productos .adm-table {
+    table-layout: fixed;
+    width: 100%;
+    min-width: 820px;
+}
+
+#sec-productos .adm-table thead th:nth-child(1) {
+    width: 40%;
+}
+
+#sec-productos .adm-table thead th:nth-child(2) {
+    width: 17%;
+}
+
+#sec-productos .adm-table thead th:nth-child(3) {
+    width: 16%;
+}
+
+#sec-productos .adm-table thead th:nth-child(4) {
+    width: 15%;
+}
+
+#sec-productos .adm-table thead th:nth-child(5) {
+    width: 12%;
+}
+
+#sec-productos .adm-table thead th {
+    padding: 10px 18px;
+}
+
+#sec-productos .adm-table tbody tr {
+    height: 64px;
+}
+
+#sec-productos .adm-table tbody td {
+    padding: 9px 18px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#sec-productos .adm-table tbody td:nth-child(4),
+#sec-productos .adm-table tbody td:nth-child(5) {
+    overflow: visible;
+    text-overflow: clip;
+}
+
+#sec-productos .adm-cell-item,
+#sec-productos .adm-cell-item>div {
+    min-width: 0;
+}
+
+#sec-productos .adm-item-name,
+#sec-productos .mod-sub-meta {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#sec-productos .mod-table-footer {
+    padding: 10px 18px;
+}
+
+#modalEditarProducto .modal-content {
+    background: #141614;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+#modalEditarProducto .modal-header {
+    padding: 18px 22px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+#modalEditarProducto .modal-body {
+    padding: 18px 22px;
+}
+
+#modalEditarProducto .modal-footer {
+    padding: 14px 22px 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+#modalEditarProducto .form-label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #9aa392;
+    margin-bottom: 6px;
+}
+
+#modalEditarProducto .form-control,
+#modalEditarProducto .form-select {
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 8px;
+    color: #edf0ea;
+    font-size: 0.88rem;
+    padding: 9px 12px;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+#modalEditarProducto .form-select option {
+    background-color: #161816;
+    color: #edf0ea;
+}
+
+#modalEditarProducto .form-control:focus,
+#modalEditarProducto .form-select:focus {
+    background-color: rgba(255, 255, 255, 0.045);
+    border-color: rgba(139, 179, 68, 0.55);
+    box-shadow: none;
+    color: #ffffff;
+}
+
+#modalEditarProducto .adm-cat-publish-box {
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 10px;
+    padding: 12px 14px;
 }
 
 #modalDetalleSubasta .modal-content,
