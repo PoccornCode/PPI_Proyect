@@ -103,13 +103,16 @@ $mostrar = $filtro === '' ? $pujas : array_filter($pujas, function ($p) use ($fi
             <?php else: ?>
 
                 <!-- pestanas por resultado -->
-                <nav class="mis-pujas-tabs d-flex flex-wrap gap-2 mb-4" aria-label="Filtrar pujas">
+                <nav class="mis-pujas-tabs d-flex flex-wrap align-items-center gap-2 mb-4" aria-label="Filtrar pujas">
                     <a href="<?= BASE_URL ?>views/subastas/mis-pujas.php" class="mis-pujas-tab <?= $filtro === '' ? 'activa' : '' ?>">Todas <span data-tab-count="todas"><?= count($pujas) ?></span></a>
                     <?php foreach ($resultados as $clave => $info): ?>
                         <?php if (!empty($conteo[$clave])): ?>
                             <a href="<?= BASE_URL ?>views/subastas/mis-pujas.php?estado=<?= e($clave) ?>" class="mis-pujas-tab <?= $filtro === $clave ? 'activa' : '' ?>"><?= e($info[0]) ?> <span data-tab-count="<?= e($clave) ?>"><?= $conteo[$clave] ?></span></a>
                         <?php endif; ?>
                     <?php endforeach; ?>
+                    <a href="<?= BASE_URL ?>views/perfil.php" class="mis-pujas-tab ms-auto d-inline-flex align-items-center gap-2">
+                        <i class="fas fa-arrow-left small"></i> Volver al perfil
+                    </a>
                 </nav>
 
                 <?php if (empty($mostrar)): ?>
