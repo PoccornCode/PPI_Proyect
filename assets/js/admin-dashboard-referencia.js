@@ -564,19 +564,4 @@
         syncConditionalRows();
         syncDirtyState();
     }
-
-    // Demo form submit inside modals
-    document.querySelectorAll('[data-adm-demo-form]').forEach((form) => {
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const msg = form.dataset.admDemoForm || 'Acción simulada en modo referencia.';
-            const modalEl = form.closest('.modal');
-            if (modalEl && window.bootstrap) {
-                const instance = window.bootstrap.Modal.getInstance(modalEl);
-                instance?.hide();
-            }
-            form.reset();
-            showToast(msg);
-        });
-    });
 })();
