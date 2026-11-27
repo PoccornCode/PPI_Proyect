@@ -223,6 +223,11 @@ class CategoriaDAO
                 SUM(CASE WHEN LOWER(s.estado) = 'activa' THEN 1 ELSE 0 END) AS activas,
                 SUM(CASE WHEN LOWER(s.estado) = 'pendiente' THEN 1 ELSE 0 END) AS pendientes
              FROM sb_subasta s
+             INNER JOIN (
+                 SELECT MAX(id_subasta) AS max_id
+                 FROM sb_subasta
+                 GROUP BY id_producto
+             ) ult ON s.id_subasta = ult.max_id
              INNER JOIN sb_producto p ON p.id_producto = s.id_producto
              WHERE p.id_categoria = ?
                AND LOWER(s.estado) IN ('activa', 'pendiente')"
@@ -449,7 +454,12 @@ class CategoriaDAO
                     COUNT(DISTINCT s.id_subasta) AS total_subastas
                 FROM sb_categoria c
                 LEFT JOIN sb_producto p ON p.id_categoria = c.id_categoria
-                LEFT JOIN sb_subasta s ON s.id_producto = p.id_producto
+                LEFT JOIN (
+                    SELECT id_producto, MAX(id_subasta) AS max_id
+                    FROM sb_subasta
+                    GROUP BY id_producto
+                ) ult ON ult.id_producto = p.id_producto
+                LEFT JOIN sb_subasta s ON s.id_subasta = ult.max_id
                 GROUP BY c.id_categoria, c.nombre, c.descripcion, c.imagen, c.estado
                 ORDER BY c.nombre ASC";
         $res = $this->conexion->query($sql);

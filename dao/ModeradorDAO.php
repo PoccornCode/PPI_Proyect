@@ -106,13 +106,18 @@ class ModeradorDAO
             $fechas[$dia] = 0;
         }
 
-        $filtroVigencia = $soloVigentes ? " AND fecha_final > NOW()" : "";
-        $sql = "SELECT DATE(fecha_inicial) AS dia, COUNT(*) AS total
-                FROM sb_subasta
-                WHERE LOWER(estado) = ?
+        $filtroVigencia = $soloVigentes ? " AND s.fecha_final > NOW()" : "";
+        $sql = "SELECT DATE(s.fecha_inicial) AS dia, COUNT(*) AS total
+                FROM sb_subasta s
+                INNER JOIN (
+                    SELECT MAX(id_subasta) AS max_id
+                    FROM sb_subasta
+                    GROUP BY id_producto
+                ) ult ON s.id_subasta = ult.max_id
+                WHERE LOWER(s.estado) = ?
                   {$filtroVigencia}
-                  AND fecha_inicial >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
-                GROUP BY DATE(fecha_inicial)";
+                  AND s.fecha_inicial >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+                GROUP BY DATE(s.fecha_inicial)";
 
         $stmt = $this->conexion->prepare($sql);
         if (!$stmt) {

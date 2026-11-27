@@ -89,6 +89,11 @@ class CatalogoDAO
                        COALESCE(pu.total, 0) AS total_pujas,
                        COALESCE(pu.maximo, s.precio_inicial) AS precio_actual
                 FROM sb_subasta s
+                INNER JOIN (
+                    SELECT MAX(id_subasta) AS max_id
+                    FROM sb_subasta
+                    GROUP BY id_producto
+                ) ult ON s.id_subasta = ult.max_id
                 INNER JOIN sb_producto p ON p.id_producto = s.id_producto
                 LEFT JOIN sb_categoria c ON c.id_categoria = p.id_categoria
                 LEFT JOIN sb_imagen_producto img ON img.id_imagen_producto = (
@@ -135,6 +140,11 @@ class CatalogoDAO
 
         $sql = "SELECT COUNT(*) AS total
                 FROM sb_subasta s
+                INNER JOIN (
+                    SELECT MAX(id_subasta) AS max_id
+                    FROM sb_subasta
+                    GROUP BY id_producto
+                ) ult ON s.id_subasta = ult.max_id
                 INNER JOIN sb_producto p ON p.id_producto = s.id_producto
                 LEFT JOIN sb_categoria c ON c.id_categoria = p.id_categoria
                 WHERE " . implode(' AND ', $where);
