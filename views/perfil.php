@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__DIR__) . '/config/env.php';
 require_once dirname(__DIR__) . '/dao/PerfilDAO.php';
+require_once dirname(__DIR__) . '/dao/MisPujasDAO.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -75,6 +76,7 @@ $resumenUsuario = $esUsuario ? $dao->obtenerResumenUsuario($id_usuario) : null;
 $subastas = $esUsuario ? $dao->obtenerSubastasActivas($id_usuario, 3) : [];
 $moderacion = $esPersonal ? $dao->obtenerResumenModeracion() : null;
 $usuariosAdmin = $esAdmin ? $dao->obtenerResumenUsuariosAdmin() : null;
+$resumenPujas = $esUsuario ? (new MisPujasDAO())->resumen($id_usuario) : null;
 
 $datos = [
     'Nombre completo' => trim(($perfil['nombre'] ?? '') . ' ' . ($perfil['apellido'] ?? '')),
@@ -164,7 +166,7 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                 <section aria-labelledby="titulo-actividad">
                     <h2 id="titulo-actividad" class="fs-4 fw-bold text-main-ppi mb-3">Mi actividad</h2>
                     <div class="row g-3">
-                        <div class="col-12 col-md-4">
+                        <div class="col-12 col-md-6">
                             <a href="<?= BASE_URL ?>views/subastas/mis-productos.php" class="perfil-acceso">
                                 <span class="perfil-acceso-valor"><?= $resumenUsuario['productos'] ?></span>
                                 <span class="perfil-acceso-titulo">Mis productos</span>
@@ -177,18 +179,17 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                                 </span>
                             </a>
                         </div>
-                        <div class="col-12 col-md-4">
-                            <a href="#" class="perfil-acceso" data-proximamente="Mis pujas">
-                                <span class="perfil-acceso-valor">—</span>
+                        <div class="col-12 col-md-6">
+                            <a href="<?= BASE_URL ?>views/subastas/mis-pujas.php" class="perfil-acceso">
+                                <span class="perfil-acceso-valor"><?= $resumenPujas['subastas'] ?></span>
                                 <span class="perfil-acceso-titulo">Mis pujas</span>
-                                <span class="perfil-acceso-detalle">Sigue tus ofertas y resultados</span>
-                            </a>
-                        </div>
-                        <div class="col-12 col-md-4">
-                            <a href="#" class="perfil-acceso" data-proximamente="Mis envíos">
-                                <span class="perfil-acceso-valor">—</span>
-                                <span class="perfil-acceso-titulo">Mis envíos</span>
-                                <span class="perfil-acceso-detalle">Estado de tus paquetes</span>
+                                <span class="perfil-acceso-detalle">
+                                    <?php if ($resumenPujas['ganando'] > 0): ?>
+                                        Vas ganando en <?= $resumenPujas['ganando'] ?> <?= $resumenPujas['ganando'] === 1 ? 'subasta' : 'subastas' ?>
+                                    <?php else: ?>
+                                        Sigue tus ofertas y resultados
+                                    <?php endif; ?>
+                                </span>
                             </a>
                         </div>
                     </div>
@@ -196,7 +197,7 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
             <?php endif; ?>
 
             <?php if ($esAdmin): ?>
-                <!-- amnin redirecciones links -->
+                <!-- admin: resumen + accesos rapidos al dashboard,,, se abren con el #hash -->
                 <section aria-labelledby="titulo-admin">
                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
                         <h2 id="titulo-admin" class="fs-4 fw-bold text-main-ppi mb-0">Administración</h2>
@@ -205,35 +206,30 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                         </a>
                     </div>
                     <div class="row g-3">
-                        <div class="col-6 col-lg-3">
-                            <div class="perfil-acceso">
+                        <div class="col-12 col-md-4">
+                            <a href="<?= e($urlPanelAdmin) ?>#usuarios" class="perfil-acceso">
                                 <span class="perfil-acceso-valor"><?= $usuariosAdmin['total'] ?></span>
-                                <span class="perfil-acceso-titulo">Usuarios</span>
+                                <span class="perfil-acceso-titulo d-flex justify-content-between align-items-center">Usuarios <i class="fas fa-arrow-right perfil-acceso-ir"></i></span>
                                 <span class="perfil-acceso-detalle">Registrados en la plataforma</span>
-                            </div>
+                            </a>
                         </div>
-                        <div class="col-6 col-lg-3">
-                            <div class="perfil-acceso">
+                        <div class="col-12 col-md-4">
+                            <a href="<?= e($urlPanelAdmin) ?>#usuarios" class="perfil-acceso">
                                 <span class="perfil-acceso-valor"><?= $usuariosAdmin['moderadores'] ?></span>
-                                <span class="perfil-acceso-titulo">Moderadores</span>
+                                <span class="perfil-acceso-titulo d-flex justify-content-between align-items-center">Moderadores <i class="fas fa-arrow-right perfil-acceso-ir"></i></span>
                                 <span class="perfil-acceso-detalle">Con acceso al panel</span>
-                            </div>
+                            </a>
                         </div>
-                        <div class="col-6 col-lg-3">
-                            <div class="perfil-acceso">
+                        <div class="col-12 col-md-4">
+                            <a href="<?= e($urlPanelAdmin) ?>#usuarios" class="perfil-acceso <?= $usuariosAdmin['sin_verificar'] > 0 ? 'perfil-acceso-alerta' : '' ?>">
                                 <span class="perfil-acceso-valor"><?= $usuariosAdmin['sin_verificar'] ?></span>
-                                <span class="perfil-acceso-titulo">Sin verificar</span>
+                                <span class="perfil-acceso-titulo d-flex justify-content-between align-items-center">Sin verificar <i class="fas fa-arrow-right perfil-acceso-ir"></i></span>
                                 <span class="perfil-acceso-detalle">Cuentas pendientes de código</span>
-                            </div>
-                        </div>
-                        <div class="col-6 col-lg-3">
-                            <a href="#" class="perfil-acceso" data-proximamente="Gestión de usuarios">
-                                <span class="perfil-acceso-valor"><i class="fas fa-users-cog"></i></span>
-                                <span class="perfil-acceso-titulo">Gestión de usuarios</span>
-                                <span class="perfil-acceso-detalle">Roles y estado de cuentas</span>
                             </a>
                         </div>
                     </div>
+
+                    
                 </section>
             <?php endif; ?>
 
@@ -248,9 +244,11 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                     </div>
                     <div class="row g-3">
                         <div class="col-12 col-md-4">
-                            <a href="<?= e($urlPanelModeracion) ?>" class="perfil-acceso" title="Abrir panel de moderación">
+                            <a href="<?= e($urlPanelModeracion) ?>" class="perfil-acceso <?= $moderacion['pendientes'] > 0 ? 'perfil-acceso-alerta' : '' ?>"  
+                            title="Abrir panel de moderación">
                                 <span class="perfil-acceso-valor"><?= $moderacion['pendientes'] ?></span>
-                                <span class="perfil-acceso-titulo">Por revisar</span>
+                                <span class="perfil-acceso-titulo d-flex justify-content-between align-items-center">Por revisar 
+                                    <i class="fas fa-arrow-right perfil-acceso-ir"></i></span>
                                 <span class="perfil-acceso-detalle">Solicitudes esperando decisión</span>
                             </a>
                         </div>
@@ -477,7 +475,12 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                                 <div class="invalid-feedback" id="err_edit_ubicacion">Ingresa tu ubicación.</div>
                             </div>
                             <div class="col-12">
-                                <div class="form-text text-second-ppi">El correo y el nombre de usuario no se pueden cambiar desde aquí.</div>
+                                <label for="edit_username" class="form-label text-main-ppi fw-bold">Nombre de usuario <span class="req-star">*</span></label>
+                                <input type="text" class="form-control" id="edit_username" name="username" maxlength="50" value="<?= e($perfil['username']) ?>" required>
+                                <div class="invalid-feedback" id="err_edit_username">Ingresa tu nombre de usuario.</div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-text text-second-ppi">El correo no se puede cambiar desde aquí.</div>
                             </div>
                         </div>
                     </form>
