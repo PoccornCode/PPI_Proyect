@@ -37,8 +37,8 @@ $categorias = obtenerCategoriasCatalogo();
 
     <link href="<?= $base_url ?>assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="<?= $base_url ?>assets/css/style.css" rel="stylesheet">
-    <link href="<?= $base_url ?>assets/css/main.css?v=40" rel="stylesheet">
-    <link href="<?= $base_url ?>assets/css/categorias.css?v=2" rel="stylesheet">
+    <link href="<?= $base_url ?>assets/css/main.css?v=46" rel="stylesheet">
+    <link href="<?= $base_url ?>assets/css/categorias.css?v=5" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi text-second-ppi">
@@ -61,12 +61,27 @@ $categorias = obtenerCategoriasCatalogo();
         </div>
     </section>
 
-    <main class="container-fluid px-4 px-lg-5 py-5">
-        <div class="container py-2 categorias-container">
+    <main class="container-fluid px-4 px-lg-5 pt-3 pb-5">
+        <div class="container categorias-container">
 
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+            <!-- filtro en tiempo real -->
+            <div class="categorias-filtros row g-3 align-items-end mb-4" role="search">
+                <div class="col-12 col-md-8 col-lg-9">
+                    <label for="filtro-cat-q" class="form-label small text-second-ppi mb-1">Buscar</label>
+                    <input type="search" class="form-control" id="filtro-cat-q" maxlength="80" placeholder="Nombre de categoría o palabra clave">
+                </div>
+                <div class="col-12 col-md-4 col-lg-3">
+                    <label for="filtro-cat-orden" class="form-label small text-second-ppi mb-1">Ordenar por</label>
+                    <select class="form-select" id="filtro-cat-orden">
+                        <option value="az">Nombre: A - Z</option>
+                        <option value="za">Nombre: Z - A</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="grid-categorias" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
                 <?php foreach ($categorias as $cat): ?>
-                    <div class="col">
+                    <div class="col cat-dir-item" data-nombre="<?= e(mb_strtolower($cat['nombre'], 'UTF-8')) ?>" data-desc="<?= e(mb_strtolower($cat['descripcion'], 'UTF-8')) ?>">
                         <article class="cat-dir-card h-100 d-flex flex-column">
                             <div class="cat-dir-thumb">
                                 <img src="<?= $base_url . e($cat['imagen']) ?>" alt="<?= e($cat['nombre']) ?>">
@@ -87,6 +102,12 @@ $categorias = obtenerCategoriasCatalogo();
                 <?php endforeach; ?>
             </div>
 
+            <div id="categorias-vacio" class="categorias-vacio text-center mb-5 d-none">
+                <i class="fas fa-search fs-2 text-second-ppi opacity-50 mb-3"></i>
+                <h2 class="fs-5 fw-bold text-main-ppi mb-2">No encontramos categorías</h2>
+                <p class="text-second-ppi small mb-0">Prueba con otra palabra clave.</p>
+            </div>
+
             <div class="text-center pt-5 pb-3 mt-4 categorias-cta">
                 <h2 class="fs-4 fw-bold text-main-ppi mb-2">¿Tienes un artículo para subastar?</h2>
                 <p class="text-second-ppi small mb-4 mx-auto categorias-cta-sub">
@@ -105,6 +126,7 @@ $categorias = obtenerCategoriasCatalogo();
     <?php include __DIR__ . "/Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= $base_url ?>assets/js/categorias.js?v=1" defer></script>
 </body>
 
 </html>

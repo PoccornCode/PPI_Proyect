@@ -26,7 +26,7 @@ function obtenerKpisModerador(): array
 function obtenerCategoriasModerador(): array
 {
     $dao = new CategoriaDAO();
-    return $dao->listarCategorias();
+    return $dao->listarCategorias(false);
 }
 
 function obtenerPerfilModeradorActual(): ?array

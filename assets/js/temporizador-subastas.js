@@ -1,6 +1,8 @@
 (function () {
     let actualizandoHome = false;
     let ultimaFirmaHome = '';
+    let actualizandoCatalogo = false;
+    let ultimaFirmaCatalogo = '';
     const preciosPrevios = new Map();
 
     function registrarPrecios(destacada, pronto, nuevas, animar) {
@@ -190,6 +192,174 @@
         }
     }
 
+    function renderCatalogo(items, baseUrl, hayFiltros) {
+        const cont = document.getElementById('contenedor-catalogo');
+        if (!cont) return;
+
+        if (!Array.isArray(items) || !items.length) {
+            cont.innerHTML = `
+                <div class="catalogo-vacio text-center">
+                    <i class="fas fa-gavel fs-1 text-second-ppi opacity-50 mb-3"></i>
+                    <h2 class="fs-4 fw-bold text-main-ppi mb-2">No encontramos subastas</h2>
+                    <p class="text-second-ppi mb-4">
+                        ${hayFiltros ? 'Prueba con otra categoría o quita algunos filtros.' : 'Todavía no hay subastas activas. ¡Sé el primero en publicar!'}
+                    </p>
+                    ${hayFiltros
+                        ? `<a href="${escaparHtml(baseUrl)}views/catalogo.php" class="btn btn-contorno-ppi px-4 py-2 fw-semibold">Ver todo el catálogo</a>`
+                        : `<a href="${escaparHtml(baseUrl)}views/subastas/registro-producto.php" class="btn btn-primary px-4 py-2 fw-semibold">Publicar producto</a>`}
+                </div>`;
+            return;
+        }
+
+        const cardsHtml = items.map((item) => {
+            const pujas = Number(item.pujas) || 0;
+            const condHtml = item.condicion
+                ? `<span aria-hidden="true">&middot;</span><span class="catalogo-condicion">${escaparHtml(item.condicion)}</span>`
+                : '';
+            return `
+                <div class="col">
+                    <article class="catalogo-card h-100 d-flex flex-column">
+                        <a href="${escaparHtml(baseUrl)}views/subasta.php?id=${encodeURIComponent(item.id)}" class="catalogo-card-thumb d-block text-decoration-none" tabindex="-1" aria-hidden="true">
+                            <img src="${escaparHtml(baseUrl + item.imagen)}" alt="" loading="lazy" onerror="this.onerror=null; this.src='${escaparHtml(baseUrl)}assets/img/news-1.jpg';">
+                        </a>
+                        <div class="p-4 d-flex flex-column flex-grow-1">
+                            <div class="d-flex align-items-center flex-wrap gap-2 mb-1 small text-second-ppi">
+                                <span class="catalogo-categoria-label">${escaparHtml(item.categoria)}</span>
+                                ${condHtml}
+                            </div>
+                            <h2 class="fs-5 fw-bold text-main-ppi mt-1 mb-2 catalogo-card-titulo">${escaparHtml(item.titulo)}</h2>
+                            <div class="d-flex justify-content-between align-items-end gap-2 mt-auto pt-2">
+                                <div>
+                                    <span class="catalogo-meta-label d-block">${pujas > 0 ? 'Puja actual' : 'Precio inicial'}</span>
+                                    <span class="h5 mb-0 precio-ppi" data-precio-subasta="${escaparHtml(String(item.id))}">$${escaparHtml(item.precio)}</span>
+                                </div>
+                                <div class="text-end">
+                                    <span class="catalogo-meta-label d-block">Tiempo restante</span>
+                                    <span class="small tiempo-ppi">
+                                        <i class="far fa-clock me-1"></i><span data-countdown="${escaparHtml(item.fecha_final_iso)}">${escaparHtml(item.tiempo)}</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="small text-second-ppi mt-1 mb-3">
+                                ${pujas} ${pujas === 1 ? 'puja registrada' : 'pujas registradas'}
+                            </div>
+                            <a href="${escaparHtml(baseUrl)}views/subasta.php?id=${encodeURIComponent(item.id)}" class="btn btn-contorno-ppi w-100 fw-semibold py-2 mt-auto">
+                                Ver subasta <i class="fas fa-arrow-right ms-1 small"></i>
+                            </a>
+                        </div>
+                    </article>
+                </div>`;
+        }).join('');
+
+        cont.innerHTML = `<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">${cardsHtml}</div>`;
+    }
+
+    function obtenerParamsCatalogo(reiniciarPagina) {
+        const form = document.getElementById('form-catalogo-filtros');
+        const params = new URLSearchParams();
+        if (form) {
+            const fd = new FormData(form);
+            fd.forEach((val, key) => {
+                const limpio = String(val).trim();
+                if (limpio !== '' && !(key === 'orden' && limpio === 'pronto')) {
+                    params.set(key, limpio);
+                }
+            });
+        } else {
+            new URLSearchParams(window.location.search).forEach((val, key) => {
+                params.set(key, val);
+            });
+        }
+        if (!reiniciarPagina) {
+            const actual = new URLSearchParams(window.location.search).get('pagina');
+            if (actual && actual !== '1') {
+                params.set('pagina', actual);
+            }
+        }
+        return params;
+    }
+
+    async function refrescarCatalogo(forzar = false) {
+        if (actualizandoCatalogo && !forzar) return;
+        const cont = document.getElementById('contenedor-catalogo');
+        if (!cont) return;
+
+        const baseUrl = cont.dataset.baseUrl || '../';
+        const params = obtenerParamsCatalogo(forzar);
+        const hayFiltros = Boolean(params.get('q') || params.get('categoria') || params.get('estado'));
+        cont.dataset.hayFiltros = hayFiltros ? '1' : '0';
+
+        if (forzar) {
+            const nuevaUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+            window.history.replaceState(null, '', nuevaUrl);
+        }
+
+        const fetchParams = new URLSearchParams(params);
+        fetchParams.set('opcion', 'listar');
+        fetchParams.set('_t', String(Date.now()));
+
+        actualizandoCatalogo = true;
+        try {
+            const resp = await fetch(`${baseUrl}controllers/catalogo_controller.php?${fetchParams.toString()}`, { cache: 'no-store' });
+            if (!resp.ok) return;
+            const data = await resp.json();
+            if (data && data.estado) {
+                const items = Array.isArray(data.items) ? data.items : [];
+                const primeraVez = ultimaFirmaCatalogo === '';
+                const cambiados = registrarPrecios(null, items, [], !primeraVez && !forzar);
+                const nuevaFirma = `${params.toString()}__${data.total}__${items.map((i) => `${i.id}:${i.precio}:${i.pujas}`).join('|')}`;
+
+                if (forzar || nuevaFirma !== ultimaFirmaCatalogo) {
+                    ultimaFirmaCatalogo = nuevaFirma;
+                    const totalEl = document.getElementById('catalogo-total');
+                    const totalTxtEl = document.getElementById('catalogo-total-texto');
+                    if (totalEl) totalEl.textContent = String(data.total);
+                    if (totalTxtEl) totalTxtEl.textContent = data.total === 1 ? 'subasta activa' : 'subastas activas';
+
+                    if (forzar || !primeraVez) {
+                        renderCatalogo(items, baseUrl, hayFiltros);
+                        actualizarContadores();
+                        if (!forzar) {
+                            resaltarPreciosCambiados(cambiados);
+                        }
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('Error al actualizar catálogo:', err);
+        } finally {
+            actualizandoCatalogo = false;
+        }
+    }
+
+    function iniciarFiltrosCatalogo() {
+        const form = document.getElementById('form-catalogo-filtros');
+        if (!form) return;
+
+        let debounceTimer = null;
+        const inputQ = form.querySelector('#q');
+        const selectCat = form.querySelector('#categoria');
+        const selectOrden = form.querySelector('#orden');
+
+        if (inputQ) {
+            inputQ.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => refrescarCatalogo(true), 250);
+            });
+        }
+        if (selectCat) {
+            selectCat.addEventListener('change', () => refrescarCatalogo(true));
+        }
+        if (selectOrden) {
+            selectOrden.addEventListener('change', () => refrescarCatalogo(true));
+        }
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            clearTimeout(debounceTimer);
+            refrescarCatalogo(true);
+        });
+    }
+
     function actualizarContadores() {
         const elementos = document.querySelectorAll('[data-countdown]');
         if (!elementos.length) return;
@@ -226,23 +396,37 @@
         });
 
         if (algunaFinalizo) {
-            setTimeout(refrescarSubastasHome, 1500);
+            setTimeout(() => {
+                refrescarSubastasHome();
+                refrescarCatalogo();
+            }, 1500);
         }
     }
 
     actualizarContadores();
+    iniciarFiltrosCatalogo();
+    refrescarCatalogo();
     setInterval(actualizarContadores, 1000);
 
     // Sincronización automática cada 2s (solo si la pestaña está visible y solo redibuja si hubo cambios)
     setInterval(() => {
         if (!document.hidden) {
             refrescarSubastasHome();
+            refrescarCatalogo();
         }
     }, 2000);
+
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-puja-adan]');
+        if (btn && typeof mostrarToast === 'function') {
+            mostrarToast('info', 'Pujar ahora', 'Al pujar se enviará a la lógica de pujas de Adán.', 7000);
+        }
+    });
 
     document.addEventListener('visibilitychange', () => {
         if (!document.hidden) {
             refrescarSubastasHome();
+            refrescarCatalogo();
         }
     });
 })();

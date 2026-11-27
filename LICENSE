@@ -1,0 +1,32 @@
+LICENCIA DE USO ACADÉMICO
+Gavel.net — Sistema de Subastas en Línea
+Programación para Internet (PPI) | Ciclo II-2026
+Universidad de El Salvador (UES)
+
+Copyright (c) 2026 Equipo de Desarrollo:
+- Ricardo Alexander Villalta López (VL24006)
+- Nathaly Saraí Flores Hernández (FH24011)
+- Jhonatan Santos Perdomo Martínez (PM24024)
+- Adán Edenilson Hernández Acosta (HA25004)
+
+Todos los derechos reservados.
+
+1. Propósito Académico
+Este software y su documentación asociada han sido desarrollados exclusivamente con fines académicos, educativos y de evaluación dentro de la asignatura Programación para Internet (PPI) de la Universidad de El Salvador (UES).
+
+2. Usos Permitidos
+Se autoriza únicamente la revisión, ejecución y evaluación del código fuente por parte de:
+- Los docentes e instructores de la cátedra para fines de calificación y retroalimentación.
+- Los integrantes del equipo de desarrollo para mantenimiento, demostración y portafolio académico.
+
+3. Restricciones
+Sin autorización previa y por escrito de los autores, queda prohibido:
+- Copiar, redistribuir o presentar total o parcialmente este código como trabajo propio (plagio académico).
+- Utilizar este software o sus componentes con fines comerciales o de lucro.
+- Publicar copias derivadas en repositorios públicos atribuyendo autoría ajena.
+
+4. Componentes de Terceros
+Las bibliotecas y recursos externos utilizados (como Bootstrap, Font Awesome, Bootstrap Icons, Chart.js, entre otros) conservan sus respectivas licencias originales.
+
+5. Exención de Responsabilidad
+Este software se proporciona "tal cual", sin garantía de ningún tipo, expresa o implícita. Los autores no asumen responsabilidad por daños o inconvenientes derivados de su uso fuera del entorno académico para el cual fue creado.

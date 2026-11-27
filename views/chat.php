@@ -26,7 +26,7 @@ $chat = puedeChatear($conexion, $id_subasta, $id_usuario);
 
 $urlVolver = ($chat && $chat['rol'] === 'vendedor')
     ? BASE_URL . 'views/subastas/mis-productos.php'
-    : BASE_URL . 'index.php';
+    : BASE_URL . 'views/subastas/mis-pujas.php';
 $imagen = ($chat && !empty($chat['imagen']))
     ? BASE_URL . 'uploads/productos/' . $chat['imagen']
     : BASE_URL . 'assets/img/hero-img.jpg';

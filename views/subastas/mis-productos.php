@@ -23,6 +23,22 @@ $id_usuario = (int)$_SESSION['id_usuario'];
 $titulo = "Mis Productos";
 $pagina = "mis-productos";
 
+// Guarda la página de origen en el sitio para el botón Regresar (evita bucles con el formulario)
+$referer = trim((string)($_SERVER['HTTP_REFERER'] ?? ''));
+if ($referer !== '') {
+    $hostActual = strtolower((string)($_SERVER['HTTP_HOST'] ?? ''));
+    $hostReferer = strtolower((string)(parse_url($referer, PHP_URL_HOST) ?? ''));
+    $pathReferer = (string)(parse_url($referer, PHP_URL_PATH) ?? '');
+    $esMismoSitio = ($hostReferer === '' || $hostReferer === $hostActual);
+    $esRutaInterna = str_contains($pathReferer, 'mis-productos.php')
+        || str_contains($pathReferer, 'registro-producto.php')
+        || str_contains($pathReferer, 'login.php');
+    if ($esMismoSitio && !$esRutaInterna) {
+        $_SESSION['mis_productos_volver'] = $referer;
+    }
+}
+$urlRegresar = $_SESSION['mis_productos_volver'] ?? (BASE_URL . 'index.php');
+
 (new ModeradorDAO($conexion))->inactivarSubastasVencidas();
 
 $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
@@ -63,12 +79,17 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                     <h2 class="text-main-ppi fw-bold mb-1">Mis Productos</h2>
                     <p class="text-second-ppi small mb-0">Gestiona tus productos registrados y publícalos en subasta.</p>
                 </div>
-                <a href="<?= BASE_URL ?>views/subastas/registro-producto.php" class="btn btn-outline-publish btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2">
+                <a href="<?= BASE_URL ?>views/subastas/registro-producto.php?origen=mis-productos" class="btn btn-outline-publish btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2">
                     <i class="fas fa-plus"></i> Registrar Nuevo Producto
                 </a>
             </div>
 
             <?php if (empty($productos)): ?>
+                <div class="mb-3">
+                    <a href="<?= htmlspecialchars($urlRegresar, ENT_QUOTES, 'UTF-8') ?>" class="text-second-ppi text-decoration-none small d-inline-flex align-items-center gap-2">
+                        <i class="fas fa-arrow-left"></i> Regresar
+                    </a>
+                </div>
                 <div class="empty-state-box">
                     <div class="mb-3">
                         <i class="fas fa-box-open fs-1 text-second-ppi opacity-50"></i>
@@ -77,12 +98,15 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                     <p class="text-second-ppi small mb-4 mx-auto" style="max-width: 480px;">
                         Comienza publicando los detalles de tu producto (fotografías, descripción y condición). Luego podrás programar su subasta y enviarla a revisión.
                     </p>
-                    <a href="<?= BASE_URL ?>views/subastas/registro-producto.php" class="btn btn-primary px-4 py-2 fw-semibold">
+                    <a href="<?= BASE_URL ?>views/subastas/registro-producto.php?origen=mis-productos" class="btn btn-primary px-4 py-2 fw-semibold">
                         <i class="fas fa-plus me-1"></i> Publicar mi primer producto
                     </a>
                 </div>
             <?php else: ?>
-                <div class="d-flex justify-content-end mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="<?= htmlspecialchars($urlRegresar, ENT_QUOTES, 'UTF-8') ?>" class="text-second-ppi text-decoration-none small d-inline-flex align-items-center gap-2">
+                        <i class="fas fa-arrow-left"></i> Regresar
+                    </a>
                     <select id="filtroEstado" class="form-select select-gavel w-auto" aria-label="Filtrar por estado de la subasta">
                         <option value="todos" selected>Todos los productos</option>
                         <option value="sin_subasta">Sin subasta</option>

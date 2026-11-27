@@ -42,6 +42,8 @@
     transition: background-color 5000s ease-in-out 0s !important;
 }
 
+
+
 .form-control:focus,
 .form-select:focus {
     background-color: #161a15 !important;
