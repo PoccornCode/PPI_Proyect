@@ -24,6 +24,15 @@ $id_producto = (int)($_GET['id'] ?? 0);
 $titulo = $id_producto > 0 ? "Modificar Producto" : "Registrar Producto";
 $textoBoton = $id_producto > 0 ? "Modificar" : "Guardar Producto";
 
+$referer = (string)($_SERVER['HTTP_REFERER'] ?? '');
+$vieneDeMisProductos = $id_producto > 0
+    || (($_GET['origen'] ?? '') === 'mis-productos')
+    || str_contains($referer, 'mis-productos.php');
+$urlVolver = $vieneDeMisProductos
+    ? BASE_URL . 'views/subastas/mis-productos.php'
+    : BASE_URL . 'index.php';
+$textoVolver = $vieneDeMisProductos ? 'Volver a Mis Productos' : 'Volver al inicio';
+
 // Carga categorías activas (y conserva la actual si se edita un producto existente)
 $categorias = [];
 if ($id_producto > 0) {
@@ -92,8 +101,8 @@ if ($id_producto > 0) {
                             <h3 class="text-main-ppi fw-bold mb-1"><?= htmlspecialchars($titulo) ?></h3>
                             <p class="text-second-ppi small mb-0">Completa la información del producto.</p>
                         </div>
-                        <a href="<?= BASE_URL ?>index.php" class="btn btn-secondary btn-sm px-3">
-                            Volver al inicio
+                        <a href="<?= htmlspecialchars($urlVolver) ?>" class="btn btn-secondary btn-sm px-3">
+                            <?= htmlspecialchars($textoVolver) ?>
                         </a>
                     </div>
 
@@ -159,7 +168,7 @@ if ($id_producto > 0) {
 
                         <!-- ACCIONES -->
                         <div class="d-flex justify-content-end gap-3 pb-4">
-                            <a href="<?= BASE_URL ?>index.php" class="btn btn-secondary px-4 py-2">Cancelar</a>
+                            <a href="<?= htmlspecialchars($urlVolver) ?>" class="btn btn-secondary px-4 py-2">Cancelar</a>
                             <button type="submit" id="btnGuardar" class="btn btn-primary px-5 py-2 fw-bold"><?= htmlspecialchars($textoBoton) ?></button>
                         </div>
 
