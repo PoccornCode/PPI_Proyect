@@ -102,6 +102,7 @@ $resumen_categorias = [
                         <span>Categorías</span>
                     </button>
                 </li>
+                <?php /* Ocultos temporalmente para la entrega: Reportes y Configuración
                 <li>
                     <button type="button" class="adm-nav-btn" data-adm-tab="reportes" title="Reportes">
                         <i class="fa-solid fa-chart-simple"></i>
@@ -114,6 +115,7 @@ $resumen_categorias = [
                         <span>Configuración</span>
                     </button>
                 </li>
+                */ ?>
             </ul>
         </nav>
 
@@ -165,8 +167,8 @@ $resumen_categorias = [
         <?php include __DIR__ . '/partials/gestion-productos.php'; ?>
         <?php include __DIR__ . '/partials/gestion-subastas.php'; ?>
         <?php include __DIR__ . '/partials/gestion-categorias.php'; ?>
-        <?php include __DIR__ . '/partials/gestion-reportes.php'; ?>
-        <?php include __DIR__ . '/partials/gestion-configuracion.php'; ?>
+        <?php // include __DIR__ . '/partials/gestion-reportes.php'; ?>
+        <?php // include __DIR__ . '/partials/gestion-configuracion.php'; ?>
     </main>
 
     <?php include __DIR__ . '/partials/modal-categoria-crud.php'; ?>
