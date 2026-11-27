@@ -2,6 +2,7 @@
 if (session_status() === PHP_SESSION_NONE)
     session_start();
 require_once __DIR__ . '/../dao/detalleSubastaDAO.php';
+require_once __DIR__ . '/../dao/SubastaDAO.php';
 
 $id_subasta = trim($_POST['id_subasta'] ?? 0);
 $precio_inicial = trim($_POST['precio_inicial'] ?? 0);
@@ -17,6 +18,11 @@ $monto = trim($_POST['monto_puja'] ?? '0');
 $dao = new subastaDao();
 
 if ($option == 'consultar') {
+    try {
+        (new SubastaDAO())->finalizarSubastasVencidas((int)$id_subasta);
+    } catch (Throwable $e) {
+        error_log('[DetalleSubasta] Error al finalizar subasta vencida: ' . $e->getMessage());
+    }
     $respuesta = $dao->getSubastaDao($id_subasta);
     echo json_encode($respuesta);
 }

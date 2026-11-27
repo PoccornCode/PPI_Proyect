@@ -90,7 +90,7 @@
                             <span class="d-block small text-second-ppi">Puja actual</span>
                             <span class="d-block display-6 precio-ppi" data-precio-subasta="${escaparHtml(String(d.id))}">$${escaparHtml(d.precio)}</span>
                             <span class="d-block mb-3 tiempo-ppi"><i class="far fa-clock me-2"></i><span data-countdown="${escaparHtml(d.fecha_final_iso)}" data-countdown-prefix="Termina en ">Termina en ${escaparHtml(d.tiempo)}</span></span>
-                            <button type="button" class="w-100 btn btn-primary py-2 fw-bold" data-puja-adan>Pujar ahora</button>
+                            <a href="views/subasta.php?id=${encodeURIComponent(d.id)}" class="w-100 btn btn-primary py-2 fw-bold">Pujar ahora</a>
                         </div>
                     </div>
                 </div>

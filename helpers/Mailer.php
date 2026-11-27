@@ -56,6 +56,46 @@ class Mailer
     return self::enviar($destinatario, $nombre, $asuntoCorreo, $cuerpoHtml);
   }
 
+  public static function enviarSubastaGanada(
+    string $destinatario,
+    string $nombreGanador,
+    string $tituloProducto,
+    float $montoGanador,
+    string $nombreVendedor,
+    string $urlChat
+  ): array {
+    $asuntoCorreo = "¡Ganaste la subasta de {$tituloProducto} en Gavel.net!";
+    $cuerpoHtml = self::generarPlantillaSubastaGanada(
+      $nombreGanador,
+      $tituloProducto,
+      $montoGanador,
+      $nombreVendedor,
+      $urlChat
+    );
+
+    return self::enviar($destinatario, $nombreGanador, $asuntoCorreo, $cuerpoHtml);
+  }
+
+  public static function enviarSubastaFinalizadaVendedor(
+    string $destinatario,
+    string $nombreVendedor,
+    string $tituloProducto,
+    float $montoGanador,
+    string $nombreGanador,
+    string $urlChat
+  ): array {
+    $asuntoCorreo = "Tu subasta de {$tituloProducto} finalizó con éxito en Gavel.net";
+    $cuerpoHtml = self::generarPlantillaSubastaFinalizadaVendedor(
+      $nombreVendedor,
+      $tituloProducto,
+      $montoGanador,
+      $nombreGanador,
+      $urlChat
+    );
+
+    return self::enviar($destinatario, $nombreVendedor, $asuntoCorreo, $cuerpoHtml);
+  }
+
 
   public static function enviar(string $para, string $nombrePara, string $asunto, string $html, ?string $replyToEmail = null, ?string $replyToName = null): array
   {
@@ -543,6 +583,158 @@ HTML;
               </p>
               <p style="margin: 0 0 20px 0; color: #4a5568; font-size: 15px; line-height: 1.6;">
                 Tu consulta con asunto <strong>"{$asuntoSafe}"</strong> fue registrada correctamente. Nuestro equipo de soporte la revisará y te responderá a la brevedad posible.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 20px 32px; background-color: #fafbfc; border-top: 1px solid #edf0f2; text-align: left; color: #a0aec0; font-size: 12px; line-height: 1.4;">
+              Gavel.net — Plataforma de subastas en línea.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+HTML;
+  }
+
+  private static function generarPlantillaSubastaGanada(
+    string $nombreGanador,
+    string $tituloProducto,
+    float $montoGanador,
+    string $nombreVendedor,
+    string $urlChat
+  ): string {
+    $ganadorSafe = htmlspecialchars($nombreGanador, ENT_QUOTES, 'UTF-8');
+    $productoSafe = htmlspecialchars($tituloProducto, ENT_QUOTES, 'UTF-8');
+    $vendedorSafe = htmlspecialchars($nombreVendedor, ENT_QUOTES, 'UTF-8');
+    $montoSafe = '$' . number_format($montoGanador, 2, '.', ',');
+    $urlSafe = htmlspecialchars($urlChat, ENT_QUOTES, 'UTF-8');
+
+    return <<<HTML
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>¡Ganaste la subasta!</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f5f7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #333333;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f4f5f7; padding: 40px 15px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="520" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 8px; border: 1px solid #e1e4e8; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+          <tr>
+            <td style="padding: 28px 32px 20px 32px; border-bottom: 1px solid #edf0f2;">
+              <span style="font-size: 22px; font-weight: 700; color: #111111; letter-spacing: -0.5px;">Gavel<span style="color: #658807;">.net</span></span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 32px; text-align: left;">
+              <h2 style="margin: 0 0 16px 0; color: #111111; font-size: 20px; font-weight: 600;">¡Felicidades, ganaste la subasta!</h2>
+              <p style="margin: 0 0 16px 0; color: #4a5568; font-size: 15px; line-height: 1.6;">
+                Hola <strong>{$ganadorSafe}</strong>, la subasta finalizó con éxito y tu puja fue la ganadora.
+              </p>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="8" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; color: #2d3748; margin-bottom: 24px;">
+                <tr>
+                  <td style="width: 130px; font-weight: 600;">Producto:</td>
+                  <td>{$productoSafe}</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600;">Monto ganador:</td>
+                  <td><strong>{$montoSafe}</strong></td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600;">Vendedor:</td>
+                  <td>{$vendedorSafe}</td>
+                </tr>
+              </table>
+              <p style="margin: 0 0 24px 0; color: #4a5568; font-size: 15px; line-height: 1.6;">
+                Ingresa al chat con el vendedor para coordinar el pago y la entrega del artículo:
+              </p>
+              <div style="text-align: center; margin-bottom: 24px;">
+                <a href="{$urlSafe}" style="display: inline-block; padding: 12px 28px; background-color: #658807; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 15px; border-radius: 6px;">Ir al chat con el vendedor</a>
+              </div>
+              <p style="margin: 0; color: #718096; font-size: 12px; line-height: 1.5; word-break: break-all;">
+                Si el botón no funciona, copia y pega este enlace en tu navegador:<br>
+                <a href="{$urlSafe}" style="color: #658807;">{$urlSafe}</a>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 20px 32px; background-color: #fafbfc; border-top: 1px solid #edf0f2; text-align: left; color: #a0aec0; font-size: 12px; line-height: 1.4;">
+              Gavel.net — Plataforma de subastas en línea.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+HTML;
+  }
+
+  private static function generarPlantillaSubastaFinalizadaVendedor(
+    string $nombreVendedor,
+    string $tituloProducto,
+    float $montoGanador,
+    string $nombreGanador,
+    string $urlChat
+  ): string {
+    $vendedorSafe = htmlspecialchars($nombreVendedor, ENT_QUOTES, 'UTF-8');
+    $productoSafe = htmlspecialchars($tituloProducto, ENT_QUOTES, 'UTF-8');
+    $ganadorSafe = htmlspecialchars($nombreGanador, ENT_QUOTES, 'UTF-8');
+    $montoSafe = '$' . number_format($montoGanador, 2, '.', ',');
+    $urlSafe = htmlspecialchars($urlChat, ENT_QUOTES, 'UTF-8');
+
+    return <<<HTML
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Tu subasta finalizó con éxito</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f5f7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #333333;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f4f5f7; padding: 40px 15px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="520" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 8px; border: 1px solid #e1e4e8; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+          <tr>
+            <td style="padding: 28px 32px 20px 32px; border-bottom: 1px solid #edf0f2;">
+              <span style="font-size: 22px; font-weight: 700; color: #111111; letter-spacing: -0.5px;">Gavel<span style="color: #658807;">.net</span></span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 32px; text-align: left;">
+              <h2 style="margin: 0 0 16px 0; color: #111111; font-size: 20px; font-weight: 600;">¡Tu subasta finalizó con éxito!</h2>
+              <p style="margin: 0 0 16px 0; color: #4a5568; font-size: 15px; line-height: 1.6;">
+                Hola <strong>{$vendedorSafe}</strong>, tu subasta cerró correctamente y ya tiene un comprador ganador.
+              </p>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="8" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; color: #2d3748; margin-bottom: 24px;">
+                <tr>
+                  <td style="width: 130px; font-weight: 600;">Producto:</td>
+                  <td>{$productoSafe}</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600;">Monto final:</td>
+                  <td><strong>{$montoSafe}</strong></td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600;">Ganador:</td>
+                  <td>{$ganadorSafe}</td>
+                </tr>
+              </table>
+              <p style="margin: 0 0 24px 0; color: #4a5568; font-size: 15px; line-height: 1.6;">
+                Ingresa al chat con el ganador para coordinar el pago y la entrega del artículo:
+              </p>
+              <div style="text-align: center; margin-bottom: 24px;">
+                <a href="{$urlSafe}" style="display: inline-block; padding: 12px 28px; background-color: #658807; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 15px; border-radius: 6px;">Ir al chat con el ganador</a>
+              </div>
+              <p style="margin: 0; color: #718096; font-size: 12px; line-height: 1.5; word-break: break-all;">
+                Si el botón no funciona, copia y pega este enlace en tu navegador:<br>
+                <a href="{$urlSafe}" style="color: #658807;">{$urlSafe}</a>
               </p>
             </td>
           </tr>
