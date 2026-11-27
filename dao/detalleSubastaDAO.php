@@ -22,7 +22,7 @@ class subastaDetalleDao
         $stmt3->bind_param("i", $id);
         $stmt3->execute();
         $res3 = $stmt3->get_result();
-        $datos3 = $res3->fetch_all(PDO::FETCH_ASSOC);
+        $datos3 = $res3->fetch_all(MYSQLI_NUM);
         $stmt3->close();
 
         $sql4 = "SELECT COUNT(DISTINCT id_usuario) FROM sb_puja 
@@ -31,11 +31,12 @@ class subastaDetalleDao
         $stmt4->bind_param("i", $id);
         $stmt4->execute();
         $res4 = $stmt4->get_result();
+        $row4 = $res4->fetch_row();
         $stmt4->close();
 
         return [
             "pujas" => $datos3,
-            "postores" => (int) $res4->fetch_column()
+            "postores" => (int) ($row4[0] ?? 0)
         ];
     }
     public function getSubastaDao($id)
@@ -45,7 +46,7 @@ class subastaDetalleDao
                 sbu.username as nombreU, sbc.nombre as nombreC,sbp.id_producto
                 FROM sb_subasta sb
                 JOIN sb_producto sbp ON sb.id_producto = sbp.id_producto
-                JOIN sb_usuario sbU ON sbu.id_usuario = sbp.id_usuario
+                JOIN sb_usuario sbu ON sbu.id_usuario = sbp.id_usuario
                 JOIN sb_categoria sbc ON sbc.id_categoria = sbp.id_categoria
                 WHERE sb.id_subasta = ?";
         $stmt = $this->conexion->prepare($sql);

@@ -40,7 +40,7 @@ if (!function_exists('e')) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.2/font/bootstrap-icons.min.css">
     <link href="<?= BASE_URL ?>assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/main.css?v=47" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/main.css?v=48" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/forms.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/productos.css?v=1" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/admin-dashboard.css?v=1" rel="stylesheet">
@@ -227,8 +227,8 @@ if (!function_exists('e')) {
     </div>
     <div class="modal fade" id="modalConfirmar" tabindex="-1" aria-labelledby="modalConfirmarLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
-            <div class="modal-content">
-                <div class="modal-header">
+            <div class="modal-content" style="background-color: #151813; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 18px; box-shadow: 0 18px 45px rgba(0, 0, 0, 0.8); padding: 0.35rem;">
+                <div class="modal-header" style="border-bottom: none; padding: 1.25rem 1.4rem 0.5rem;">
                     <h5 class="modal-title fw-bold text-white m-0" id="modalConfirmarLabel">
                         Confirmar
                     </h5>
@@ -257,7 +257,7 @@ if (!function_exists('e')) {
     <script>
         const id_subasta = <?= (int) $id ?>,
             ruta_controller = "<?= BASE_URL ?>controllers/detalleSubastaController.php",
-            ruta_base_img = "<?php BASE_URL ?>uploads/productos/"
+            ruta_base_img = "<?= BASE_URL ?>uploads/productos/"
     </script>
     <script src="<?= BASE_URL ?>assets/js/toast-ppi.js?v=2"></script>
     <script src="<?= BASE_URL ?>assets/js/detalleSubasta.js"></script>
