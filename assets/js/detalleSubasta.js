@@ -124,7 +124,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             })
 
         }
-
     } catch (error) {
         // Swal.close();
 
@@ -133,19 +132,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 )
 
 btnPujar.addEventListener("click", async function () {
-
-    let datos = new FormData()
-    datos.append("opcion", "guardarPuja")
-    datos.append("id_subasta", id_subasta)
-    datos.append("id_usuario", resultadoSesion.idUsuario)
-    datos.append("monto_puja", montoInput.value)
-    const respuesta = await fetch(ruta_controller, {
-        method: "POST",
-        body: datos
-    })
-    resultado = await respuesta.json()
-    dibujarPujas(true)
-    mostrarModal(resultado.tipo, resultado.titulo, resultado.mensaje);
+    if (resultadoSesion.idUsuario == null || resultadoSesion.idUsuario == "") {
+        mostrarModal("error","¡Ojo!","Debes de tener una cuenta para poder pujar")
+    } else {
+        let datos = new FormData()
+        datos.append("opcion", "guardarPuja")
+        datos.append("id_subasta", id_subasta)
+        datos.append("id_usuario", resultadoSesion.idUsuario)
+        datos.append("monto_puja", montoInput.value)
+        const respuesta = await fetch(ruta_controller, {
+            method: "POST",
+            body: datos
+        })
+        resultado = await respuesta.json()
+        dibujarPujas(true)
+        mostrarModal(resultado.tipo, resultado.titulo, resultado.mensaje);
+    }
 })
 
 let ultimasPujsa = 1
@@ -215,6 +217,7 @@ async function dibujarPujas(consultar) {
                 chatTagLider.textContent = "Puja Lider"
                 chatTagLider.classList.add("span-puja-lider")
                 chatMeta.appendChild(chatTagLider)
+                chatBurbuja.classList.add("chat-tag-lider")
             }
             chatBurbuja.classList.add("chat-burbuja")
             chatMeta.append(chatUsuario)

@@ -52,121 +52,141 @@ if (!function_exists('e')) {
     <main class="py-4">
         <div class="container-fluid px-4 px-lg-5">
 
-            <div class="row g-4 ">
+            <div class="row g-4 mt-1">
                 <div class="col-lg-1"></div>
                 <!-- Producto -->
-                <div class="col-lg-6">
-                    <section class="card-gavel detalle-panel h-100 p-3">
-                        <div class="text-center mt-2 mb-4">
-                            <h3 class="text-main-ppi">Detalles de la subasta</h3>
-                        </div>
-                        <div class="detalle-foto m-2">
-                            <img id="foto-principal" alt="">
-                        </div>
-                        <div id="miniaturas" class="mt-4 m-2"
-                            style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px;">
-                        </div>
-                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 m-2"
-                            id="subasta-categoria-estado">
-                        </div>
-                        <h1 id="subasta-producto-nombre" class="detalle-titulo text-main-ppi m-2">Nombre del Producto
-                        </h1>
-                        <div class="mb-3 m-2">
-                            <span class="badge-condicion">Condición: <span id="subasta-condicion">—</span></span>
-                        </div>
-                        <p id="subasta-descripcion" class="text-main-ppi mb-4 m-2">Descripcion</p>
+                <div class="col-10 row">
+                    <div class="col-lg-7">
+                        <section class="card-gavel detalle-panel h-100 p-3">
+                            <div class="text-center mt-2 mb-4">
+                                <h3 class="text-main-ppi">Detalles de la subasta</h3>
+                            </div>
+                            <div class="detalle-foto m-2">
+                                <img id="foto-principal" alt="">
+                            </div>
+                            <div id="miniaturas" class="mt-4 m-2"
+                                style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px;">
+                            </div>
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 m-2"
+                                id="subasta-categoria-estado">
+                            </div>
+                        </section>
+                    </div>
+                    <div class="col-lg-5">
+                        <section class="card-gavel chat-panel h-100">
+                            <div class="chat-header">
+                                <div>
+                                    <h2 class="h5 text-main-ppi fw-bold mb-0">Pujas realizadas</h2>
+                                    <small id="chat-resumen" class="text-second-ppi">0 pujas · 0 postores</small>
+                                </div>
+                                <span class="status-badge status-activa">
+                                    <span class="status-dot"></span>En vivo
+                                </span>
+                            </div>
+                            <div id="chat-feed" class="chat-feed"></div>
+                            <form id="formPuja" class="chat-composer" method="POST" autocomplete="off" novalidate>
+                                <div class="d-flex flex-wrap align-items-baseline justify-content-between gap-2 mb-2">
+                                    <label for="monto" class="form-label text-main-ppi fw-bold mb-0">Tu puja</label>
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-group-text addon-gavel">$</span>
+                                    <input type="number" class="form-control" id="monto-input" name="monto" step="0.01"
+                                        min="0" inputmode="decimal" placeholder="0.00" required>
+                                    <button type="button" id="btnPujar" class="btn btn-primary fw-bold px-4">
+                                        <i class="fas fa-gavel me-2"></i>Pujar
+                                    </button>
+                                </div>
+                                <p id="puja-ayuda" class="small text-second-ppi mt-3 mb-0">
+                                    <i class="fas fa-info-circle me-1"></i>Tu puja debe superar la puja actual por al
+                                    menos
+                                    el
+                                    incremento mínimo. Las pujas no se pueden retirar.
+                                </p>
+                            </form>
+                        </section>
+                        <!-- <div style="height: 200px;"></div> -->
+                    </div>
+                    <div class="col-12 mt-4">
+                        <section class="card-gavel detalle-panel h-100 p-3 row">
+                            <div class="col-lg-7">
+                                <h1 id="subasta-producto-nombre" class="detalle-titulo text-main-ppi m-2">Nombre del
+                                    Producto
+                                </h1>
+                                <div class="mb-3 m-2">
+                                    <span class="badge-condicion">Condición: <span
+                                            id="subasta-condicion">—</span></span>
+                                </div>
+                                <p id="subasta-descripcion" class="text-main-ppi mb-4 m-2">Descripcion</p>
 
-                        <div class="detalle-vendedor mb-4">
-                            <div id="vendedor-avatar" class="avatar-ppi">?</div>
-                            <div class="flex-grow-1">
-                                <div class="small text-second-ppi">Vendedor</div>
-                                <div id="vendedor-nombre" class="fw-bold text-main-ppi">—</div>
-                            </div>
-                        </div>
-                        <h2 class="section-title">Detalles de la subasta</h2>
-                        <div class="row g-3">
-                            <div class="col-6 col-md-4">
-                                <div class="detalle-dato">
-                                    <div class="detalle-dato-label"><i class="fas fa-dollar-sign"></i>Monto inicial
+                                <div class="detalle-vendedor mb-4">
+                                    <div id="vendedor-avatar" class="avatar-ppi">?</div>
+                                    <div class="flex-grow-1">
+                                        <div class="small text-second-ppi">Vendedor</div>
+                                        <div id="vendedor-nombre" class="fw-bold text-main-ppi">—</div>
                                     </div>
-                                    <label id="dato-monto-inicial" class="detalle-dato-valor">—</label>
-                                    <div class="detalle-dato-sub">Precio de salida</div>
                                 </div>
                             </div>
-                            <div class="col-6 col-md-4">
-                                <div class="detalle-dato">
-                                    <div class="detalle-dato-label"><i class="fas fa-plus-circle"></i>Incremento mínimo
+                            <div class="col-lg-5">
+                                <h2 class="section-title">Detalles de la subasta</h2>
+                                <div class="row g-3">
+                                    <div class="col-6 col-md-6">
+                                        <div class="detalle-dato">
+                                            <div class="detalle-dato-label"><i class="fas fa-dollar-sign"></i>Monto
+                                                inicial
+                                            </div>
+                                            <label id="dato-monto-inicial" class="detalle-dato-valor">—</label>
+                                            <div class="detalle-dato-sub">Precio de salida</div>
+                                        </div>
                                     </div>
-                                    <label id="dato-incremento" class="detalle-dato-valor">—</label>
-                                    <div class="detalle-dato-sub">Sobre la puja actual</div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-4">
-                                <div class="detalle-dato destacado">
-                                    <div class="detalle-dato-label"><i class="fas fa-gavel"></i>Puja actual</div>
-                                    <label id="dato-puja-actual" class="detalle-dato-valor">—</label>
-                                    <div id="dato-lider" class="detalle-dato-sub">Puja reciente</div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-4">
-                                <div class="detalle-dato">
-                                    <div class="detalle-dato-label"><i class="far fa-calendar-alt"></i>Fecha de inicio
+                                    <div class="col-6 col-md-6">
+                                        <div class="detalle-dato destacado">
+                                            <div class="detalle-dato-label"><i class="fas fa-gavel"></i>Puja actual
+                                            </div>
+                                            <label id="dato-puja-actual" class="detalle-dato-valor">—</label>
+                                            <div id="dato-lider" class="detalle-dato-sub">Puja reciente</div>
+                                        </div>
                                     </div>
-                                    <div id="dato-inicio" class="detalle-dato-valor">—</div>
-                                    <div id="dato-inicio-hora" class="detalle-dato-sub">—</div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-4">
-                                <div class="detalle-dato">
-                                    <div class="detalle-dato-label"><i class="far fa-calendar-check"></i>Fecha de cierre
+                                    <div class="col-6 col-md-6">
+                                        <div class="detalle-dato">
+                                            <div class="detalle-dato-label"><i class="fas fa-plus-circle"></i>Incremento
+                                                mínimo
+                                            </div>
+                                            <label id="dato-incremento" class="detalle-dato-valor">—</label>
+                                            <div class="detalle-dato-sub">Sobre la puja actual</div>
+                                        </div>
                                     </div>
-                                    <div id="dato-cierre" class="detalle-dato-valor">—</div>
-                                    <div id="dato-cierre-hora" class="detalle-dato-sub">—</div>
+                                    <div class="col-6 col-md-6">
+                                        <div class="detalle-dato">
+                                            <div class="detalle-dato-label"><i class="fas fa-users"></i>Postores</div>
+                                            <div id="dato-postores" class="detalle-dato-valor">—</div>
+                                            <div id="dato-total-pujas" class="detalle-dato-sub">Cantidad de interesados
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-6">
+                                        <div class="detalle-dato">
+                                            <div class="detalle-dato-label"><i class="far fa-calendar-alt"></i>Fecha de
+                                                inicio
+                                            </div>
+                                            <div id="dato-inicio" class="detalle-dato-valor">—</div>
+                                            <div id="dato-inicio-hora" class="detalle-dato-sub">—</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-6">
+                                        <div class="detalle-dato">
+                                            <div class="detalle-dato-label"><i class="far fa-calendar-check"></i>Fecha
+                                                de
+                                                cierre
+                                            </div>
+                                            <div id="dato-cierre" class="detalle-dato-valor">—</div>
+                                            <div id="dato-cierre-hora" class="detalle-dato-sub">—</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-6 col-md-4">
-                                <div class="detalle-dato">
-                                    <div class="detalle-dato-label"><i class="fas fa-users"></i>Postores</div>
-                                    <div id="dato-postores" class="detalle-dato-valor">—</div>
-                                    <div id="dato-total-pujas" class="detalle-dato-sub">Cantidad de interesados</div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </section>
-                </div>
-                <div class="col-lg-4">
-                    <section class="card-gavel chat-panel h-60">
-                        <div class="chat-header">
-                            <div>
-                                <h2 class="h5 text-main-ppi fw-bold mb-0">Pujas realizadas</h2>
-                                <small id="chat-resumen" class="text-second-ppi">0 pujas · 0 postores</small>
-                            </div>
-                            <span class="status-badge status-activa">
-                                <span class="status-dot"></span>En vivo
-                            </span>
-                        </div>
-                        <div id="chat-feed" class="chat-feed"></div>
-                        <form id="formPuja" class="chat-composer" method="POST" autocomplete="off" novalidate>
-                            <div class="d-flex flex-wrap align-items-baseline justify-content-between gap-2 mb-2">
-                                <label for="monto" class="form-label text-main-ppi fw-bold mb-0">Tu puja</label>
-                            </div>
-                            <div class="input-group">
-                                <span class="input-group-text addon-gavel">$</span>
-                                <input type="number" class="form-control" id="monto-input" name="monto" step="0.01"
-                                    min="0" inputmode="decimal" placeholder="0.00" required>
-                                <button type="button" id="btnPujar" class="btn btn-primary fw-bold px-4">
-                                    <i class="fas fa-gavel me-2"></i>Pujar
-                                </button>
-                            </div>
-                            <p id="puja-ayuda" class="small text-second-ppi mt-3 mb-0">
-                                <i class="fas fa-info-circle me-1"></i>Tu puja debe superar la puja actual por al menos
-                                el
-                                incremento mínimo. Las pujas no se pueden retirar.
-                            </p>
-                        </form>
-                    </section>
-                    <!-- <div style="height: 200px;"></div> -->
+                            </script>
+                        </section>
+                    </div>
                 </div>
                 <div class="col-lg-1"></div>
             </div>
@@ -202,4 +222,5 @@ if (!function_exists('e')) {
     <script src="<?= BASE_URL ?>assets/js/toast-ppi.js?v=2"></script>
     <script src="<?= BASE_URL ?>assets/js/detalleSubasta.js"></script>
 </body>
+
 </html>
