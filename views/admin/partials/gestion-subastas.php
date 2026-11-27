@@ -40,9 +40,6 @@ $totalSubastas = count($subastasLista);
                 <option value="cancelada">Cancelada</option>
             </select>
         </div>
-        <button type="button" class="adm-btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevaSubasta">
-            <i class="fa-solid fa-plus"></i> Nueva subasta
-        </button>
     </div>
 
     <div class="adm-table-card">

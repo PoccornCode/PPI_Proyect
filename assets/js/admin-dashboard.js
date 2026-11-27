@@ -77,6 +77,9 @@
         if (pushHash && target === 'usuarios') {
             window.AdminUsuarios?.recargar();
         }
+        if (pushHash && target === 'productos') {
+            window.AdminProductos?.recargar();
+        }
         if (pushHash && target === 'subastas') {
             window.AdminSubastas?.recargar();
         }

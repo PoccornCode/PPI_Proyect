@@ -30,15 +30,18 @@ $totalProductos = count($productosLista);
                     </option>
                 <?php endforeach; ?>
             </select>
+            <select class="adm-select-filter" id="admProductCondFilter" aria-label="Filtrar por condición">
+                <option value="">Todas las condiciones</option>
+                <option value="nuevo">Nuevo</option>
+                <option value="como_nuevo">Como nuevo</option>
+                <option value="usado">Usado</option>
+            </select>
             <select class="adm-select-filter" id="admProductStatusFilter" aria-label="Filtrar por estado">
                 <option value="">Todos los estados</option>
                 <option value="1">Disponible</option>
                 <option value="0">Inactivo</option>
             </select>
         </div>
-        <button type="button" class="adm-btn-primary" id="btnNuevoProductoAdmin">
-            <i class="fa-solid fa-plus"></i> Nuevo producto
-        </button>
     </div>
 
     <div class="adm-table-card">
@@ -85,11 +88,7 @@ $totalProductos = count($productosLista);
                                 </div>
                             </td>
                             <td><?= htmlspecialchars($categoria) ?></td>
-                            <td>
-                                <span class="adm-badge adm-badge--pendiente">
-                                    <?= htmlspecialchars($condicion) ?>
-                                </span>
-                            </td>
+                            <td><?= htmlspecialchars($condicion) ?></td>
                             <td>
                                 <span class="adm-badge <?= htmlspecialchars((string)($p['estado_clase'] ?? 'adm-badge--activa')) ?>">
                                     <?= htmlspecialchars((string)($p['estado_texto'] ?? 'Disponible')) ?>
@@ -106,11 +105,6 @@ $totalProductos = count($productosLista);
                                         aria-label="Editar <?= htmlspecialchars($titulo) ?>"
                                         data-adm-product-action="editar" data-producto-id="<?= (int)($p['id_producto'] ?? 0) ?>">
                                         <i class="fa-solid fa-pen-to-square"></i>
-                                    </button>
-                                    <button type="button" class="adm-action-btn adm-action-btn--edit" title="Crear subasta"
-                                        aria-label="Crear subasta para <?= htmlspecialchars($titulo) ?>"
-                                        data-adm-product-action="subastar" data-producto-id="<?= (int)($p['id_producto'] ?? 0) ?>">
-                                        <i class="fa-solid fa-gavel"></i>
                                     </button>
                                 </div>
                             </td>

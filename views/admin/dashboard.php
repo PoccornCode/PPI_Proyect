@@ -8,6 +8,7 @@ if (!defined('BASE_URL')) {
     require_once dirname(__DIR__, 2) . '/config/env.php';
 }
 require_once dirname(__DIR__, 2) . '/controllers/admin_controller.php';
+require_once dirname(__DIR__, 2) . '/controllers/producto_admin_controller.php';
 
 $base_url = BASE_URL;
 $perfilAdmin = requerirAdministradorAutenticado(false);
@@ -18,6 +19,7 @@ $resumenInferiorInicio = obtenerResumenInferiorInicioAdmin($base_url);
 $rolesAdmin = obtenerRolesAdmin();
 $usuariosAdminInicial = obtenerUsuariosAdmin('', 0, 1, 5);
 $categoriasAdmin = obtenerCategoriasAdmin();
+$productosAdminInicial = obtenerProductosSinSubastaAdmin($base_url);
 $subastasAdminInicial = obtenerSubastasAdmin($base_url);
 
 $adm_nombre_completo = $perfilAdmin['nombre_completo'];
@@ -999,6 +1001,7 @@ $resumen_categorias = [
     <script src="<?= $base_url ?>assets/js/paginacion.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/paginacion.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-usuarios.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-usuarios.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-usuario-agregar.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-usuario-agregar.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/admin-productos.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-productos.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-subastas.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-subastas.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-subasta-detalle.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-subasta-detalle.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-subasta-estado.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-subasta-estado.js') ?>"></script>
