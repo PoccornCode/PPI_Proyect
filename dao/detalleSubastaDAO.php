@@ -22,7 +22,7 @@ class subastaDetalleDao
         $stmt3->bind_param("i", $id);
         $stmt3->execute();
         $res3 = $stmt3->get_result();
-        $datos3 = $res3->fetch_all(MYSQLI_ASSOC);
+        $datos3 = $res3->fetch_all(MYSQLI_NUM);
         $stmt3->close();
 
         $sql4 = "SELECT COUNT(DISTINCT id_usuario) FROM sb_puja 
