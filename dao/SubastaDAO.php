@@ -205,6 +205,25 @@ class SubastaDAO
                 return ['estado' => false, 'mensaje' => 'Este producto ya tiene una subasta en revisión, activa o finalizada.'];
             }
 
+            $sqlUltima = "SELECT estado FROM sb_subasta WHERE id_producto = ? ORDER BY id_subasta DESC LIMIT 1;";
+            $stmt = $this->conexion->prepare($sqlUltima);
+            $stmt->bind_param("i", $id_producto);
+            $stmt->execute();
+            $ultima = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+
+            $estadoAnterior = $ultima['estado'] ?? null;
+
+            if ($estadoAnterior === null) {
+                $tipo_solicitud = 'nueva';
+            } elseif ($estadoAnterior === 'rechazada') {
+                if ($tipo_solicitud !== 'apelacion') {
+                    $tipo_solicitud = 'reenvio';
+                }
+            } else {
+                $tipo_solicitud = 'reenvio';
+            }
+
             $sql="INSERT INTO sb_subasta (precio_inicial, incremento_minimo, fecha_inicial, fecha_final, id_producto, tipo_solicitud, nota_vendedor)
             VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL ? DAY), ?, ?, ?);";
             $stmt=$this->conexion->prepare($sql);

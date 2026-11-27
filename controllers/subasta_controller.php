@@ -53,6 +53,11 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     }
 
     if ($opcion === "insertar") {
+        if ($id_usuario === 0) {
+            echo json_encode(['estado' => false, 'mensaje' => 'Debes iniciar sesión para subastar.']);
+            exit;
+        }
+        
         if ($precio_inicial <= 0 || $incremento_minimo <= 0 || $dias < 1 || $dias > 30) {
             echo json_encode(['estado' => false, 'mensaje' => 'Revisa los precios y la duración.']);
             exit;
