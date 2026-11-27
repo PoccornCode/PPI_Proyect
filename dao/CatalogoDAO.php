@@ -35,11 +35,7 @@ class CatalogoDAO
         $sql = "SELECT p.id_puja,
                        p.monto AS monto_ganador,
                        u.id_usuario AS id_ganador,
-                       u.nombre,
-                       u.apellido,
-                       u.username,
-                       u.email,
-                       u.telefono
+                       u.username
                 FROM sb_puja p
                 INNER JOIN sb_usuario u ON u.id_usuario = p.id_usuario
                 WHERE p.id_subasta = ?
