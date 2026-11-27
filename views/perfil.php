@@ -75,6 +75,7 @@ $resumenUsuario = $esUsuario ? $dao->obtenerResumenUsuario($id_usuario) : null;
 $subastas = $esUsuario ? $dao->obtenerSubastasActivas($id_usuario, 3) : [];
 $moderacion = $esPersonal ? $dao->obtenerResumenModeracion() : null;
 $usuariosAdmin = $esAdmin ? $dao->obtenerResumenUsuariosAdmin() : null;
+$resumenPujas = (new MisPujasDAO())->resumen((int)$_SESSION['id_usuario']);
 
 $datos = [
     'Nombre completo' => trim(($perfil['nombre'] ?? '') . ' ' . ($perfil['apellido'] ?? '')),
@@ -164,7 +165,7 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                 <section aria-labelledby="titulo-actividad">
                     <h2 id="titulo-actividad" class="fs-4 fw-bold text-main-ppi mb-3">Mi actividad</h2>
                     <div class="row g-3">
-                        <div class="col-12 col-md-4">
+                        <div class="col-12 col-md-6">
                             <a href="<?= BASE_URL ?>views/subastas/mis-productos.php" class="perfil-acceso">
                                 <span class="perfil-acceso-valor"><?= $resumenUsuario['productos'] ?></span>
                                 <span class="perfil-acceso-titulo">Mis productos</span>
@@ -177,18 +178,17 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                                 </span>
                             </a>
                         </div>
-                        <div class="col-12 col-md-4">
-                            <a href="#" class="perfil-acceso" data-proximamente="Mis pujas">
-                                <span class="perfil-acceso-valor">—</span>
+                        <div class="col-12 col-md-6">
+                            <a href="<?= BASE_URL ?>views/subastas/mis-pujas.php" class="perfil-acceso">
+                                <span class="perfil-acceso-valor"><?= $resumenPujas['subastas'] ?></span>
                                 <span class="perfil-acceso-titulo">Mis pujas</span>
-                                <span class="perfil-acceso-detalle">Sigue tus ofertas y resultados</span>
-                            </a>
-                        </div>
-                        <div class="col-12 col-md-4">
-                            <a href="#" class="perfil-acceso" data-proximamente="Mis envíos">
-                                <span class="perfil-acceso-valor">—</span>
-                                <span class="perfil-acceso-titulo">Mis envíos</span>
-                                <span class="perfil-acceso-detalle">Estado de tus paquetes</span>
+                                <span class="perfil-acceso-detalle">
+                                    <?php if ($resumenPujas['ganando'] > 0): ?>
+                                        Vas ganando en <?= $resumenPujas['ganando'] ?> <?= $resumenPujas['ganando'] === 1 ? 'subasta' : 'subastas' ?>
+                                    <?php else: ?>
+                                        Sigue tus ofertas y resultados
+                                    <?php endif; ?>
+                                </span>
                             </a>
                         </div>
                     </div>
@@ -478,6 +478,11 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                             </div>
                             <div class="col-12">
                                 <div class="form-text text-second-ppi">El correo y el nombre de usuario no se pueden cambiar desde aquí.</div>
+                            </div>
+                            <div class="col-12">
+                                <label for="edit_username" class="form-label text-main-ppi fw-bold">Nombre de usuario <span class="req-star">*</span></label>
+                                <input type="text" class="form-control" id="edit_username" name="username" maxlength="50" value="<?= e($perfil['username']) ?>" required>
+                                <div class="invalid-feedback" id="err_edit_username">Ingresa tu nombre de usuario.</div>
                             </div>
                         </div>
                     </form>
