@@ -2,6 +2,7 @@ User-agent: *
 Allow: /
 Allow: /index.php
 Allow: /views/catalogo.php
+Allow: /views/categorias.php
 Allow: /views/como-funciona.php
 Allow: /views/contacto/
 Allow: /views/legal/
@@ -14,9 +15,12 @@ Disallow: /controller/
 Disallow: /controllers/
 Disallow: /includes/
 Disallow: /views/auth/
+Disallow: /views/admin/
+Disallow: /views/moderador/
 Disallow: /views/subastas/registro-producto.php
 Disallow: /views/subastas/mis-productos.php
+Disallow: /views/subastas/mis-pujas.php
 Disallow: /views/perfil.php
 
-Sitemap: sitemap.xml
+Sitemap: https://proyectos-ppi-gt2.partysv.com/subastas/sitemap.xml
 

@@ -1,0 +1,152 @@
+/* estilos de views/subastas/mis-pujas.php */
+
+.mis-pujas-vacio-texto {
+    max-width: 480px;
+}
+
+/* pestañas */
+.mis-pujas-tabs {
+    border-bottom: 1px solid #1e221b;
+    gap: 24px !important;
+}
+
+.mis-pujas-tab {
+    padding: 8px 2px 10px;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    color: #8f8e88;
+    font-size: .9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color .18s ease, border-color .18s ease;
+}
+
+.mis-pujas-tab span {
+    margin-left: 6px;
+    color: #5e615a;
+    font-size: .82rem;
+    font-weight: 600;
+}
+
+.mis-pujas-tab:hover {
+    color: #d6d5cf;
+}
+
+.mis-pujas-tab.activa {
+    border-bottom-color: #94aa34;
+    color: #f0efe9;
+}
+
+.mis-pujas-tab.activa span {
+    color: #94aa34;
+}
+
+/* cada puja */
+.mis-pujas-item {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr) auto auto auto;
+    align-items: center;
+    gap: 28px;
+    padding: 18px 22px;
+    border: 1px solid #1c2217;
+    border-radius: 12px;
+    background-color: #0f110e;
+    transition: border-color .25s ease;
+}
+
+.mis-pujas-item:hover {
+    border-color: rgba(148, 170, 52, 0.35);
+}
+
+.mis-pujas-foto {
+    display: block;
+    width: 96px;
+    height: 96px;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #131612;
+}
+
+.mis-pujas-foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.mis-pujas-info {
+    min-width: 0;
+}
+
+.mis-pujas-info h2 a:hover {
+    color: #94aa34 !important;
+}
+
+.mis-pujas-montos {
+    display: flex;
+    gap: 32px;
+}
+
+.mis-pujas-estado {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 160px;
+}
+
+.mis-pujas-accion {
+    min-width: 130px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* chips de resultado */
+.mis-pujas-chip {
+    display: inline-block;
+    padding: 0;
+    border: none;
+    background: none;
+    font-size: .85rem;
+    font-weight: 700;
+}
+
+.mis-pujas-chip-ok {
+    color: #94aa34;
+}
+
+.mis-pujas-chip-alerta {
+    color: #d98a76;
+}
+
+.mis-pujas-chip-neutro {
+    color: #9b9a94;
+}
+
+@media (max-width: 991.98px) {
+    .mis-pujas-item {
+        grid-template-columns: 80px minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .mis-pujas-foto {
+        width: 80px;
+        height: 80px;
+    }
+
+    .mis-pujas-montos,
+    .mis-pujas-estado,
+    .mis-pujas-accion {
+        grid-column: 1 / -1;
+    }
+
+    .mis-pujas-estado {
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .mis-pujas-accion .btn {
+        width: 100%;
+    }
+}

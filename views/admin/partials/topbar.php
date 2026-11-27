@@ -49,6 +49,7 @@ $rolNombreTopbar = (string)($adm_rol_nombre ?? '');
                         <div style="font-size:0.74rem; color:#9aa392;">Cola de aprobación</div>
                     </div>
                 </a>
+                <?php /* Oculto temporalmente: mensajes de contacto
                 <button type="button" class="dropdown-item" data-adm-tab="reportes" data-adm-rep-subtab="moderacion">
                     <i class="fa-regular fa-envelope" style="color:#8ea958;"></i>
                     <div>
@@ -58,6 +59,7 @@ $rolNombreTopbar = (string)($adm_rol_nombre ?? '');
                         <div style="font-size:0.74rem; color:#9aa392;">Pendientes de respuesta</div>
                     </div>
                 </button>
+                */ ?>
             </div>
         </div>
 
@@ -87,11 +89,13 @@ $rolNombreTopbar = (string)($adm_rol_nombre ?? '');
                         <i class="fa-solid fa-shield-halved"></i> Panel de Moderación
                     </a>
                 </li>
+                <?php /* Oculto temporalmente: Configuración
                 <li>
                     <button type="button" class="dropdown-item" data-adm-tab="configuracion">
                         <i class="fa-solid fa-gear"></i> Configuración
                     </button>
                 </li>
+                */ ?>
                 <li>
                     <hr class="dropdown-divider">
                 </li>

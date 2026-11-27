@@ -82,8 +82,8 @@ $base_url = BASE_URL;
                 <p class="legal-text">
                     Tienes derecho a consultar, corregir o solicitar la eliminación de tus datos en cualquier momento. Puedes editar tu perfil directamente desde tu panel de usuario o comunicarte con nuestro equipo si necesitas asistencia técnica o dar de baja tu cuenta.
                 </p>
-                <div class="pt-3 pb-5">
-                    <a href="<?= $base_url ?>views/contacto/contacto.php" class="btn btn-outline-publish px-4 py-2 fw-semibold me-2">
+                <div class="pt-3 pb-5 d-flex flex-wrap gap-3">
+                    <a href="<?= $base_url ?>views/contacto/contacto.php" class="btn btn-outline-publish px-4 py-2 fw-semibold">
                         Contactar con soporte
                     </a>
                     <a href="<?= $base_url ?>views/legal/terminos.php" class="btn btn-dark border-secondary px-4 py-2 text-light">
