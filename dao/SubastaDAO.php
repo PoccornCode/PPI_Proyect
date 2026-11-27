@@ -32,6 +32,11 @@ class SubastaDAO
                        COUNT(pu.id_puja) AS total_pujas,
                        COALESCE(MAX(pu.monto), s.precio_inicial) AS precio_actual
                 FROM sb_subasta s
+                INNER JOIN (
+                    SELECT MAX(id_subasta) AS max_id
+                    FROM sb_subasta
+                    GROUP BY id_producto
+                ) ult ON s.id_subasta = ult.max_id
                 INNER JOIN sb_producto p ON s.id_producto = p.id_producto
                 LEFT JOIN sb_categoria c ON p.id_categoria = c.id_categoria
                 LEFT JOIN sb_imagen_producto img ON p.id_producto = img.id_producto AND img.principal = 1
@@ -69,6 +74,11 @@ class SubastaDAO
                        img.ruta AS imagen_ruta,
                        COALESCE(MAX(pu.monto), s.precio_inicial) AS precio_actual
                 FROM sb_subasta s
+                INNER JOIN (
+                    SELECT MAX(id_subasta) AS max_id
+                    FROM sb_subasta
+                    GROUP BY id_producto
+                ) ult ON s.id_subasta = ult.max_id
                 INNER JOIN sb_producto p ON s.id_producto = p.id_producto
                 LEFT JOIN sb_categoria c ON p.id_categoria = c.id_categoria
                 LEFT JOIN sb_imagen_producto img ON p.id_producto = img.id_producto AND img.principal = 1
@@ -108,6 +118,11 @@ class SubastaDAO
                        img.ruta AS imagen_ruta,
                        COALESCE(MAX(pu.monto), s.precio_inicial) AS precio_actual
                 FROM sb_subasta s
+                INNER JOIN (
+                    SELECT MAX(id_subasta) AS max_id
+                    FROM sb_subasta
+                    GROUP BY id_producto
+                ) ult ON s.id_subasta = ult.max_id
                 INNER JOIN sb_producto p ON s.id_producto = p.id_producto
                 LEFT JOIN sb_categoria c ON p.id_categoria = c.id_categoria
                 LEFT JOIN sb_imagen_producto img ON p.id_producto = img.id_producto AND img.principal = 1
