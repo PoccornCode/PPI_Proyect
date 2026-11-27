@@ -23,7 +23,29 @@
     const previewImg = document.getElementById('catImagePreview');
     const placeholderWrap = document.getElementById('catImagePlaceholder');
 
+    const confirmModalEl = document.getElementById('modalConfirmarEditarCategoria');
+    const confirmIntroEl = document.getElementById('admCatConfirmIntro');
+    const confirmListEl = document.getElementById('admCatConfirmList');
+    const confirmBackBtn = document.getElementById('admCatConfirmBackBtn');
+    const confirmSaveBtn = document.getElementById('admCatConfirmSaveBtn');
+
     if (!gridEl || !formCrud || !modalCrudEl) return;
+
+    let payloadPendiente = null;
+
+    function escHtml(valor) {
+        return String(valor ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function resumirTexto(texto, max = 42) {
+        const limpio = String(texto || '').trim();
+        if (!limpio) return 'Vacío';
+        return limpio.length > max ? `${limpio.slice(0, max)}…` : limpio;
+    }
 
     const notify = (tipo, mensaje) => {
         if (window.AdminCategorias?.notify) {
@@ -64,6 +86,8 @@
         return true;
     }
 
+    let datosIniciales = null;
+
     function abrirModalEdicion(card) {
         if (!card) return;
 
@@ -93,6 +117,13 @@
                 : 'Oculta en el sitio público hasta que decidas publicarla.';
         }
         if (btnGuardarText) btnGuardarText.textContent = 'Guardar cambios';
+
+        datosIniciales = {
+            id_categoria: idCategoria,
+            nombre: nombre.trim(),
+            descripcion: descripcion.trim(),
+            estado: esActiva ? '1' : '0'
+        };
 
         setPreview(imgSrc);
         getCrudModal()?.show();
@@ -128,6 +159,71 @@
             return;
         }
 
+        if (
+            !archivo &&
+            datosIniciales &&
+            datosIniciales.id_categoria === idCategoria &&
+            datosIniciales.nombre === nombre &&
+            datosIniciales.descripcion === descripcion &&
+            datosIniciales.estado === estado
+        ) {
+            if (typeof window.mostrarToast === 'function') {
+                window.mostrarToast('info', 'Sin cambios', 'No se detectaron modificaciones en los datos de la categoría.', 3200);
+            } else {
+                notify('info', 'No se detectaron modificaciones en los datos de la categoría.');
+            }
+            return;
+        }
+
+        const cambios = [];
+        if (datosIniciales) {
+            if (datosIniciales.nombre !== nombre) {
+                cambios.push({ etiqueta: 'Nombre', antes: resumirTexto(datosIniciales.nombre), despues: resumirTexto(nombre) });
+            }
+            if (datosIniciales.descripcion !== descripcion) {
+                cambios.push({ etiqueta: 'Descripción', antes: resumirTexto(datosIniciales.descripcion), despues: resumirTexto(descripcion) });
+            }
+            if (datosIniciales.estado !== estado) {
+                cambios.push({
+                    etiqueta: 'Estado',
+                    antes: datosIniciales.estado === '1' ? 'Publicada' : 'Desactivada',
+                    despues: estado === '1' ? 'Publicada' : 'Desactivada'
+                });
+            }
+            if (archivo) {
+                cambios.push({ etiqueta: 'Imagen', antes: 'Actual', despues: resumirTexto(archivo.name, 28) });
+            }
+        }
+
+        payloadPendiente = { idCategoria, nombre, descripcion, estado, archivo };
+
+        if (confirmModalEl && confirmListEl) {
+            if (confirmIntroEl) {
+                confirmIntroEl.innerHTML = `¿Deseas aplicar los siguientes cambios en la categoría <strong>${escHtml(datosIniciales?.nombre || nombre)}</strong>?`;
+            }
+            confirmListEl.innerHTML = cambios.map((c) => `
+                <div class="adm-user-confirm-row">
+                    <span class="adm-user-confirm-label">${escHtml(c.etiqueta)}</span>
+                    <div class="adm-user-confirm-values">
+                        <span class="adm-user-confirm-old">${escHtml(c.antes)}</span>
+                        <i class="fa-solid fa-arrow-right adm-user-confirm-arrow" aria-hidden="true"></i>
+                        <span class="adm-user-confirm-new">${escHtml(c.despues)}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            getCrudModal()?.hide();
+            window.bootstrap?.Modal.getOrCreateInstance(confirmModalEl).show();
+            return;
+        }
+
+        await ejecutarGuardadoCategoria();
+    });
+
+    async function ejecutarGuardadoCategoria() {
+        if (!payloadPendiente) return;
+        const { idCategoria, nombre, descripcion, estado, archivo } = payloadPendiente;
+
         const formData = new FormData();
         formData.append('opcion', 'categoria_actualizar');
         formData.append('id_categoria', String(idCategoria));
@@ -143,6 +239,7 @@
             btnGuardar.disabled = true;
             btnGuardar.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Guardando...</span>';
         }
+        if (confirmSaveBtn) confirmSaveBtn.disabled = true;
 
         try {
             const response = await fetch(controllerUrl, {
@@ -162,13 +259,17 @@
             if (!response.ok || !data?.estado || !data.categoria) {
                 const tipoToast = data?.bloqueado ? 'warning' : (response.status === 422 ? 'warning' : 'error');
                 notify(tipoToast, data?.mensaje || 'No se pudo actualizar la categoría.');
+                window.bootstrap?.Modal.getInstance(confirmModalEl)?.hide();
+                getCrudModal()?.show();
                 if (data?.campo === 'nombre') inputNombre?.focus();
                 if (data?.campo === 'descripcion') inputDesc?.focus();
                 return;
             }
 
             window.AdminCategorias?.actualizarTarjeta(data.categoria);
+            window.bootstrap?.Modal.getInstance(confirmModalEl)?.hide();
             getCrudModal()?.hide();
+            payloadPendiente = null;
             notify('success', data.mensaje || 'Categoría actualizada correctamente.');
         } catch (err) {
             notify('error', err?.message || 'Error de conexión al actualizar la categoría.');
@@ -177,6 +278,16 @@
                 btnGuardar.disabled = false;
                 btnGuardar.innerHTML = htmlOriginal;
             }
+            if (confirmSaveBtn) confirmSaveBtn.disabled = false;
         }
+    }
+
+    confirmBackBtn?.addEventListener('click', () => {
+        window.bootstrap?.Modal.getInstance(confirmModalEl)?.hide();
+        getCrudModal()?.show();
+    });
+
+    confirmSaveBtn?.addEventListener('click', () => {
+        ejecutarGuardadoCategoria();
     });
 })();

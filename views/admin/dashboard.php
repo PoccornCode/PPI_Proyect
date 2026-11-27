@@ -978,6 +978,8 @@ $resumen_categorias = [
         </div>
     </div>
 
+    <?php include __DIR__ . '/partials/modal-confirmar-categoria.php'; ?>
+
     <?php include __DIR__ . '/partials/modal-agregar-usuario.php'; ?>
     <?php include __DIR__ . '/partials/modal-detalle-usuario.php'; ?>
     <?php include __DIR__ . '/partials/modal-editar-usuario.php'; ?>
