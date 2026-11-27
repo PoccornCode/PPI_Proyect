@@ -1,8 +1,12 @@
 <?php
 require_once __DIR__ . '/../config/conexion.php';
+require_once __DIR__ . '/../helpers/Mailer.php';
 
 class SubastaDAO
 {
+    // Ruta temporal del chat; ajustar si el módulo de chat cambia de ubicación o parámetro
+    private const RUTA_CHAT_SUBASTA = 'views/chat.php?id_subasta=';
+
     private $conexion;
 
     public function __construct($conexion = null)
@@ -239,6 +243,172 @@ class SubastaDAO
             $this->conexion->rollback();
             return ['estado' => false, 'mensaje' => 'No se pudo crear la subasta'];
         }
+    }
+
+    // Cierra subastas activas vencidas y notifica por correo al ganador y al vendedor
+    public function finalizarSubastasVencidas(?int $idSubastaEspecifica = null): array
+    {
+        $resumen = [
+            'estado'           => true,
+            'procesadas'       => 0,
+            'finalizadas'      => 0,
+            'sin_ofertas'      => 0,
+            'correos_enviados' => 0,
+            'errores'          => [],
+        ];
+
+        if (!$this->conexion || $this->conexion->connect_errno) {
+            $resumen['estado'] = false;
+            return $resumen;
+        }
+
+        $sql = "SELECT s.id_subasta, p.nombre AS titulo, p.id_usuario AS id_vendedor
+                FROM sb_subasta s
+                INNER JOIN sb_producto p ON p.id_producto = s.id_producto
+                WHERE LOWER(s.estado) = 'activa'
+                  AND s.fecha_final <= NOW()";
+
+        if ($idSubastaEspecifica !== null && $idSubastaEspecifica > 0) {
+            $sql .= " AND s.id_subasta = ?";
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bind_param("i", $idSubastaEspecifica);
+        } else {
+            $stmt = $this->conexion->prepare($sql);
+        }
+
+        if (!$stmt) {
+            $resumen['estado'] = false;
+            return $resumen;
+        }
+
+        $stmt->execute();
+        $vencidas = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+
+        foreach ($vencidas as $subasta) {
+            $idSubasta  = (int)$subasta['id_subasta'];
+            $idVendedor = (int)$subasta['id_vendedor'];
+            $titulo     = (string)$subasta['titulo'];
+
+            $pujaGanadora = $this->obtenerPujaGanadora($idSubasta);
+            $nuevoEstado  = $pujaGanadora !== null ? 'finalizada' : 'sin_ofertas';
+
+            // Actualización atómica para evitar correos duplicados en peticiones simultáneas
+            $stmtUpd = $this->conexion->prepare(
+                "UPDATE sb_subasta SET estado = ? WHERE id_subasta = ? AND LOWER(estado) = 'activa'"
+            );
+            if (!$stmtUpd) {
+                continue;
+            }
+            $stmtUpd->bind_param("si", $nuevoEstado, $idSubasta);
+            $stmtUpd->execute();
+            $actualizada = $stmtUpd->affected_rows === 1;
+            $stmtUpd->close();
+
+            if (!$actualizada) {
+                continue;
+            }
+
+            $resumen['procesadas']++;
+
+            if ($nuevoEstado === 'sin_ofertas') {
+                $resumen['sin_ofertas']++;
+                continue;
+            }
+
+            $resumen['finalizadas']++;
+
+            $vendedor = $this->obtenerContactoUsuario($idVendedor);
+            $ganador  = $this->obtenerContactoUsuario((int)$pujaGanadora['id_usuario']);
+            $monto    = (float)$pujaGanadora['monto'];
+            $baseUrl  = defined('BASE_URL') ? rtrim(BASE_URL, '/') : '';
+            $urlChat  = $baseUrl . '/' . self::RUTA_CHAT_SUBASTA . $idSubasta;
+
+            $nombreVendedor = $vendedor['nombre_mostrar'] ?? 'Vendedor';
+            $nombreGanador  = $ganador['nombre_mostrar'] ?? 'Ganador';
+
+            if (!empty($ganador['correo'])) {
+                $envioGanador = Mailer::enviarSubastaGanada(
+                    $ganador['correo'],
+                    $nombreGanador,
+                    $titulo,
+                    $monto,
+                    $nombreVendedor,
+                    $urlChat
+                );
+                if (!empty($envioGanador['exito'])) {
+                    $resumen['correos_enviados']++;
+                } else {
+                    $resumen['errores'][] = "Subasta #{$idSubasta} (ganador): " . ($envioGanador['mensaje'] ?? 'Error al enviar');
+                }
+            }
+
+            if (!empty($vendedor['correo'])) {
+                $envioVendedor = Mailer::enviarSubastaFinalizadaVendedor(
+                    $vendedor['correo'],
+                    $nombreVendedor,
+                    $titulo,
+                    $monto,
+                    $nombreGanador,
+                    $urlChat
+                );
+                if (!empty($envioVendedor['exito'])) {
+                    $resumen['correos_enviados']++;
+                } else {
+                    $resumen['errores'][] = "Subasta #{$idSubasta} (vendedor): " . ($envioVendedor['mensaje'] ?? 'Error al enviar');
+                }
+            }
+        }
+
+        return $resumen;
+    }
+
+    private function obtenerPujaGanadora(int $idSubasta): ?array
+    {
+        $sql = "SELECT id_usuario, monto
+                FROM sb_puja
+                WHERE id_subasta = ?
+                ORDER BY monto DESC, fecha ASC, id_puja ASC
+                LIMIT 1";
+        $stmt = $this->conexion->prepare($sql);
+        if (!$stmt) {
+            return null;
+        }
+        $stmt->bind_param("i", $idSubasta);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        return $row ?: null;
+    }
+
+    private function obtenerContactoUsuario(int $idUsuario): ?array
+    {
+        $sql = "SELECT u.nombre, u.username, c.correo
+                FROM sb_usuario u
+                LEFT JOIN sb_correo_usuario c ON c.id_usuario = u.id_usuario
+                WHERE u.id_usuario = ?
+                LIMIT 1";
+        $stmt = $this->conexion->prepare($sql);
+        if (!$stmt) {
+            return null;
+        }
+        $stmt->bind_param("i", $idUsuario);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        if (!$row) {
+            return null;
+        }
+
+        $nombre = trim((string)($row['nombre'] ?? ''));
+        $username = trim((string)($row['username'] ?? ''));
+
+        return [
+            'nombre_mostrar' => $nombre !== '' ? $nombre : ($username !== '' ? $username : 'Usuario'),
+            'correo'         => trim((string)($row['correo'] ?? '')),
+        ];
     }
 
 }

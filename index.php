@@ -65,7 +65,7 @@ $urlSubasta = 'views/subasta.php?id=';
 
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
-    <link href="assets/css/main.css?v=49" rel="stylesheet">
+    <link href="assets/css/main.css?v=50" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -123,7 +123,7 @@ $urlSubasta = 'views/subasta.php?id=';
                                             <span class="d-block small text-second-ppi">Puja actual</span>
                                             <span class="d-block display-6 precio-ppi">$<?= e($destacada['precio']) ?></span>
                                             <span class="d-block mb-3 tiempo-ppi"><i class="far fa-clock me-2"></i><span data-countdown="<?= e($destacada['fecha_final_iso']) ?>" data-countdown-prefix="Termina en ">Termina en <?= e($destacada['tiempo']) ?></span></span>
-                                            <button type="button" class="w-100 btn btn-primary py-2 fw-bold" data-puja-adan>Pujar ahora</button>
+                                            <a href="<?= e($urlSubasta . $destacada['id']) ?>" class="w-100 btn btn-primary py-2 fw-bold">Pujar ahora</a>
                                         </div>
                                     </div>
                                 </div>

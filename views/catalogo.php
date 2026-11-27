@@ -74,8 +74,8 @@ $total = $catalogo['total'];
 
     <link href="<?= $base_url ?>assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="<?= $base_url ?>assets/css/style.css" rel="stylesheet">
-    <link href="<?= $base_url ?>assets/css/main.css?v=46" rel="stylesheet">
-    <link href="<?= $base_url ?>assets/css/catalogo.css?v=9" rel="stylesheet">
+    <link href="<?= $base_url ?>assets/css/main.css?v=50" rel="stylesheet">
+    <link href="<?= $base_url ?>assets/css/catalogo.css?v=11" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi text-second-ppi d-flex flex-column min-vh-100">
@@ -98,8 +98,14 @@ $total = $catalogo['total'];
         </div>
     </section>
 
-    <main class="container-fluid px-4 px-lg-5 py-5 flex-grow-1">
+    <main class="container-fluid px-4 px-lg-5 py-4 flex-grow-1">
         <div class="container catalogo-container">
+
+            <div class="d-flex justify-content-end mb-3">
+                <a href="<?= $base_url ?>index.php" class="catalogo-volver" onclick="if (window.history.length > 1) { event.preventDefault(); window.history.back(); }">
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i> Volver atrás
+                </a>
+            </div>
 
             <!-- filtros -->
             <form id="form-catalogo-filtros" action="<?= $base_url ?>views/catalogo.php" method="GET" class="catalogo-filtros row g-3 align-items-end" role="search">

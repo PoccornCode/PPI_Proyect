@@ -42,6 +42,11 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     $opcion = $_POST['opcion'] ?? $_GET['opcion'] ?? 'home';
 
     if ($opcion === 'home') {
+        try {
+            (new SubastaDAO())->finalizarSubastasVencidas();
+        } catch (Throwable $e) {
+            error_log('[Subasta] Error al finalizar subastas vencidas: ' . $e->getMessage());
+        }
         $destacada = obtenerSubastaDestacadaHome();
         echo json_encode([
             'estado'    => true,
@@ -49,6 +54,12 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
             'pronto'    => obtenerSubastasTerminanProntoHome(5, $destacada['id'] ?? null),
             'nuevas'    => obtenerNuevasSubastasHome(4),
         ]);
+        exit;
+    }
+
+    if ($opcion === 'finalizar_vencidas') {
+        $idSubasta = isset($_POST['id_subasta']) ? (int)$_POST['id_subasta'] : (isset($_GET['id_subasta']) ? (int)$_GET['id_subasta'] : null);
+        echo json_encode((new SubastaDAO())->finalizarSubastasVencidas($idSubasta ?: null));
         exit;
     }
 
