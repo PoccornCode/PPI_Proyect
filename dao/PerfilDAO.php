@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/../config/conexion.php';
-require_once dirname(__DIR__) . '/dao/MisPujasDAO.php';
 
 class PerfilDAO
 {
@@ -175,6 +174,9 @@ class PerfilDAO
             return ["estado" => true, "mensaje" => "Tus datos se actualizaron correctamente."];
         } catch (Throwable $e) {
             $this->conexion->rollback();
+            if ((int)$e->getCode() === 1062 || (int)$this->conexion->errno === 1062) {
+                return ["estado" => false, "campo" => "username", "mensaje" => "Este nombre de usuario ya está en uso."];
+            }
             error_log("[PerfilDAO] Error al actualizar datos: " . $e->getMessage());
             return ["estado" => false, "mensaje" => "No se pudieron guardar los cambios. Inténtalo de nuevo."];
         }

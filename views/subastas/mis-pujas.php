@@ -117,10 +117,13 @@ $mostrar = $filtro === '' ? $pujas : array_filter($pujas, function ($p) use ($fi
                 <?php else: ?>
                     <div class="d-flex flex-column gap-3">
                         <?php foreach ($mostrar as $p): ?>
-                            <?php [$textoResultado, $colorResultado] = $resultados[$p['resultado']]; ?>
+                            <?php
+                            [$textoResultado, $colorResultado] = $resultados[$p['resultado']];
+                            $imgSrc = preg_match('#^https?://#i', $p['imagen']) ? $p['imagen'] : BASE_URL . $p['imagen'];
+                            ?>
                             <article class="mis-pujas-item">
                                 <a href="<?= BASE_URL ?>views/subasta.php?id=<?= (int)$p['id'] ?>" class="mis-pujas-foto" tabindex="-1" aria-hidden="true">
-                                    <img src="<?= BASE_URL . e($p['imagen']) ?>" alt="" loading="lazy" onerror="this.onerror=null; this.src='<?= BASE_URL ?>assets/img/news-1.jpg';">
+                                    <img src="<?= e($imgSrc) ?>" alt="" loading="lazy" onerror="this.onerror=null; this.src='<?= BASE_URL ?>assets/img/news-1.jpg';">
                                 </a>
 
                                 <div class="mis-pujas-info">

@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__DIR__) . '/config/env.php';
 require_once dirname(__DIR__) . '/dao/PerfilDAO.php';
+require_once dirname(__DIR__) . '/dao/MisPujasDAO.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -75,7 +76,7 @@ $resumenUsuario = $esUsuario ? $dao->obtenerResumenUsuario($id_usuario) : null;
 $subastas = $esUsuario ? $dao->obtenerSubastasActivas($id_usuario, 3) : [];
 $moderacion = $esPersonal ? $dao->obtenerResumenModeracion() : null;
 $usuariosAdmin = $esAdmin ? $dao->obtenerResumenUsuariosAdmin() : null;
-$resumenPujas = (new MisPujasDAO())->resumen((int)$_SESSION['id_usuario']);
+$resumenPujas = $esUsuario ? (new MisPujasDAO())->resumen($id_usuario) : null;
 
 $datos = [
     'Nombre completo' => trim(($perfil['nombre'] ?? '') . ' ' . ($perfil['apellido'] ?? '')),
@@ -474,12 +475,12 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                                 <div class="invalid-feedback" id="err_edit_ubicacion">Ingresa tu ubicación.</div>
                             </div>
                             <div class="col-12">
-                                <div class="form-text text-second-ppi">El correo y el nombre de usuario no se pueden cambiar desde aquí.</div>
-                            </div>
-                            <div class="col-12">
                                 <label for="edit_username" class="form-label text-main-ppi fw-bold">Nombre de usuario <span class="req-star">*</span></label>
                                 <input type="text" class="form-control" id="edit_username" name="username" maxlength="50" value="<?= e($perfil['username']) ?>" required>
                                 <div class="invalid-feedback" id="err_edit_username">Ingresa tu nombre de usuario.</div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-text text-second-ppi">El correo no se puede cambiar desde aquí.</div>
                             </div>
                         </div>
                     </form>
