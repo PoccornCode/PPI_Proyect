@@ -4,6 +4,7 @@
     const VALID_TABS = [
         'inicio',
         'usuarios',
+        'productos',
         'subastas',
         'categorias',
         'reportes',

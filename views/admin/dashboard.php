@@ -83,6 +83,12 @@ $resumen_categorias = [
                     </button>
                 </li>
                 <li>
+                    <button type="button" class="adm-nav-btn" data-adm-tab="productos" title="Productos">
+                        <i class="fa-solid fa-box-open"></i>
+                        <span>Productos</span>
+                    </button>
+                </li>
+                <li>
                     <button type="button" class="adm-nav-btn" data-adm-tab="subastas" title="Subastas">
                         <i class="fa-solid fa-gavel"></i>
                         <span>Subastas</span>
@@ -157,6 +163,8 @@ $resumen_categorias = [
         </section>
 
         <?php include __DIR__ . '/partials/gestion-usuarios.php'; ?>
+
+        <?php include __DIR__ . '/partials/gestion-productos.php'; ?>
 
         <?php include __DIR__ . '/partials/gestion-subastas.php'; ?>
 
