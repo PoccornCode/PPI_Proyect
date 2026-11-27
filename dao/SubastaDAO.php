@@ -175,7 +175,7 @@ class SubastaDAO
         try {
             $this->conexion->begin_transaction();
             $sqlVerficar="SELECT p.id_producto FROM sb_producto p
-            WHERE p.id_producto = ? AND p.id_usuario = ?
+            WHERE p.id_producto = ? AND p.id_usuario = ? AND p.estado=1
             FOR UPDATE;";
             $stmt=$this->conexion->prepare($sqlVerficar);
             $stmt->bind_param("ii", $id_producto, $id_usuario);
@@ -193,7 +193,7 @@ class SubastaDAO
             }
 
             //Por si un usuario mañoso abre 2 pestañas ytrata de insertar 2 subastasas
-            $sqlAbierta = "SELECT 1 FROM sb_subasta WHERE id_producto = ? AND estado IN ('pendiente', 'activa') LIMIT 1;";
+            $sqlAbierta = "SELECT 1 FROM sb_subasta WHERE id_producto = ? AND estado IN ('pendiente', 'activa', 'finalizada') LIMIT 1;";
             $stmt = $this->conexion->prepare($sqlAbierta);
             $stmt->bind_param("i", $id_producto);
             $stmt->execute();
@@ -202,7 +202,7 @@ class SubastaDAO
 
             if ($yaTiene) {
                 $this->conexion->rollback();
-                return ['estado' => false, 'mensaje' => 'Este producto ya tiene una subasta en revisión o activa.'];
+                return ['estado' => false, 'mensaje' => 'Este producto ya tiene una subasta en revisión, activa o finalizada.'];
             }
 
             $sql="INSERT INTO sb_subasta (precio_inicial, incremento_minimo, fecha_inicial, fecha_final, id_producto, tipo_solicitud, nota_vendedor)

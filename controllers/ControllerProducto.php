@@ -89,6 +89,11 @@
             exit;
         }
 
+        if (tieneSubastaEn($conexion, $id_producto, ['activa', 'finalizada'])) {
+            echo json_encode(['estado' => false, 'mensaje' => 'Este producto está en subasta o ya fue vendido y no se puede modificar.']);
+            exit;
+        }
+
         $fotos = obtenerImagenesProducto($conexion, $id_producto);
         echo json_encode(['estado' => true, 'producto' => $producto, 'imagenes' => $fotos]);
         exit;
@@ -111,7 +116,18 @@
         exit;
     }
 
+    $condicionesValidas = ['Nuevo', 'Como nuevo', 'Excelente', 'Buen estado', 'Aceptable', 'Para repuestos o restauración'];
+    if (!in_array($condicion, $condicionesValidas, true)) {
+        echo json_encode(['estado' => false, 'mensaje' => 'La condición seleccionada no es válida.']);
+        exit;
+    }
+
     if($opcion==="guardar"){
+        if (!$imagenes || empty($imagenes['name'][0])) {
+            echo json_encode(['estado' => false, 'mensaje' => 'Debes subir al menos una imagen del producto.']);
+            exit;
+        }
+        
         try {
             $rutas = subirImagenes($imagenes);
         } catch (Throwable $e) {

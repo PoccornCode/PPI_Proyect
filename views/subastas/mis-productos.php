@@ -6,6 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__ . '/../../config/env.php';
 require_once __DIR__ . '/../../config/conexion.php';
 require_once __DIR__ . '/../../dao/ProductoDAO.php';
+require_once __DIR__ . '/../../dao/ModeradorDAO.php';
 
 if (!isset($_SESSION['id_usuario'])) {
     $_SESSION['redirect_after_login'] = BASE_URL . 'views/subastas/mis-productos.php';
@@ -22,7 +23,10 @@ $id_usuario = (int)$_SESSION['id_usuario'];
 $titulo = "Mis Productos";
 $pagina = "mis-productos";
 
+(new ModeradorDAO($conexion))->inactivarSubastasVencidas();
+
 $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -101,14 +105,12 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                         // Normaliza el estado de la subasta para decidir qué badge y botones mostrar en la tarjeta
                         $estadoSubasta = $item['estado_subasta'] ?? null;
                         $estadoNorm = $estadoSubasta !== null ? strtolower(trim((string)$estadoSubasta)) : '';
-                        // Datos de la subasta actual (si existen en la consulta del DAO)
                         $idSubasta = (int)($item['id_subasta'] ?? 0);
-                        $totalPujas = (int)($item['total_pujas'] ?? 0);
                         $motivoRechazo = (string)($item['motivo_rechazo'] ?? '');
-                        // Texto de respaldo mientras el DAO aún no devuelve s.motivo_rechazo
                         if ($estadoNorm === 'rechazada' && $motivoRechazo === '') {
-                            $motivoRechazo = 'Aquí va el motivo real de rechazo. En dao/ProductoDAO.php, agrega s.motivo_rechazo (de la última subasta del producto) para mostrar el texto guardado por el moderador.';
+                            $motivoRechazo = 'El moderador no indicó un motivo.';
                         }
+
                         // Empaqueta los datos del producto y su subasta en JSON seguro para abrir el modal "Ver detalles"
                         $detalleJson = htmlspecialchars(json_encode([
                             'nombre' => (string)($item['nombre'] ?? ''),
@@ -171,70 +173,64 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                                         <?= htmlspecialchars($item['descripcion']) ?>
                                     </p>
 
-                                    <?php // Acciones según el estado actual de la subasta ?>
-                                    <div class="d-flex gap-2 mt-auto pt-2">
-                                        <?php if ($estadoNorm === ''): // Sin subasta: subastar, ver detalles, modificar y eliminar ?>
-                                            <button
-                                                type="button"
-                                                class="btn btn-subastar-producto btn-sm flex-grow-1 btn-abrir-subasta"
-                                                data-id-producto="<?= (int)$item['id_producto'] ?>"
-                                                data-nombre="<?= htmlspecialchars($item['nombre']) ?>"
-                                                data-estado-anterior=""
-                                                data-motivo-rechazo="">
-                                                <i class="fas fa-gavel"></i> Subastar
-                                            </button>
-                                            <button type="button" class="btn btn-modificar-producto btn-sm btn-accion-icon btn-ver-detalle" data-id-producto="<?= (int)$item['id_producto'] ?>" data-detalle="<?= $detalleJson ?>" title="Ver detalles" aria-label="Ver detalles">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <a href="<?= BASE_URL ?>views/subastas/registro-producto.php?id=<?= (int)$item['id_producto'] ?>" class="btn btn-modificar-producto btn-sm btn-accion-icon" title="Modificar" aria-label="Modificar">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <form action="<?= BASE_URL ?>controllers/ControllerProducto.php?id=<?= (int)$item['id_producto'] ?>" method="POST" class="form-eliminar" data-nombre="<?= htmlspecialchars($item['nombre']) ?>">
-                                                <input type="hidden" name="opcion" value="eliminar">
-                                                <button type="submit" class="btn btn-eliminar-producto btn-sm btn-accion-icon" title="Eliminar" aria-label="Eliminar">
-                                                    <i class="fas fa-trash"></i>
+                                <?php // Acciones según el estado actual de la subasta ?>
+                                        <div class="d-flex gap-2 mt-auto pt-2">
+                                            <?php if ($estadoNorm === ''): // Sin subasta: subastar, ver, modificar, eliminar ?>
+                                                <button type="button" class="btn btn-subastar-producto btn-sm flex-grow-1 btn-abrir-subasta"
+                                                    data-id-producto="<?= (int)$item['id_producto'] ?>"
+                                                    data-nombre="<?= htmlspecialchars($item['nombre']) ?>"
+                                                    data-estado-anterior="" data-motivo-rechazo="">
+                                                    <i class="fas fa-gavel"></i> Subastar
                                                 </button>
-                                            </form>
-                                        <?php elseif ($estadoNorm === 'pendiente' || $estadoNorm === 'en revision'): // En revisión: ver detalles y cancelar solicitud si no tiene pujas ?>
-                                            <button type="button" class="btn btn-modificar-producto btn-sm <?= $totalPujas === 0 ? 'btn-accion-icon' : 'flex-grow-1' ?> btn-ver-detalle" data-id-producto="<?= (int)$item['id_producto'] ?>" data-detalle="<?= $detalleJson ?>" title="Ver detalles" aria-label="Ver detalles">
-                                                <i class="fas fa-eye"></i><?= $totalPujas === 0 ? '' : ' Ver detalles' ?>
-                                            </button>
-                                            <?php if ($totalPujas === 0): ?>
-                                                <button type="button" class="btn btn-eliminar-producto btn-sm flex-grow-1 btn-cancelar-solicitud" data-id-subasta="<?= $idSubasta ?>" data-url="<?= BASE_URL ?>controllers/ControllerProducto.php" data-nombre="<?= htmlspecialchars($item['nombre']) ?>">
+
+                                            <?php elseif ($estadoNorm === 'pendiente'): // En revisión: cancelar, ver, modificar, eliminar ?>
+                                                <button type="button" class="btn btn-eliminar-producto btn-sm flex-grow-1 btn-cancelar-solicitud"
+                                                    data-id-subasta="<?= $idSubasta ?>"
+                                                    data-url="<?= BASE_URL ?>controllers/ControllerProducto.php"
+                                                    data-nombre="<?= htmlspecialchars($item['nombre']) ?>">
                                                     <i class="fas fa-times"></i> Cancelar solicitud
                                                 </button>
-                                            <?php endif; ?>
-                                        <?php elseif ($estadoNorm === 'activa' || $estadoNorm === 'abierta'): // Activa: ver subasta pública y ver detalles (sin editar ni eliminar) ?>
-                                            <a href="<?= BASE_URL ?>views/subasta.php?id=<?= $idSubasta ?>" class="btn btn-subastar-producto btn-sm flex-grow-1">
-                                                <i class="fas fa-gavel"></i> Ver subasta
-                                            </a>
-                                            <button type="button" class="btn btn-modificar-producto btn-sm btn-accion-icon btn-ver-detalle" data-id-producto="<?= (int)$item['id_producto'] ?>" data-detalle="<?= $detalleJson ?>" title="Ver detalles" aria-label="Ver detalles">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        <?php elseif (in_array($estadoNorm, ['rechazada', 'cancelada', 'sin_ofertas'], true)): // Rechazada/Cancelada/Sin ofertas: reenviar o resubastar, ver detalles y modificar ?>
-                                            <button
-                                                type="button"
-                                                class="btn btn-subastar-producto btn-sm flex-grow-1 btn-abrir-subasta"
-                                                data-id-producto="<?= (int)$item['id_producto'] ?>"
-                                                data-nombre="<?= htmlspecialchars($item['nombre']) ?>"
-                                                data-estado-anterior="<?= htmlspecialchars($estadoNorm) ?>"
-                                                data-motivo-rechazo="<?= htmlspecialchars($motivoRechazo) ?>">
-                                                <i class="fas fa-redo"></i> <?= $estadoNorm === 'rechazada' ? 'Reenviar' : 'Resubastar' ?>
-                                            </button>
-                                            <button type="button" class="btn btn-modificar-producto btn-sm btn-accion-icon btn-ver-detalle" data-id-producto="<?= (int)$item['id_producto'] ?>" data-detalle="<?= $detalleJson ?>" title="Ver detalles" aria-label="Ver detalles">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <a href="<?= BASE_URL ?>views/subastas/registro-producto.php?id=<?= (int)$item['id_producto'] ?>" class="btn btn-modificar-producto btn-sm btn-accion-icon" title="Modificar" aria-label="Modificar">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                        <?php else: // Finalizada u otro estado cerrado: solo ver detalles ?>
-                                            <button type="button" class="btn btn-modificar-producto btn-sm flex-grow-1 btn-ver-detalle" data-id-producto="<?= (int)$item['id_producto'] ?>" data-detalle="<?= $detalleJson ?>">
-                                                <i class="fas fa-eye"></i> Ver detalles
-                                            </button>
-                                        <?php endif; ?>
-                                    </div>
 
-                                </div>
+                                            <?php elseif ($estadoNorm === 'activa'): // En subasta: ver subasta y ver detalles ?>
+                                                <a href="<?= BASE_URL ?>views/subasta.php?id=<?= $idSubasta ?>" class="btn btn-subastar-producto btn-sm flex-grow-1">
+                                                    <i class="fas fa-gavel"></i> Ver subasta
+                                                </a>
+
+                                            <?php elseif (in_array($estadoNorm, ['rechazada', 'cancelada', 'sin_ofertas'], true)): // Reenviar/resubastar, ver, modificar, eliminar ?>
+                                                <button type="button" class="btn btn-subastar-producto btn-sm flex-grow-1 btn-abrir-subasta"
+                                                    data-id-producto="<?= (int)$item['id_producto'] ?>"
+                                                    data-nombre="<?= htmlspecialchars($item['nombre']) ?>"
+                                                    data-estado-anterior="<?= htmlspecialchars($estadoNorm) ?>"
+                                                    data-motivo-rechazo="<?= htmlspecialchars($motivoRechazo) ?>">
+                                                    <i class="fas fa-redo"></i> <?= $estadoNorm === 'rechazada' ? 'Reenviar' : 'Resubastar' ?>
+                                                </button>
+
+                                            <?php else: // Finalizada: solo ver detalles ?>
+                                                <button type="button" class="btn btn-modificar-producto btn-sm flex-grow-1 btn-ver-detalle" data-detalle="<?= $detalleJson ?>">
+                                                    <i class="fas fa-eye"></i> Ver detalles
+                                                </button>
+                                            <?php endif; ?>
+
+                                            <?php if ($estadoNorm !== 'finalizada'): // Ojito en todos menos finalizada (ya lo tiene a lo ancho) ?>
+                                                <button type="button" class="btn btn-modificar-producto btn-sm btn-accion-icon btn-ver-detalle" data-detalle="<?= $detalleJson ?>" title="Ver detalles" aria-label="Ver detalles">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            <?php endif; ?>
+
+                                            <?php if (!in_array($estadoNorm, ['activa', 'finalizada'], true)): // Modificar y eliminar: bloqueados solo en activa y finalizada ?>
+                                                <a href="<?= BASE_URL ?>views/subastas/registro-producto.php?id=<?= (int)$item['id_producto'] ?>" class="btn btn-modificar-producto btn-sm btn-accion-icon" title="Modificar" aria-label="Modificar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <form action="<?= BASE_URL ?>controllers/ControllerProducto.php?id=<?= (int)$item['id_producto'] ?>" method="POST" class="form-eliminar" data-nombre="<?= htmlspecialchars($item['nombre']) ?>">
+                                                    <input type="hidden" name="opcion" value="eliminar">
+                                                    <button type="submit" class="btn btn-eliminar-producto btn-sm btn-accion-icon" title="Eliminar" aria-label="Eliminar">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            <?php endif; ?>
+                                        </div>
+
+                                    </div>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -250,7 +246,7 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
 
     <?php include __DIR__ . "/partials/modal-detalle-producto.php"; ?>
     <?php include __DIR__ . "/partials/modal-publicar-subasta.php"; ?>
-    <?php include __DIR__ . "/partials/modal-eliminar-producto"; ?>
+    <?php include __DIR__ . "/partials/modal-eliminar-producto.php"; ?>
     <?php include __DIR__ . "/partials/modal-cancelar-solicitud.php"; ?>
     <?php include __DIR__ . "/../Footer/footer.php"; ?>
 
