@@ -99,6 +99,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         datoFechaCierre.textContent = `${fechaFinalComp.fecha.dia}-${fechaFinalComp.fecha.mes}-${fechaFinalComp.fecha.anio}`;
         datoHoraCierre.textContent = `${fechaFinalComp.hora.hora}:${fechaFinalComp.hora.minutos}`;
+
+        const detalleTiempoRestante = document.getElementById("detalle-tiempo-restante");
+        const detalleCountdown = document.getElementById("detalle-countdown");
+        const detalleCierreTexto = document.getElementById("detalle-cierre-texto");
+
+        if (detalleCierreTexto) {
+            detalleCierreTexto.textContent = `Cierra el ${fechaFinalComp.fecha.dia}/${fechaFinalComp.fecha.mes}/${fechaFinalComp.fecha.anio} ${fechaFinalComp.hora.hora}:${fechaFinalComp.hora.minutos}`;
+        }
+        if (detalleTiempoRestante && detalleCountdown) {
+            if (estadoDato !== "activa" || fechaFinalObjeto <= new Date()) {
+                detalleTiempoRestante.textContent = "Finalizada";
+            } else {
+                detalleCountdown.setAttribute("data-countdown", fechaFinalObjeto.toISOString());
+            }
+        }
         montoInput.setAttribute("step", resultado.datos.dato_incremento);
 
         estado.innerHTML = `

@@ -1,17 +1,34 @@
 <?php
+$dirnameMain = dirname(__DIR__, 2);
+require_once $dirnameMain . '/config/env.php';
+require_once dirname(__DIR__,2) . '/controllers/catalogo_controller.php';
 $titulo = "Detalles";
 $pagina = "detalles";
 
-$dirnameMain = dirname(__DIR__, 2);
+$estadoTextos = [
+    'finalizada' => 'Subasta finalizada',
+    'sin_ofertas' => 'Finalizó sin ofertas',
+    'pendiente' => 'En revisión por moderación',
+    'rechazada' => 'No fue aprobada',
+    'cancelada' => 'Subasta cancelada',
+];
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$id || $id < 1) {
     http_response_code(404);
     exit('Subasta no válida');
 }
-
-require_once $dirnameMain . '/config/env.php';
-
+$s = $id > 0 ? obtenerDetalleSubasta($id, (int)($_SESSION["id_usuario"] ?? 0)) : null;
+    if (!$s) {
+        // no existe o no se puede ver
+        require dirname(__DIR__) . '/404.php';
+        exit;
+        }
+        
 if (!function_exists('e')) {
     function e($texto)
     {
@@ -81,6 +98,13 @@ if (!function_exists('e')) {
                                     <div>
                                         <h2 class="h5 text-main-ppi fw-bold mb-0">Pujas realizadas</h2>
                                         <small id="chat-resumen" class="text-second-ppi">0 pujas · 0 postores</small>
+                                    </div>
+                                    <div>
+                                        <span class="d-block small text-second-ppi">Tiempo restante</span>
+                                        <span id="detalle-tiempo-restante" class="d-block h5 mb-0 tiempo-ppi">
+                                            <i class="far fa-clock me-1"></i><span id="detalle-countdown">—</span>
+                                        </span>
+                                        <span id="detalle-cierre-texto" class="small text-second-ppi">Cierra el —</span>
                                     </div>
                                     <span class="status-badge status-activa">
                                         <span class="status-dot"></span>En vivo
@@ -260,6 +284,7 @@ if (!function_exists('e')) {
             ruta_base_img = "<?= BASE_URL ?>uploads/productos/"
     </script>
     <script src="<?= BASE_URL ?>assets/js/toast-ppi.js?v=2"></script>
+    <script src="<?= BASE_URL ?>assets/js/temporizador-subastas.js"></script>
     <script src="<?= BASE_URL ?>assets/js/detalleSubasta.js"></script>
 </body>
 
