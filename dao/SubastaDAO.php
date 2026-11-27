@@ -170,4 +170,75 @@ class SubastaDAO
 
         return sprintf('%02d:%02d:%02d', $horas, $minutos, $segs);
     }
+
+    public function insertarSubasta($precio_inicial, $incremento_minimo, $dias, $id_producto, $id_usuario, $tipo_solicitud = 'nueva', $nota_vendedor = null){
+        try {
+            $this->conexion->begin_transaction();
+            $sqlVerficar="SELECT p.id_producto FROM sb_producto p
+            WHERE p.id_producto = ? AND p.id_usuario = ? AND p.estado=1
+            FOR UPDATE;";
+            $stmt=$this->conexion->prepare($sqlVerficar);
+            $stmt->bind_param("ii", $id_producto, $id_usuario);
+            if (!$stmt->execute()) {
+                throw new RuntimeException('Error al verificar el producto para insertar subasta: ' . $stmt->error);
+            }
+     
+
+            $resultado = $stmt->get_result();
+            $existe = $resultado && $resultado->num_rows > 0;
+            $stmt->close();
+            if(!$existe){
+                $this->conexion->rollback();
+                return ['estado' => false, 'mensaje' => 'El producto no existe o no pertenece al usuario'];
+            }
+
+            //Por si un usuario mañoso abre 2 pestañas ytrata de insertar 2 subastasas
+            $sqlAbierta = "SELECT 1 FROM sb_subasta WHERE id_producto = ? AND estado IN ('pendiente', 'activa', 'finalizada') LIMIT 1;";
+            $stmt = $this->conexion->prepare($sqlAbierta);
+            $stmt->bind_param("i", $id_producto);
+            $stmt->execute();
+            $yaTiene = $stmt->get_result()->num_rows > 0;
+            $stmt->close();
+
+            if ($yaTiene) {
+                $this->conexion->rollback();
+                return ['estado' => false, 'mensaje' => 'Este producto ya tiene una subasta en revisión, activa o finalizada.'];
+            }
+
+            $sqlUltima = "SELECT estado FROM sb_subasta WHERE id_producto = ? ORDER BY id_subasta DESC LIMIT 1;";
+            $stmt = $this->conexion->prepare($sqlUltima);
+            $stmt->bind_param("i", $id_producto);
+            $stmt->execute();
+            $ultima = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+
+            $estadoAnterior = $ultima['estado'] ?? null;
+
+            if ($estadoAnterior === null) {
+                $tipo_solicitud = 'nueva';
+            } elseif ($estadoAnterior === 'rechazada') {
+                if ($tipo_solicitud !== 'apelacion') {
+                    $tipo_solicitud = 'reenvio';
+                }
+            } else {
+                $tipo_solicitud = 'reenvio';
+            }
+
+            $sql="INSERT INTO sb_subasta (precio_inicial, incremento_minimo, fecha_inicial, fecha_final, id_producto, tipo_solicitud, nota_vendedor)
+            VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL ? DAY), ?, ?, ?);";
+            $stmt=$this->conexion->prepare($sql);
+            $stmt->bind_param("ddiiss", $precio_inicial, $incremento_minimo, $dias, $id_producto, $tipo_solicitud, $nota_vendedor);
+            if (!$stmt->execute()) {
+                throw new RuntimeException('Error al crear la subasta: ' . $stmt->error);
+            }
+            $stmt->close();
+            $this->conexion->commit();
+            return ['estado' => true, 'mensaje' => 'Subasta creada con éxito'];
+        } catch (Throwable $e) {
+            error_log($e->getMessage());
+            $this->conexion->rollback();
+            return ['estado' => false, 'mensaje' => 'No se pudo crear la subasta'];
+        }
+    }
+
 }

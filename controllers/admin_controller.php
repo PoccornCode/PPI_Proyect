@@ -180,7 +180,68 @@ function obtenerDetalleUsuarioAdmin(int $idUsuario, int $idAdminActual = 0): ?ar
 function obtenerCategoriasAdmin(): array
 {
     $dao = new CategoriaDAO();
-    return $dao->listarCategorias();
+    return $dao->listarCategoriasAdmin();
+}
+
+function cambiarEstadoCategoriaAdmin(int $idCategoria, ?int $nuevoEstado = null): array
+{
+    $modDao = new ModeradorDAO();
+    $modDao->inactivarSubastasVencidas();
+
+    $dao = new CategoriaDAO();
+    return $dao->cambiarEstadoCategoria($idCategoria, $nuevoEstado);
+}
+
+function guardarImagenCategoriaAdmin(?array $archivo): array
+{
+    if (!$archivo || !isset($archivo['error']) || (int)$archivo['error'] === UPLOAD_ERR_NO_FILE) {
+        return ['estado' => true, 'ruta' => '', 'subida' => false];
+    }
+
+    if ((int)$archivo['error'] !== UPLOAD_ERR_OK) {
+        return ['estado' => false, 'mensaje' => 'No se pudo recibir la imagen seleccionada.'];
+    }
+
+    $maxBytes = 5 * 1024 * 1024;
+    if ((int)($archivo['size'] ?? 0) > $maxBytes) {
+        return ['estado' => false, 'mensaje' => 'La imagen supera el tamaño máximo permitido (5 MB).'];
+    }
+
+    $tmpPath = (string)($archivo['tmp_name'] ?? '');
+    if ($tmpPath === '' || !is_uploaded_file($tmpPath)) {
+        return ['estado' => false, 'mensaje' => 'El archivo de imagen no es válido.'];
+    }
+
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime = (string)$finfo->file($tmpPath);
+    $extensiones = [
+        'image/jpeg' => 'jpg',
+        'image/png'  => 'png',
+        'image/webp' => 'webp',
+    ];
+
+    if (!isset($extensiones[$mime])) {
+        return ['estado' => false, 'mensaje' => 'Formato no permitido. Usa JPG, PNG o WEBP.'];
+    }
+
+    $dirDestino = dirname(__DIR__) . '/uploads/categorias';
+    if (!is_dir($dirDestino) && !mkdir($dirDestino, 0775, true) && !is_dir($dirDestino)) {
+        return ['estado' => false, 'mensaje' => 'No se pudo preparar la carpeta de imágenes de categorías.'];
+    }
+
+    $nombreArchivo = 'cat_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $extensiones[$mime];
+    $rutaFisica = $dirDestino . '/' . $nombreArchivo;
+
+    if (!move_uploaded_file($tmpPath, $rutaFisica)) {
+        return ['estado' => false, 'mensaje' => 'No se pudo guardar la imagen en el servidor.'];
+    }
+
+    return [
+        'estado'      => true,
+        'ruta'        => 'uploads/categorias/' . $nombreArchivo,
+        'ruta_fisica' => $rutaFisica,
+        'subida'      => true,
+    ];
 }
 
 function obtenerSubastasAdmin(string $baseUrl = ''): array
@@ -548,6 +609,159 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
 
         if (empty($res['estado'])) {
             http_response_code(422);
+        }
+
+        echo json_encode($res, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'categorias') {
+        $categorias = obtenerCategoriasAdmin();
+        echo json_encode([
+            'estado'     => true,
+            'categorias' => $categorias,
+            'resumen'    => [
+                'total'        => count($categorias),
+                'publicadas'   => count(array_filter($categorias, fn($c) => (int)$c['estado'] === 1)),
+                'desactivadas' => count(array_filter($categorias, fn($c) => (int)$c['estado'] === 0)),
+            ],
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'categoria_crear') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'Método no permitido.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $nombre = trim((string)($_POST['nombre'] ?? ''));
+        $descripcion = trim((string)($_POST['descripcion'] ?? ''));
+        $estado = (isset($_POST['estado']) && (string)$_POST['estado'] === '1') ? 1 : 0;
+
+        $dao = new CategoriaDAO();
+        $validacion = $dao->validarDatosCategoria($nombre, $descripcion);
+        if (empty($validacion['estado'])) {
+            http_response_code(422);
+            echo json_encode($validacion, JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $imgRes = guardarImagenCategoriaAdmin($_FILES['imagen'] ?? null);
+        if (empty($imgRes['estado'])) {
+            http_response_code(422);
+            echo json_encode([
+                'estado'  => false,
+                'campo'   => 'imagen',
+                'mensaje' => $imgRes['mensaje'] ?? 'Imagen no válida.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $res = $dao->crearCategoria($nombre, $descripcion, (string)($imgRes['ruta'] ?? ''), $estado);
+        if (empty($res['estado'])) {
+            if (!empty($imgRes['subida']) && !empty($imgRes['ruta_fisica']) && is_file($imgRes['ruta_fisica'])) {
+                @unlink($imgRes['ruta_fisica']);
+            }
+            http_response_code(422);
+        }
+
+        echo json_encode($res, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'categoria_actualizar') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'Método no permitido.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $idCategoria = (int)($_POST['id_categoria'] ?? 0);
+        $nombre = trim((string)($_POST['nombre'] ?? ''));
+        $descripcion = trim((string)($_POST['descripcion'] ?? ''));
+        $estado = (isset($_POST['estado']) && (string)$_POST['estado'] === '1') ? 1 : 0;
+
+        if ($idCategoria <= 0) {
+            http_response_code(400);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'ID de categoría no válido.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $modDao = new ModeradorDAO();
+        $modDao->inactivarSubastasVencidas();
+
+        $dao = new CategoriaDAO();
+        $validacion = $dao->validarDatosCategoria($nombre, $descripcion, $idCategoria);
+        if (empty($validacion['estado'])) {
+            http_response_code(422);
+            echo json_encode($validacion, JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $imgRes = guardarImagenCategoriaAdmin($_FILES['imagen'] ?? null);
+        if (empty($imgRes['estado'])) {
+            http_response_code(422);
+            echo json_encode([
+                'estado'  => false,
+                'campo'   => 'imagen',
+                'mensaje' => $imgRes['mensaje'] ?? 'Imagen no válida.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $nuevaRuta = !empty($imgRes['subida']) ? (string)$imgRes['ruta'] : null;
+        $res = $dao->actualizarCategoria($idCategoria, $nombre, $descripcion, $nuevaRuta, $estado);
+
+        if (empty($res['estado'])) {
+            if (!empty($imgRes['subida']) && !empty($imgRes['ruta_fisica']) && is_file($imgRes['ruta_fisica'])) {
+                @unlink($imgRes['ruta_fisica']);
+            }
+            http_response_code(!empty($res['bloqueado']) ? 409 : 422);
+        } elseif (!empty($imgRes['subida']) && !empty($res['imagen_anterior'])) {
+            $anterior = ltrim((string)$res['imagen_anterior'], '/');
+            if (strpos($anterior, 'uploads/categorias/') === 0) {
+                $rutaAnteriorFisica = dirname(__DIR__) . '/' . $anterior;
+                if (is_file($rutaAnteriorFisica)) {
+                    @unlink($rutaAnteriorFisica);
+                }
+            }
+        }
+
+        unset($res['imagen_anterior']);
+        echo json_encode($res, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'categoria_cambiar_estado') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'Método no permitido.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $idCategoria = (int)($_POST['id_categoria'] ?? 0);
+        $nuevoEstado = isset($_POST['estado']) && $_POST['estado'] !== ''
+            ? ((int)$_POST['estado'] === 1 ? 1 : 0)
+            : null;
+
+        $res = cambiarEstadoCategoriaAdmin($idCategoria, $nuevoEstado);
+        if (empty($res['estado'])) {
+            $codigo = !empty($res['bloqueado']) ? 409 : ($idCategoria <= 0 ? 400 : 422);
+            http_response_code($codigo);
         }
 
         echo json_encode($res, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

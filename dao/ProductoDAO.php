@@ -74,12 +74,18 @@
         $sql = "SELECT p.id_producto, p.nombre, p.descripcion, p.condicion, p.estado,
                     c.nombre AS categoria,
                     img.ruta AS imagen_principal,
-                    s.id_subasta, s.estado AS estado_subasta, s.precio_inicial, s.fecha_inicial, s.fecha_final
+                    s.id_subasta, s.estado AS estado_subasta, s.precio_inicial, s.fecha_inicial, s.fecha_final, s.motivo_rechazo,
+                    (SELECT COUNT(*) FROM sb_puja pu WHERE pu.id_subasta = s.id_subasta) AS total_pujas
                 FROM sb_producto p
                 LEFT JOIN sb_categoria c ON p.id_categoria = c.id_categoria
                 LEFT JOIN sb_imagen_producto img ON p.id_producto = img.id_producto AND img.principal = 1
-                LEFT JOIN sb_subasta s ON p.id_producto = s.id_producto
-                WHERE p.id_usuario = ?
+                LEFT JOIN (
+                    SELECT id_producto, MAX(id_subasta) AS id_ultima
+                    FROM sb_subasta
+                    GROUP BY id_producto
+                ) u ON u.id_producto = p.id_producto
+                LEFT JOIN sb_subasta s ON s.id_subasta = u.id_ultima
+                WHERE p.id_usuario = ? AND p.estado= 1
                 ORDER BY p.id_producto DESC";
 
         $stmt = $conexion->prepare($sql);
@@ -95,8 +101,10 @@
     }
 
     function obtenerProductoPorId($conexion, $id_producto, $id_usuario){
-        $sql = "SELECT id_producto, nombre, descripcion, condicion, estado, id_categoria
-        FROM sb_producto WHERE id_producto = ? AND id_usuario = ?;";
+        $sql = "SELECT p.id_producto, p.nombre, p.descripcion, p.condicion, p.estado, p.id_categoria, img.ruta AS imagen_principal
+        FROM sb_producto p LEFT JOIN sb_imagen_producto img ON img.id_producto = p.id_producto AND img.principal = 1
+        WHERE p.id_producto = ? AND p.id_usuario = ? AND p.estado = 1
+        LIMIT 1;";
 
         $stmt = $conexion->prepare($sql);
         $stmt->bind_param("ii", $id_producto, $id_usuario);
@@ -135,7 +143,7 @@
         try{
             $conexion->begin_transaction();
 
-            $sqlVerificar= "SELECT 1 FROM sb_producto WHERE id_producto = ? AND id_usuario=? FOR UPDATE;";
+            $sqlVerificar= "SELECT 1 FROM sb_producto WHERE id_producto = ? AND id_usuario=? AND estado = 1 FOR UPDATE;";
             $stmt= $conexion->prepare($sqlVerificar);
             $stmt->bind_param("ii", $id_producto, $id_usuario);
 
@@ -156,6 +164,15 @@
             }
 
             $stmt->close(); 
+
+            if (tieneSubastaEn($conexion, $id_producto, ['activa', 'finalizada'])) {
+                $conexion->rollback();
+                foreach ($rutasNuevas as $ruta) {
+                    @unlink(__DIR__ . '/../uploads/productos/' . $ruta);
+                }
+                return ['estado' => false, 'mensaje' => 'No puedes modificar un producto que está en subasta o ya fue vendido.'];
+            }
+             
             $sql= "UPDATE sb_producto
             SET nombre = ?, descripcion = ?, condicion = ?, id_categoria = ?
             WHERE id_producto = ? AND id_usuario = ?;";
@@ -168,8 +185,18 @@
             }
             $stmt->close();
 
-            //Actualizar imagenes 
             $rutasBorradas=actualizarImagenes($conexion, $id_producto, $rutasNuevas, $idrutasEliminar);
+
+            //Actualizar imagenes 
+            $total = contarImagenes($conexion, $id_producto);
+            if ($total < 1 || $total > 5) {
+                $conexion->rollback();
+                foreach ($rutasNuevas as $ruta) {
+                    @unlink(__DIR__ . '/../uploads/productos/' . $ruta);
+                }
+                return ['estado' => false, 'mensaje' => 'El producto debe tener entre 1 y 5 fotografías.'];
+            }
+
             $conexion->commit();
 
             foreach ($rutasBorradas as $ruta) {
@@ -264,7 +291,7 @@
     function eliminar($conexion, $id_producto, $id_usuario) {
         try {
             $conexion->begin_transaction();
-            $sql="SELECT 1 FROM sb_producto WHERE id_producto=? AND id_usuario=?";
+            $sql="SELECT 1 FROM sb_producto WHERE id_producto=? AND id_usuario=? AND estado = 1 FOR UPDATE";
             $stmt=$conexion->prepare($sql);
             $stmt->bind_param("ii", $id_producto, $id_usuario);
             if(!$stmt->execute()){
@@ -277,22 +304,34 @@
             }
 
             $stmt->close();
+            if (tieneSubastaEn($conexion, $id_producto, ['activa', 'finalizada'])) {
+                $conexion->rollback();
+                return ['estado' => false, 'mensaje' => 'No puedes eliminar un producto que está en subasta o ya fue vendido.'];
+            }
+            
+            $sqlCancelar = "UPDATE sb_subasta SET estado = 'cancelada' WHERE id_producto = ? AND estado = 'pendiente';";
+            $stmt = $conexion->prepare($sqlCancelar);
+            $stmt->bind_param("i", $id_producto);
+            if (!$stmt->execute()) {
+                throw new RuntimeException('Error al cancelar la subasta pendiente: ' . $stmt->error);
+            }
+            $stmt->close();
 
             $imagenes=obtenerImagenesProducto($conexion, $id_producto);
             eliminarImagenes($conexion, $id_producto);
 
-            $sqlEliminar="DELETE FROM sb_producto WHERE id_producto = ? AND id_usuario = ?;";
-            $stmt=$conexion->prepare($sqlEliminar);
+            $sqlEliminar = "UPDATE sb_producto SET estado = 0 WHERE id_producto = ? AND id_usuario = ?;";
+            $stmt = $conexion->prepare($sqlEliminar);
             $stmt->bind_param("ii", $id_producto, $id_usuario);
 
-            if(!$stmt->execute()){
+            if (!$stmt->execute()) {
                 throw new RuntimeException('Error al eliminar el producto: ' . $stmt->error);
-            } 
+            }
 
             if ($stmt->affected_rows === 0) {
-                throw new RuntimeException('El producto no existe o no pertenece al usuario');
+                throw new RuntimeException('El producto ya estaba eliminado');
             }
-            
+
             $stmt->close();
             $conexion->commit();
 
@@ -320,4 +359,56 @@
         $stmt->close();
     }
 
+    function cancelarSolicitud($conexion, $id_subasta, $id_usuario){
+        try {
+            $conexion->begin_transaction();
+            $sql= "UPDATE sb_subasta s
+            INNER JOIN sb_producto p ON p.id_producto = s.id_producto
+            SET s.estado = 'cancelada'
+            WHERE s.id_subasta = ? AND p.id_usuario = ? AND p.estado = 1
+            AND s.estado = 'pendiente'
+            AND NOT EXISTS (SELECT 1 FROM sb_puja pu WHERE pu.id_subasta = s.id_subasta);";
+            $stmt=$conexion->prepare($sql);
+            $stmt->bind_param("ii", $id_subasta, $id_usuario);
 
+            if(!$stmt->execute()){
+                throw new RuntimeException('Error al cancelar la subasta: ' . $stmt->error);
+            }  
+            $filasAfectadas=$stmt->affected_rows;
+            $stmt->close();
+            
+            if ($filasAfectadas === 0) {
+                throw new RuntimeException('Esta solicitud ya no se puede cancelar');
+            }
+
+            
+            $conexion->commit();
+            return ['estado' => true, 'mensaje' => 'Solicitud cancelada exitosamente'];
+        } catch (\Throwable $th) {
+            $conexion->rollback();
+            error_log($th->getMessage());
+             return ['estado' => false, 'mensaje' => 'No se pudo cancelar la subasta'];
+        }
+    }
+
+    function contarImagenes($conexion, $id_producto) {
+        $sql = "SELECT COUNT(*) AS total FROM sb_imagen_producto WHERE id_producto = ?;";
+        $stmt = $conexion->prepare($sql);
+        $stmt->bind_param("i", $id_producto);
+        $stmt->execute();
+        $total = (int)$stmt->get_result()->fetch_assoc()['total'];
+        $stmt->close();
+        return $total;
+    }
+
+    function tieneSubastaEn($conexion, $id_producto, array $estados) {
+        $marcas = implode(',', array_fill(0, count($estados), '?'));
+        $sql = "SELECT 1 FROM sb_subasta WHERE id_producto = ? AND estado IN ($marcas) LIMIT 1;";
+        $stmt = $conexion->prepare($sql);
+        $tipos = 'i' . str_repeat('s', count($estados));
+        $stmt->bind_param($tipos, $id_producto, ...$estados);
+        $stmt->execute();
+        $tiene = $stmt->get_result()->num_rows > 0;
+        $stmt->close();
+        return $tiene;
+    }

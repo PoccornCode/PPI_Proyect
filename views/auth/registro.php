@@ -160,7 +160,7 @@ $pagina = "registro";
     <?php include "../Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/registro.js?v=15"></script>
+    <script src="<?= BASE_URL ?>assets/js/registro.js?v=16"></script>
 </body>
 
 </html>

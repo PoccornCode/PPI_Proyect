@@ -153,7 +153,7 @@ if (!empty($_SESSION['id_usuario'])) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>assets/js/toast-ppi.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/contacto.js"></script>
+    <script src="<?= BASE_URL ?>assets/js/contacto.js?v=2"></script>
 </body>
 
 </html>

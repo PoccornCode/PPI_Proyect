@@ -75,8 +75,8 @@ $base_url = BASE_URL;
                 <p class="legal-text">
                     Gavel.net opera como punto de encuentro tecnológico para la gestión de subastas. No asume responsabilidad directa por acuerdos externos realizados fuera de las herramientas del sistema o por fallos en servicios de conectividad ajenos a la plataforma.
                 </p>
-                <div class="pt-3 pb-5">
-                    <a href="<?= $base_url ?>views/legal/privacidad.php" class="btn btn-outline-publish px-4 py-2 fw-semibold me-2">
+                <div class="pt-3 pb-5 d-flex flex-wrap gap-3">
+                    <a href="<?= $base_url ?>views/legal/privacidad.php" class="btn btn-outline-publish px-4 py-2 fw-semibold">
                         Ver Política de Privacidad
                     </a>
                     <a href="<?= $base_url ?>views/como-funciona.php" class="btn btn-dark border-secondary px-4 py-2 text-light">
