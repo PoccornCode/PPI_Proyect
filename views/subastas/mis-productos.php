@@ -63,7 +63,7 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                     <h2 class="text-main-ppi fw-bold mb-1">Mis Productos</h2>
                     <p class="text-second-ppi small mb-0">Gestiona tus productos registrados y publícalos en subasta.</p>
                 </div>
-                <a href="<?= BASE_URL ?>views/subastas/registro-producto.php" class="btn btn-outline-publish btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2">
+                <a href="<?= BASE_URL ?>views/subastas/registro-producto.php?origen=mis-productos" class="btn btn-outline-publish btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2">
                     <i class="fas fa-plus"></i> Registrar Nuevo Producto
                 </a>
             </div>
@@ -77,7 +77,7 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                     <p class="text-second-ppi small mb-4 mx-auto" style="max-width: 480px;">
                         Comienza publicando los detalles de tu producto (fotografías, descripción y condición). Luego podrás programar su subasta y enviarla a revisión.
                     </p>
-                    <a href="<?= BASE_URL ?>views/subastas/registro-producto.php" class="btn btn-primary px-4 py-2 fw-semibold">
+                    <a href="<?= BASE_URL ?>views/subastas/registro-producto.php?origen=mis-productos" class="btn btn-primary px-4 py-2 fw-semibold">
                         <i class="fas fa-plus me-1"></i> Publicar mi primer producto
                     </a>
                 </div>
