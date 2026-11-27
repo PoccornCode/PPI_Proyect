@@ -196,7 +196,7 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
             <?php endif; ?>
 
             <?php if ($esAdmin): ?>
-                <!-- amnin redirecciones links -->
+                <!-- admin: resumen + accesos rapidos al dashboard,,, se abren con el #hash -->
                 <section aria-labelledby="titulo-admin">
                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
                         <h2 id="titulo-admin" class="fs-4 fw-bold text-main-ppi mb-0">Administración</h2>
@@ -205,34 +205,38 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                         </a>
                     </div>
                     <div class="row g-3">
-                        <div class="col-6 col-lg-3">
-                            <div class="perfil-acceso">
+                        <div class="col-12 col-md-4">
+                            <a href="<?= e($urlPanelAdmin) ?>#usuarios" class="perfil-acceso">
                                 <span class="perfil-acceso-valor"><?= $usuariosAdmin['total'] ?></span>
-                                <span class="perfil-acceso-titulo">Usuarios</span>
+                                <span class="perfil-acceso-titulo d-flex justify-content-between align-items-center">Usuarios <i class="fas fa-arrow-right perfil-acceso-ir"></i></span>
                                 <span class="perfil-acceso-detalle">Registrados en la plataforma</span>
-                            </div>
-                        </div>
-                        <div class="col-6 col-lg-3">
-                            <div class="perfil-acceso">
-                                <span class="perfil-acceso-valor"><?= $usuariosAdmin['moderadores'] ?></span>
-                                <span class="perfil-acceso-titulo">Moderadores</span>
-                                <span class="perfil-acceso-detalle">Con acceso al panel</span>
-                            </div>
-                        </div>
-                        <div class="col-6 col-lg-3">
-                            <div class="perfil-acceso">
-                                <span class="perfil-acceso-valor"><?= $usuariosAdmin['sin_verificar'] ?></span>
-                                <span class="perfil-acceso-titulo">Sin verificar</span>
-                                <span class="perfil-acceso-detalle">Cuentas pendientes de código</span>
-                            </div>
-                        </div>
-                        <div class="col-6 col-lg-3">
-                            <a href="#" class="perfil-acceso" data-proximamente="Gestión de usuarios">
-                                <span class="perfil-acceso-valor"><i class="fas fa-users-cog"></i></span>
-                                <span class="perfil-acceso-titulo">Gestión de usuarios</span>
-                                <span class="perfil-acceso-detalle">Roles y estado de cuentas</span>
                             </a>
                         </div>
+                        <div class="col-12 col-md-4">
+                            <a href="<?= e($urlPanelAdmin) ?>#usuarios" class="perfil-acceso">
+                                <span class="perfil-acceso-valor"><?= $usuariosAdmin['moderadores'] ?></span>
+                                <span class="perfil-acceso-titulo d-flex justify-content-between align-items-center">Moderadores <i class="fas fa-arrow-right perfil-acceso-ir"></i></span>
+                                <span class="perfil-acceso-detalle">Con acceso al panel</span>
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <a href="<?= e($urlPanelAdmin) ?>#usuarios" class="perfil-acceso <?= $usuariosAdmin['sin_verificar'] > 0 ? 'perfil-acceso-alerta' : '' ?>">
+                                <span class="perfil-acceso-valor"><?= $usuariosAdmin['sin_verificar'] ?></span>
+                                <span class="perfil-acceso-titulo d-flex justify-content-between align-items-center">Sin verificar <i class="fas fa-arrow-right perfil-acceso-ir"></i></span>
+                                <span class="perfil-acceso-detalle">Cuentas pendientes de código</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <p class="perfil-rapidos-titulo">Accesos rápidos</p>
+                    <div class="perfil-rapidos">
+                        <a href="<?= e($urlPanelAdmin) ?>#usuarios" class="perfil-rapido"><i class="fas fa-users-cog"></i>Gestionar usuarios</a>
+                        <a href="<?= e($urlPanelModeracion) ?>" class="perfil-rapido">
+                            <i class="fas fa-clipboard-check"></i>Revisar pendientes
+                            <?php if ($moderacion['pendientes'] > 0): ?><span class="perfil-rapido-badge"><?= $moderacion['pendientes'] ?></span><?php endif; ?>
+                        </a>
+                        <a href="<?= e($urlPanelAdmin) ?>#categorias" class="perfil-rapido"><i class="fas fa-th-large"></i>Categorías</a>
+                        <a href="<?= e($urlPanelAdmin) ?>#reportes" class="perfil-rapido"><i class="fas fa-chart-bar"></i>Reportes</a>
                     </div>
                 </section>
             <?php endif; ?>
@@ -248,9 +252,11 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                     </div>
                     <div class="row g-3">
                         <div class="col-12 col-md-4">
-                            <a href="<?= e($urlPanelModeracion) ?>" class="perfil-acceso" title="Abrir panel de moderación">
+                            <a href="<?= e($urlPanelModeracion) ?>" class="perfil-acceso <?= $moderacion['pendientes'] > 0 ? 'perfil-acceso-alerta' : '' ?>"  
+                            title="Abrir panel de moderación">
                                 <span class="perfil-acceso-valor"><?= $moderacion['pendientes'] ?></span>
-                                <span class="perfil-acceso-titulo">Por revisar</span>
+                                <span class="perfil-acceso-titulo d-flex justify-content-between align-items-center">Por revisar 
+                                    <i class="fas fa-arrow-right perfil-acceso-ir"></i></span>
                                 <span class="perfil-acceso-detalle">Solicitudes esperando decisión</span>
                             </a>
                         </div>

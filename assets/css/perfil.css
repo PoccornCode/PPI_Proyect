@@ -186,3 +186,53 @@ a.perfil-subasta:focus {
     object-fit: cover;
     background-color: #151813;
 }
+
+/* accesos rapidos del admin */
+.perfil-rapidos-titulo {
+    margin: 1.5rem 0 .75rem;
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: #a7a59d;
+}
+
+.perfil-rapidos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+}
+
+.perfil-rapido {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .65rem 1.1rem;
+    font-size: .9rem;
+    font-weight: 600;
+    color: #c9c9c9;
+    text-decoration: none;
+    background-color: #0f110e;
+    border: 1px solid #23271f;
+    border-radius: 999px;
+    transition: border-color .2s ease-in-out, color .2s ease-in-out;
+}
+
+.perfil-rapido i {
+    color: #94aa34;
+}
+
+.perfil-rapido:hover,
+.perfil-rapido:focus {
+    color: #94aa34;
+    border-color: #658807;
+}
+
+.perfil-rapido-badge {
+    padding: 0 .5rem;
+    font-size: .75rem;
+    font-weight: 800;
+    color: #080708;
+    background-color: #94aa34;
+    border-radius: 999px;
+}
