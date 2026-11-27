@@ -228,16 +228,7 @@ $urlPanelAdmin = BASE_URL . 'views/admin/dashboard.php';
                         </div>
                     </div>
 
-                    <p class="perfil-rapidos-titulo">Accesos rápidos</p>
-                    <div class="perfil-rapidos">
-                        <a href="<?= e($urlPanelAdmin) ?>#usuarios" class="perfil-rapido"><i class="fas fa-users-cog"></i>Gestionar usuarios</a>
-                        <a href="<?= e($urlPanelModeracion) ?>" class="perfil-rapido">
-                            <i class="fas fa-clipboard-check"></i>Revisar pendientes
-                            <?php if ($moderacion['pendientes'] > 0): ?><span class="perfil-rapido-badge"><?= $moderacion['pendientes'] ?></span><?php endif; ?>
-                        </a>
-                        <a href="<?= e($urlPanelAdmin) ?>#categorias" class="perfil-rapido"><i class="fas fa-th-large"></i>Categorías</a>
-                        <a href="<?= e($urlPanelAdmin) ?>#reportes" class="perfil-rapido"><i class="fas fa-chart-bar"></i>Reportes</a>
-                    </div>
+                    
                 </section>
             <?php endif; ?>
 
