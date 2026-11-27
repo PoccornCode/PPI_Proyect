@@ -981,6 +981,7 @@ $resumen_categorias = [
     <?php include __DIR__ . '/partials/modal-agregar-usuario.php'; ?>
     <?php include __DIR__ . '/partials/modal-detalle-usuario.php'; ?>
     <?php include __DIR__ . '/partials/modal-editar-usuario.php'; ?>
+    <?php include __DIR__ . '/partials/modal-detalle-producto.php'; ?>
     <?php include __DIR__ . '/partials/modal-detalle-subasta.php'; ?>
     <?php include __DIR__ . '/partials/modal-confirmar-subasta.php'; ?>
     <?php include __DIR__ . '/partials/modal-editar-estado-subasta.php'; ?>
@@ -1002,6 +1003,7 @@ $resumen_categorias = [
     <script src="<?= $base_url ?>assets/js/admin-usuarios.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-usuarios.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-usuario-agregar.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-usuario-agregar.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-productos.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-productos.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/admin-producto-detalle.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-producto-detalle.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-subastas.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-subastas.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-subasta-detalle.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-subasta-detalle.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-subasta-estado.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-subasta-estado.js') ?>"></script>
