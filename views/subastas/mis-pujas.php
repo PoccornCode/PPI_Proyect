@@ -69,7 +69,7 @@ $mostrar = $filtro === '' ? $pujas : array_filter($pujas, function ($p) use ($fi
     <link href="<?= BASE_URL ?>assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/main.css?v=40" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/mis-pujas.css?v=1" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/mis-pujas.css?v=4" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi d-flex flex-column min-vh-100">
@@ -104,10 +104,10 @@ $mostrar = $filtro === '' ? $pujas : array_filter($pujas, function ($p) use ($fi
 
                 <!-- pestanas por resultado -->
                 <nav class="mis-pujas-tabs d-flex flex-wrap gap-2 mb-4" aria-label="Filtrar pujas">
-                    <a href="<?= BASE_URL ?>views/subastas/mis-pujas.php" class="mis-pujas-tab <?= $filtro === '' ? 'activa' : '' ?>">Todas <span><?= count($pujas) ?></span></a>
+                    <a href="<?= BASE_URL ?>views/subastas/mis-pujas.php" class="mis-pujas-tab <?= $filtro === '' ? 'activa' : '' ?>">Todas <span data-tab-count="todas"><?= count($pujas) ?></span></a>
                     <?php foreach ($resultados as $clave => $info): ?>
                         <?php if (!empty($conteo[$clave])): ?>
-                            <a href="<?= BASE_URL ?>views/subastas/mis-pujas.php?estado=<?= e($clave) ?>" class="mis-pujas-tab <?= $filtro === $clave ? 'activa' : '' ?>"><?= e($info[0]) ?> <span><?= $conteo[$clave] ?></span></a>
+                            <a href="<?= BASE_URL ?>views/subastas/mis-pujas.php?estado=<?= e($clave) ?>" class="mis-pujas-tab <?= $filtro === $clave ? 'activa' : '' ?>"><?= e($info[0]) ?> <span data-tab-count="<?= e($clave) ?>"><?= $conteo[$clave] ?></span></a>
                         <?php endif; ?>
                     <?php endforeach; ?>
                 </nav>
@@ -115,13 +115,13 @@ $mostrar = $filtro === '' ? $pujas : array_filter($pujas, function ($p) use ($fi
                 <?php if (empty($mostrar)): ?>
                     <p class="text-second-ppi">No tienes pujas con ese resultado.</p>
                 <?php else: ?>
-                    <div class="d-flex flex-column gap-3">
+                    <div class="d-flex flex-column gap-3" data-mis-pujas-url="<?= BASE_URL ?>controllers/mis_pujas_controller.php">
                         <?php foreach ($mostrar as $p): ?>
                             <?php
                             [$textoResultado, $colorResultado] = $resultados[$p['resultado']];
                             $imgSrc = preg_match('#^https?://#i', $p['imagen']) ? $p['imagen'] : BASE_URL . $p['imagen'];
                             ?>
-                            <article class="mis-pujas-item">
+                            <article class="mis-pujas-item" data-subasta-id="<?= (int)$p['id'] ?>">
                                 <a href="<?= BASE_URL ?>views/subasta.php?id=<?= (int)$p['id'] ?>" class="mis-pujas-foto" tabindex="-1" aria-hidden="true">
                                     <img src="<?= e($imgSrc) ?>" alt="" loading="lazy" onerror="this.onerror=null; this.src='<?= BASE_URL ?>assets/img/news-1.jpg';">
                                 </a>
@@ -131,7 +131,7 @@ $mostrar = $filtro === '' ? $pujas : array_filter($pujas, function ($p) use ($fi
                                     <h2 class="fs-6 fw-bold mb-1">
                                         <a href="<?= BASE_URL ?>views/subasta.php?id=<?= (int)$p['id'] ?>" class="text-main-ppi text-decoration-none"><?= e($p['titulo']) ?></a>
                                     </h2>
-                                    <span class="small text-second-ppi">
+                                    <span class="small text-second-ppi" data-meta-pujas>
                                         <?= $p['mis_pujas'] ?> <?= $p['mis_pujas'] === 1 ? 'puja tuya' : 'pujas tuyas' ?>
                                         <?php if ($p['ultima'] !== ''): ?> &middot; última el <?= e($p['ultima']) ?><?php endif; ?>
                                     </span>
@@ -140,25 +140,25 @@ $mostrar = $filtro === '' ? $pujas : array_filter($pujas, function ($p) use ($fi
                                 <div class="mis-pujas-montos">
                                     <div>
                                         <span class="d-block small text-second-ppi">Tu puja</span>
-                                        <span class="fw-bold text-main-ppi">$<?= e($p['mi_puja']) ?></span>
+                                        <span class="fw-bold text-main-ppi" data-mi-puja>$<?= e($p['mi_puja']) ?></span>
                                     </div>
                                     <div>
-                                        <span class="d-block small text-second-ppi"><?= $p['abierta'] ? 'Puja actual' : 'Puja final' ?></span>
-                                        <span class="fw-bold precio-ppi">$<?= e($p['puja_actual']) ?></span>
+                                        <span class="d-block small text-second-ppi" data-label-actual><?= $p['abierta'] ? 'Puja actual' : 'Puja final' ?></span>
+                                        <span class="fw-bold precio-ppi" data-puja-actual>$<?= e($p['puja_actual']) ?></span>
                                     </div>
                                 </div>
 
                                 <div class="mis-pujas-estado">
-                                    <span class="mis-pujas-chip mis-pujas-chip-<?= e($colorResultado) ?>"><?= e($textoResultado) ?></span>
+                                    <span class="mis-pujas-chip mis-pujas-chip-<?= e($colorResultado) ?>" data-chip-resultado><?= e($textoResultado) ?></span>
                                     <?php if ($p['abierta']): ?>
-                                        <span class="small tiempo-ppi" data-countdown="<?= e($p['fecha_final_iso']) ?>" data-countdown-prefix="Termina en "><?= e($p['tiempo']) ?></span>
+                                        <span class="small tiempo-ppi" data-estado-tiempo data-countdown="<?= e($p['fecha_final_iso']) ?>" data-countdown-prefix="Termina en "><?= e($p['tiempo']) ?></span>
                                     <?php else: ?>
-                                        <span class="small text-second-ppi">Subasta cerrada</span>
+                                        <span class="small text-second-ppi" data-estado-tiempo>Subasta cerrada</span>
                                     <?php endif; ?>
                                 </div>
 
                                 <div class="mis-pujas-accion">
-                                    <a href="<?= BASE_URL ?>views/subasta.php?id=<?= (int)$p['id'] ?>" class="btn btn-contorno-ppi btn-sm fw-bold px-3">
+                                    <a href="<?= BASE_URL ?>views/subasta.php?id=<?= (int)$p['id'] ?>" class="btn btn-contorno-ppi btn-sm fw-bold px-3" data-btn-accion>
                                         <?= $p['resultado'] === 'superada' ? 'Volver a pujar' : 'Ver subasta' ?>
                                     </a>
                                 </div>
@@ -176,6 +176,7 @@ $mostrar = $filtro === '' ? $pujas : array_filter($pujas, function ($p) use ($fi
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>assets/js/temporizador-subastas.js" defer></script>
+    <script src="<?= BASE_URL ?>assets/js/mis-pujas.js?v=1" defer></script>
 </body>
 
 </html>
