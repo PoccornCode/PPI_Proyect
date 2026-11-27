@@ -257,7 +257,7 @@ if (!function_exists('e')) {
     <script>
         const id_subasta = <?= (int) $id ?>,
             ruta_controller = "<?= BASE_URL ?>controllers/detalleSubastaController.php",
-            ruta_base_img = "<?php BASE_URL ?>uploads/productos/"
+            ruta_base_img = "<?= BASE_URL ?>uploads/productos/"
     </script>
     <script src="<?= BASE_URL ?>assets/js/toast-ppi.js?v=2"></script>
     <script src="<?= BASE_URL ?>assets/js/detalleSubasta.js"></script>
