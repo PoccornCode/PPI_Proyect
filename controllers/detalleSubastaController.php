@@ -15,7 +15,7 @@ $id_usuario = trim($_POST['id_usuario'] ?? '0');
 $option = trim($_POST['opcion'] ?? '');
 $monto = trim($_POST['monto_puja'] ?? '0');
 
-$dao = new subastaDao();
+$dao = new subastaDetalleDao();
 
 if ($option == 'consultar') {
     try {

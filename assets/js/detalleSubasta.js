@@ -22,7 +22,8 @@ const montoInicial = document.getElementById("dato-monto-inicial"),
 let resultadoSesion = null,
     resultadoPujas = null,
     precioInicialNum = 0,
-    incrementoMinimoNum = 0;
+    incrementoMinimoNum = 0,
+    resultadoMain = null
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {
@@ -79,7 +80,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Guardamos los valores numéricos para validar las pujas
         precioInicialNum = parseFloat(resultado.datos.precio_inicial) || 0;
         incrementoMinimoNum = parseFloat(resultado.datos.dato_incremento) || 0;
-
+        resultadoMain = resultado
         refrescarPujas();
 
         let estadoClass = new Map();
@@ -151,27 +152,33 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         }
     } catch (error) {
-        console.error(error);
+        // mostrarModal("error","¡UPS!","Algo ha sucecido, por favor recarga la pagina")
+        console.error(error)
     }
 });
 
 btnPujar.addEventListener("click", async function (e) {
     e.preventDefault();
 
-    // 1. Validar sesión
     if (!resultadoSesion || !resultadoSesion.idUsuario) {
         mostrarModal("error", "¡Ojo!", "Debes iniciar sesión para poder pujar.");
         return;
     }
+    if(resultadoMain.datos.estado !== "activa"){
+        mostrarModal(
+            "warning",
+            "¡Lo sentimos!",
+            "Esta subasta ya no acepta ofertas nuevas"
+        )
+        return
+    }
 
-    // 2. Validar que el input tenga un número válido mayor a 0
     const montoOfertado = parseFloat(montoInput.value);
     if (isNaN(montoOfertado) || montoOfertado <= 0) {
         mostrarModal("warning", "Monto Inválido", "Ingresa un monto válido mayor a $0.00.");
         return;
     }
 
-    // 3. Calcular el monto mínimo permitido según si ya hay pujas o no
     const hayPujas = resultadoPujas && resultadoPujas.pujas && resultadoPujas.pujas.length > 0;
     const pujaActualNum = hayPujas ? parseFloat(resultadoPujas.pujas[0][0]) : 0;
     const minimoPermitido = hayPujas ? (pujaActualNum + incrementoMinimoNum) : precioInicialNum;
@@ -185,7 +192,6 @@ btnPujar.addEventListener("click", async function (e) {
         return;
     }
 
-    // 4. Confirmación antes de guardar en la base de datos
     const confirmado = await mostrarModalConfirmar(
         "Confirmar puja",
         `¿Estás seguro de que deseas ofertar <strong class="text-white">$ ${montoOfertado.toFixed(2)}</strong> en esta subasta?`,
@@ -194,7 +200,6 @@ btnPujar.addEventListener("click", async function (e) {
 
     if (!confirmado) return;
 
-    // 5. Guardar puja en BD
     let datos = new FormData();
     datos.append("opcion", "guardarPuja");
     datos.append("id_subasta", id_subasta);
