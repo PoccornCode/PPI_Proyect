@@ -24,12 +24,30 @@ $id_producto = (int)($_GET['id'] ?? 0);
 $titulo = $id_producto > 0 ? "Modificar Producto" : "Registrar Producto";
 $textoBoton = $id_producto > 0 ? "Modificar" : "Guardar Producto";
 
-//Agregar a dao o controller despues
+// Carga categorías activas (y conserva la actual si se edita un producto existente)
 $categorias = [];
-$catQuery = $conexion->query("SELECT id_categoria, nombre FROM sb_categoria ORDER BY nombre ASC");
-if ($catQuery) {
-    while ($cat = $catQuery->fetch_assoc()) {
-        $categorias[] = $cat;
+if ($id_producto > 0) {
+    $stmtCat = $conexion->prepare(
+        "SELECT id_categoria, nombre
+         FROM sb_categoria
+         WHERE estado = 1 OR id_categoria = (SELECT id_categoria FROM sb_producto WHERE id_producto = ? LIMIT 1)
+         ORDER BY nombre ASC"
+    );
+    if ($stmtCat) {
+        $stmtCat->bind_param('i', $id_producto);
+        $stmtCat->execute();
+        $catQuery = $stmtCat->get_result();
+        while ($catQuery && ($cat = $catQuery->fetch_assoc())) {
+            $categorias[] = $cat;
+        }
+        $stmtCat->close();
+    }
+} else {
+    $catQuery = $conexion->query("SELECT id_categoria, nombre FROM sb_categoria WHERE estado = 1 ORDER BY nombre ASC");
+    if ($catQuery) {
+        while ($cat = $catQuery->fetch_assoc()) {
+            $categorias[] = $cat;
+        }
     }
 }
 ?>

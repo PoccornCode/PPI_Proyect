@@ -238,14 +238,6 @@ $resumen_categorias = [
                                     data-id="<?= (int)$cat['id_categoria'] ?>">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </button>
-                                <button type="button"
-                                    class="adm-cat-icon-btn adm-cat-icon-btn--delete"
-                                    title="<?= (int)$cat['total_productos'] > 0 ? 'Tiene productos asociados (desactívala en su lugar)' : 'Eliminar categoría' ?>"
-                                    aria-label="Eliminar <?= htmlspecialchars($cat['nombre']) ?>"
-                                    data-cat-action="delete"
-                                    data-id="<?= (int)$cat['id_categoria'] ?>">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </button>
                             </div>
                         </div>
                     </article>
@@ -972,34 +964,6 @@ $resumen_categorias = [
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL CONFIRMAR ELIMINACIÓN DE CATEGORÍA -->
-    <div class="modal fade adm-modal" id="modalEliminarCategoria" tabindex="-1" aria-labelledby="modalEliminarCategoriaLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-sm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold fs-6" id="modalEliminarCategoriaLabel">
-                        <i class="fa-solid fa-triangle-exclamation me-2" style="color:#d8685d;"></i>Eliminar categoría
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="small mb-2" style="color:#d6ddd0;">
-                        ¿Seguro que deseas eliminar permanentemente la categoría <strong class="text-white" id="catDeleteName"></strong>?
-                    </p>
-                    <p class="mb-0" style="font-size:0.78rem; color:#9aa392;">
-                        Esta acción no se puede deshacer. Si solo quieres ocultarla temporalmente, usa <strong>Desactivar</strong>.
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="mod-btn-sm mod-btn-cancel" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="mod-btn-sm mod-btn-reject" id="btnConfirmarEliminarCat">
-                        <i class="fa-solid fa-trash-can"></i> Eliminar
-                    </button>
-                </div>
             </div>
         </div>
     </div>

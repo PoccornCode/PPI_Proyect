@@ -15,15 +15,17 @@ class CategoriaDAO
         }
     }
 
-    public function listarCategorias(): array
+    public function listarCategorias(bool $soloActivas = true): array
     {
         $categorias = [];
         if (!$this->conexion || $this->conexion->connect_errno) {
             return $categorias;
         }
 
+        $where = $soloActivas ? "WHERE estado = 1" : "";
         $sql = "SELECT id_categoria, nombre, descripcion, imagen
                 FROM sb_categoria
+                {$where}
                 ORDER BY nombre ASC";
         $res = $this->conexion->query($sql);
 
@@ -41,6 +43,129 @@ class CategoriaDAO
         }
 
         return $categorias;
+    }
+
+    public function cambiarEstadoCategoria(int $idCategoria, ?int $nuevoEstado = null): array
+    {
+        if (!$this->conexion || $this->conexion->connect_errno) {
+            return [
+                'estado'  => false,
+                'mensaje' => 'No hay conexión disponible con la base de datos.',
+            ];
+        }
+
+        if ($idCategoria <= 0) {
+            return [
+                'estado'  => false,
+                'mensaje' => 'ID de categoría no válido.',
+            ];
+        }
+
+        $stmtSel = $this->conexion->prepare("SELECT id_categoria, nombre, estado FROM sb_categoria WHERE id_categoria = ? LIMIT 1");
+        if (!$stmtSel) {
+            return [
+                'estado'  => false,
+                'mensaje' => 'No se pudo consultar la categoría.',
+            ];
+        }
+
+        $stmtSel->bind_param('i', $idCategoria);
+        $stmtSel->execute();
+        $resSel = $stmtSel->get_result();
+        $cat = $resSel ? $resSel->fetch_assoc() : null;
+        $stmtSel->close();
+
+        if (!$cat) {
+            return [
+                'estado'  => false,
+                'mensaje' => 'No se encontró la categoría solicitada.',
+            ];
+        }
+
+        $estadoActual = (int)$cat['estado'];
+        $estadoFinal = ($nuevoEstado === null)
+            ? ($estadoActual === 1 ? 0 : 1)
+            : ($nuevoEstado === 1 ? 1 : 0);
+
+        $nombre = (string)$cat['nombre'];
+
+        if ($estadoFinal === 0) {
+            $stmtCheck = $this->conexion->prepare(
+                "SELECT
+                    SUM(CASE WHEN LOWER(s.estado) = 'activa' THEN 1 ELSE 0 END) AS activas,
+                    SUM(CASE WHEN LOWER(s.estado) = 'pendiente' THEN 1 ELSE 0 END) AS pendientes
+                 FROM sb_subasta s
+                 INNER JOIN sb_producto p ON p.id_producto = s.id_producto
+                 WHERE p.id_categoria = ?
+                   AND LOWER(s.estado) IN ('activa', 'pendiente')"
+            );
+            if (!$stmtCheck) {
+                return [
+                    'estado'  => false,
+                    'mensaje' => 'No se pudieron verificar las subastas asociadas a la categoría.',
+                ];
+            }
+
+            $stmtCheck->bind_param('i', $idCategoria);
+            $stmtCheck->execute();
+            $resCheck = $stmtCheck->get_result();
+            $conteo = $resCheck ? $resCheck->fetch_assoc() : null;
+            $stmtCheck->close();
+
+            $activas = (int)($conteo['activas'] ?? 0);
+            $pendientes = (int)($conteo['pendientes'] ?? 0);
+
+            if (($activas + $pendientes) > 0) {
+                $partes = [];
+                if ($activas > 0) {
+                    $partes[] = $activas === 1 ? '1 subasta activa' : ($activas . ' subastas activas');
+                }
+                if ($pendientes > 0) {
+                    $partes[] = $pendientes === 1 ? '1 subasta pendiente' : ($pendientes . ' subastas pendientes');
+                }
+
+                return [
+                    'estado'              => false,
+                    'bloqueado'           => true,
+                    'subastas_activas'    => $activas,
+                    'subastas_pendientes' => $pendientes,
+                    'mensaje'             => 'No puedes desactivar "' . $nombre . '" porque tiene ' . implode(' y ', $partes) . '.',
+                ];
+            }
+        }
+
+        if ($estadoFinal !== $estadoActual) {
+            $stmtUpd = $this->conexion->prepare("UPDATE sb_categoria SET estado = ? WHERE id_categoria = ?");
+            if (!$stmtUpd) {
+                return [
+                    'estado'  => false,
+                    'mensaje' => 'No se pudo actualizar el estado de la categoría.',
+                ];
+            }
+
+            $stmtUpd->bind_param('ii', $estadoFinal, $idCategoria);
+            $ok = $stmtUpd->execute();
+            $stmtUpd->close();
+
+            if (!$ok) {
+                return [
+                    'estado'  => false,
+                    'mensaje' => 'Ocurrió un error al guardar el nuevo estado.',
+                ];
+            }
+        }
+
+        return [
+            'estado'    => true,
+            'mensaje'   => $estadoFinal === 1
+                ? ('La categoría "' . $nombre . '" fue publicada.')
+                : ('La categoría "' . $nombre . '" fue desactivada.'),
+            'categoria' => [
+                'id_categoria' => (int)$cat['id_categoria'],
+                'nombre'       => $nombre,
+                'estado'       => $estadoFinal,
+            ],
+        ];
     }
 
     public function listarCategoriasAdmin(): array
@@ -96,6 +221,7 @@ class CategoriaDAO
                     SELECT c.id_categoria, c.nombre, c.descripcion, c.imagen, COUNT(p.id_producto) AS total
                     FROM sb_categoria c
                     LEFT JOIN sb_producto p ON c.id_categoria = p.id_categoria
+                    WHERE c.estado = 1
                     GROUP BY c.id_categoria, c.nombre, c.descripcion, c.imagen
                     ORDER BY total DESC, c.nombre ASC
                     LIMIT {$limite}

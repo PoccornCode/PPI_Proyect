@@ -183,6 +183,15 @@ function obtenerCategoriasAdmin(): array
     return $dao->listarCategoriasAdmin();
 }
 
+function cambiarEstadoCategoriaAdmin(int $idCategoria, ?int $nuevoEstado = null): array
+{
+    $modDao = new ModeradorDAO();
+    $modDao->inactivarSubastasVencidas();
+
+    $dao = new CategoriaDAO();
+    return $dao->cambiarEstadoCategoria($idCategoria, $nuevoEstado);
+}
+
 function obtenerSubastasAdmin(string $baseUrl = ''): array
 {
     $modDao = new ModeradorDAO();
@@ -565,6 +574,31 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
                 'desactivadas' => count(array_filter($categorias, fn($c) => (int)$c['estado'] === 0)),
             ],
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($opcion === 'categoria_cambiar_estado') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'Método no permitido.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $idCategoria = (int)($_POST['id_categoria'] ?? 0);
+        $nuevoEstado = isset($_POST['estado']) && $_POST['estado'] !== ''
+            ? ((int)$_POST['estado'] === 1 ? 1 : 0)
+            : null;
+
+        $res = cambiarEstadoCategoriaAdmin($idCategoria, $nuevoEstado);
+        if (empty($res['estado'])) {
+            $codigo = !empty($res['bloqueado']) ? 409 : ($idCategoria <= 0 ? 400 : 422);
+            http_response_code($codigo);
+        }
+
+        echo json_encode($res, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
 
