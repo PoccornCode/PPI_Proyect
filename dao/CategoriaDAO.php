@@ -45,6 +45,142 @@ class CategoriaDAO
         return $categorias;
     }
 
+    public function existeNombreCategoria(string $nombre, int $excluirId = 0): bool
+    {
+        if (!$this->conexion || $this->conexion->connect_errno) {
+            return false;
+        }
+
+        $nombreLimpio = trim($nombre);
+        if ($nombreLimpio === '') {
+            return false;
+        }
+
+        if ($excluirId > 0) {
+            $stmt = $this->conexion->prepare(
+                "SELECT id_categoria FROM sb_categoria WHERE LOWER(nombre) = LOWER(?) AND id_categoria <> ? LIMIT 1"
+            );
+            if (!$stmt) return false;
+            $stmt->bind_param('si', $nombreLimpio, $excluirId);
+        } else {
+            $stmt = $this->conexion->prepare(
+                "SELECT id_categoria FROM sb_categoria WHERE LOWER(nombre) = LOWER(?) LIMIT 1"
+            );
+            if (!$stmt) return false;
+            $stmt->bind_param('s', $nombreLimpio);
+        }
+
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $existe = ($res && $res->num_rows > 0);
+        $stmt->close();
+
+        return $existe;
+    }
+
+    public function validarDatosCategoria(string $nombre, string $descripcion, int $excluirId = 0): array
+    {
+        $nombreLimpio = trim($nombre);
+        $descLimpia = trim($descripcion);
+
+        if ($nombreLimpio === '') {
+            return [
+                'estado'  => false,
+                'campo'   => 'nombre',
+                'mensaje' => 'El nombre de la categoría es obligatorio.',
+            ];
+        }
+
+        if (mb_strlen($nombreLimpio, 'UTF-8') > 50) {
+            return [
+                'estado'  => false,
+                'campo'   => 'nombre',
+                'mensaje' => 'El nombre no puede superar los 50 caracteres.',
+            ];
+        }
+
+        if (mb_strlen($descLimpia, 'UTF-8') > 255) {
+            return [
+                'estado'  => false,
+                'campo'   => 'descripcion',
+                'mensaje' => 'La descripción no puede superar los 255 caracteres.',
+            ];
+        }
+
+        if ($this->existeNombreCategoria($nombreLimpio, $excluirId)) {
+            return [
+                'estado'  => false,
+                'campo'   => 'nombre',
+                'mensaje' => 'Ya existe una categoría con el nombre "' . $nombreLimpio . '".',
+            ];
+        }
+
+        return [
+            'estado'      => true,
+            'nombre'      => $nombreLimpio,
+            'descripcion' => $descLimpia,
+        ];
+    }
+
+    public function crearCategoria(string $nombre, string $descripcion, string $imagen, int $estado = 1): array
+    {
+        if (!$this->conexion || $this->conexion->connect_errno) {
+            return [
+                'estado'  => false,
+                'mensaje' => 'No hay conexión disponible con la base de datos.',
+            ];
+        }
+
+        $validacion = $this->validarDatosCategoria($nombre, $descripcion);
+        if (empty($validacion['estado'])) {
+            return $validacion;
+        }
+
+        $nombreLimpio = $validacion['nombre'];
+        $descLimpia = $validacion['descripcion'];
+        $estadoFinal = $estado === 1 ? 1 : 0;
+        $imagenFinal = trim($imagen) !== '' ? trim($imagen) : 'assets/img/cat-coleccionables.jpg';
+
+        $descParam = $descLimpia !== '' ? $descLimpia : null;
+        $stmt = $this->conexion->prepare(
+            "INSERT INTO sb_categoria (nombre, descripcion, imagen, estado) VALUES (?, ?, ?, ?)"
+        );
+        if (!$stmt) {
+            return [
+                'estado'  => false,
+                'mensaje' => 'No se pudo preparar el registro de la categoría.',
+            ];
+        }
+
+        $stmt->bind_param('sssi', $nombreLimpio, $descParam, $imagenFinal, $estadoFinal);
+        $ok = $stmt->execute();
+        $nuevoId = $ok ? (int)$stmt->insert_id : 0;
+        $stmt->close();
+
+        if (!$ok || $nuevoId <= 0) {
+            return [
+                'estado'  => false,
+                'mensaje' => 'Ocurrió un error al guardar la categoría en la base de datos.',
+            ];
+        }
+
+        return [
+            'estado'    => true,
+            'mensaje'   => $estadoFinal === 1
+                ? ('Categoría "' . $nombreLimpio . '" creada y publicada.')
+                : ('Categoría "' . $nombreLimpio . '" creada como desactivada.'),
+            'categoria' => [
+                'id_categoria'    => $nuevoId,
+                'nombre'          => $nombreLimpio,
+                'descripcion'     => $descLimpia,
+                'imagen'          => $imagenFinal,
+                'estado'          => $estadoFinal,
+                'total_subastas'  => 0,
+                'total_productos' => 0,
+            ],
+        ];
+    }
+
     public function cambiarEstadoCategoria(int $idCategoria, ?int $nuevoEstado = null): array
     {
         if (!$this->conexion || $this->conexion->connect_errno) {

@@ -23,12 +23,99 @@
         }
     }
 
+    function escHtml(str) {
+        return String(str ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
     function normalizarTexto(texto) {
         return String(texto || '')
             .toLowerCase()
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
             .trim();
+    }
+
+    function resolverImagenUrl(ruta) {
+        const limpia = String(ruta || '').trim();
+        if (!limpia) return `${baseUrl}assets/img/cat-coleccionables.jpg`;
+        if (/^(https?:|data:)/i.test(limpia)) return limpia;
+        return `${baseUrl}${limpia.replace(/^\/+/, '')}`;
+    }
+
+    function construirTarjetaCategoria(cat) {
+        const esActiva = Number(cat.estado) === 1;
+        const descTexto = String(cat.descripcion || '').trim() || 'Sin descripción registrada.';
+        const totalSub = Number(cat.total_subastas || 0);
+        const imgUrl = resolverImagenUrl(cat.imagen);
+
+        const article = document.createElement('article');
+        article.className = `adm-cat-card-v2${esActiva ? '' : ' is-inactive'}`;
+        article.dataset.id = String(cat.id_categoria);
+        article.dataset.nombre = String(cat.nombre || '');
+        article.dataset.descripcion = descTexto;
+        article.dataset.estado = esActiva ? 'publicadas' : 'desactivadas';
+
+        article.innerHTML = `
+            <div class="adm-cat-cover">
+                <img src="${escHtml(imgUrl)}" alt="${escHtml(cat.nombre)}" loading="lazy">
+            </div>
+            <div class="adm-cat-body">
+                <div class="adm-cat-meta-row">
+                    <span class="adm-cat-status ${esActiva ? 'is-published' : 'is-draft'}">
+                        <span class="adm-cat-status-dot"></span>
+                        ${esActiva ? 'Publicada' : 'Desactivada'}
+                    </span>
+                    <span class="adm-cat-auctions-count">
+                        ${totalSub} ${totalSub === 1 ? 'subasta' : 'subastas'}
+                    </span>
+                </div>
+                <h3 class="adm-cat-title">${escHtml(cat.nombre)}</h3>
+                <p class="adm-cat-desc">${escHtml(descTexto)}</p>
+            </div>
+            <div class="adm-cat-footer">
+                <button type="button"
+                    class="adm-cat-btn-toggle ${esActiva ? 'is-deactivate' : 'is-publish'}"
+                    data-cat-action="toggle"
+                    data-id="${Number(cat.id_categoria)}">
+                    <i class="fa-solid ${esActiva ? 'fa-eye-slash' : 'fa-globe'}"></i>
+                    <span>${esActiva ? 'Desactivar' : 'Publicar'}</span>
+                </button>
+                <div class="adm-cat-icon-actions">
+                    <button type="button"
+                        class="adm-cat-icon-btn adm-cat-icon-btn--edit"
+                        title="Editar categoría"
+                        aria-label="Editar ${escHtml(cat.nombre)}"
+                        data-cat-action="edit"
+                        data-id="${Number(cat.id_categoria)}">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        return article;
+    }
+
+    function insertarTarjetaOrdenada(cat) {
+        const article = construirTarjetaCategoria(cat);
+        const nombreNuevo = normalizarTexto(article.dataset.nombre || '');
+        const tarjetas = Array.from(gridEl.querySelectorAll('.adm-cat-card-v2'));
+        const siguiente = tarjetas.find((card) =>
+            normalizarTexto(card.dataset.nombre || '').localeCompare(nombreNuevo, 'es') > 0
+        );
+
+        if (siguiente) {
+            gridEl.insertBefore(article, siguiente);
+        } else {
+            gridEl.appendChild(article);
+        }
+
+        filtrarCategorias();
+        return article;
     }
 
     function filtrarCategorias() {
@@ -149,24 +236,19 @@
         cambiarEstadoCategoria(card, toggleBtn);
     });
 
-    if (searchInput) {
-        searchInput.addEventListener('input', filtrarCategorias);
-    }
-
-    if (statusSelect) {
-        statusSelect.addEventListener('change', filtrarCategorias);
-    }
-
-    if (resetBtn) {
-        resetBtn.addEventListener('click', () => {
-            if (searchInput) searchInput.value = '';
-            if (statusSelect) statusSelect.value = 'todas';
-            filtrarCategorias();
-            searchInput?.focus();
-        });
-    }
+    searchInput?.addEventListener('input', filtrarCategorias);
+    statusSelect?.addEventListener('change', filtrarCategorias);
+    resetBtn?.addEventListener('click', () => {
+        if (searchInput) searchInput.value = '';
+        if (statusSelect) statusSelect.value = 'todas';
+        filtrarCategorias();
+        searchInput?.focus();
+    });
 
     window.AdminCategorias = {
-        filtrar: filtrarCategorias
+        filtrar: filtrarCategorias,
+        insertarTarjeta: insertarTarjetaOrdenada,
+        resolverImagenUrl,
+        notify
     };
 })();
