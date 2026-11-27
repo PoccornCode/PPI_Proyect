@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/conexion.php';
+require_once dirname(__DIR__) . '/dao/MisPujasDAO.php';
 
 class PerfilDAO
 {
@@ -131,14 +132,24 @@ class PerfilDAO
         ];
     }
 
-    // actualiza nombre, apellido, ubicacion y telefono del usuario
-    public function actualizarDatos($id_usuario, $nombre, $apellido, $ubicacion, $telefono)
+    public function existeUsernameEnOtro($username, $id_usuario)
+    {
+        $stmt = $this->conexion->prepare("SELECT id_usuario FROM sb_usuario WHERE username = ? AND id_usuario <> ? LIMIT 1");
+        $stmt->bind_param("si", $username, $id_usuario);
+        $stmt->execute();
+        $existe = $stmt->get_result()->num_rows > 0;
+        $stmt->close();
+        return $existe;
+    }
+
+    // actualizar modificaciones 
+    public function actualizarDatos($id_usuario, $nombre, $apellido, $ubicacion, $telefono, $username)
     {
         $this->conexion->begin_transaction();
         try {
-            $sql = "UPDATE sb_usuario SET nombre = ?, apellido = ?, ubicacion = ? WHERE id_usuario = ?";
+            $sql = "UPDATE sb_usuario SET nombre = ?, apellido = ?, ubicacion = ?, username = ? WHERE id_usuario = ?";
             $stmt = $this->conexion->prepare($sql);
-            $stmt->bind_param("sssi", $nombre, $apellido, $ubicacion, $id_usuario);
+            $stmt->bind_param("ssssi", $nombre, $apellido, $ubicacion, $username, $id_usuario);
             $stmt->execute();
             $stmt->close();
  
