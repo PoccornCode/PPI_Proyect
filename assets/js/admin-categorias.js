@@ -118,6 +118,52 @@
         return article;
     }
 
+    function actualizarTarjetaCategoria(cat) {
+        const card = gridEl.querySelector(`.adm-cat-card-v2[data-id="${Number(cat.id_categoria)}"]`);
+        if (!card) return null;
+
+        const esActiva = Number(cat.estado) === 1;
+        const descTexto = String(cat.descripcion || '').trim() || 'Sin descripción registrada.';
+        const imgUrl = resolverImagenUrl(cat.imagen);
+
+        card.dataset.nombre = String(cat.nombre || '');
+        card.dataset.descripcion = descTexto;
+        card.dataset.estado = esActiva ? 'publicadas' : 'desactivadas';
+
+        const imgEl = card.querySelector('.adm-cat-cover img');
+        if (imgEl) {
+            imgEl.src = imgUrl;
+            imgEl.alt = String(cat.nombre || '');
+        }
+
+        const titleEl = card.querySelector('.adm-cat-title');
+        if (titleEl) titleEl.textContent = String(cat.nombre || '');
+
+        const descEl = card.querySelector('.adm-cat-desc');
+        if (descEl) descEl.textContent = descTexto;
+
+        const editBtn = card.querySelector('[data-cat-action="edit"]');
+        if (editBtn) editBtn.setAttribute('aria-label', `Editar ${String(cat.nombre || '')}`);
+
+        const toggleBtn = card.querySelector('[data-cat-action="toggle"]');
+        actualizarEstadoTarjeta(card, toggleBtn, esActiva);
+
+        // Reordena alfabéticamente si cambió el nombre
+        const nombreNuevo = normalizarTexto(card.dataset.nombre || '');
+        const otras = Array.from(gridEl.querySelectorAll('.adm-cat-card-v2')).filter((el) => el !== card);
+        const siguiente = otras.find((el) =>
+            normalizarTexto(el.dataset.nombre || '').localeCompare(nombreNuevo, 'es') > 0
+        );
+        if (siguiente) {
+            gridEl.insertBefore(card, siguiente);
+        } else {
+            gridEl.appendChild(card);
+        }
+
+        filtrarCategorias();
+        return card;
+    }
+
     function filtrarCategorias() {
         const termino = normalizarTexto(searchInput?.value || '');
         const estadoFiltro = (statusSelect?.value || 'todas').toLowerCase();
@@ -248,6 +294,7 @@
     window.AdminCategorias = {
         filtrar: filtrarCategorias,
         insertarTarjeta: insertarTarjetaOrdenada,
+        actualizarTarjeta: actualizarTarjetaCategoria,
         resolverImagenUrl,
         notify
     };

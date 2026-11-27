@@ -1596,25 +1596,25 @@ body.admin-body .adm-badge--cancelada {
 }
 
 .adm-cat-btn-toggle.is-deactivate {
-    background-color: transparent;
-    border: 1px solid #262b24;
-    color: #b8c0b2;
+    background-color: #181b17;
+    border: 1px solid #2a3028;
+    color: #c2cabd;
 }
 
 .adm-cat-btn-toggle.is-deactivate:hover {
-    background-color: rgba(194, 100, 110, 0.1);
-    border-color: rgba(194, 100, 110, 0.35);
-    color: #e4a1a8;
+    background-color: #9e424c;
+    border-color: #9e424c;
+    color: #ffffff;
 }
 
 .adm-cat-btn-toggle.is-publish {
-    background-color: #1b2214;
-    border: 1px solid #3c4d24;
-    color: #b5cf7e;
+    background-color: #5e7325;
+    border: 1px solid #5e7325;
+    color: #ffffff;
 }
 
 .adm-cat-btn-toggle.is-publish:hover {
-    background-color: #5e7325;
+    background-color: #6d852c;
     border-color: #6d852c;
     color: #ffffff;
 }

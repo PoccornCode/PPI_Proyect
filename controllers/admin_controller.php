@@ -674,6 +674,75 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
         exit;
     }
 
+    if ($opcion === 'categoria_actualizar') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'Método no permitido.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $idCategoria = (int)($_POST['id_categoria'] ?? 0);
+        $nombre = trim((string)($_POST['nombre'] ?? ''));
+        $descripcion = trim((string)($_POST['descripcion'] ?? ''));
+        $estado = (isset($_POST['estado']) && (string)$_POST['estado'] === '1') ? 1 : 0;
+
+        if ($idCategoria <= 0) {
+            http_response_code(400);
+            echo json_encode([
+                'estado'  => false,
+                'mensaje' => 'ID de categoría no válido.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $modDao = new ModeradorDAO();
+        $modDao->inactivarSubastasVencidas();
+
+        $dao = new CategoriaDAO();
+        $validacion = $dao->validarDatosCategoria($nombre, $descripcion, $idCategoria);
+        if (empty($validacion['estado'])) {
+            http_response_code(422);
+            echo json_encode($validacion, JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $imgRes = guardarImagenCategoriaAdmin($_FILES['imagen'] ?? null);
+        if (empty($imgRes['estado'])) {
+            http_response_code(422);
+            echo json_encode([
+                'estado'  => false,
+                'campo'   => 'imagen',
+                'mensaje' => $imgRes['mensaje'] ?? 'Imagen no válida.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $nuevaRuta = !empty($imgRes['subida']) ? (string)$imgRes['ruta'] : null;
+        $res = $dao->actualizarCategoria($idCategoria, $nombre, $descripcion, $nuevaRuta, $estado);
+
+        if (empty($res['estado'])) {
+            if (!empty($imgRes['subida']) && !empty($imgRes['ruta_fisica']) && is_file($imgRes['ruta_fisica'])) {
+                @unlink($imgRes['ruta_fisica']);
+            }
+            http_response_code(!empty($res['bloqueado']) ? 409 : 422);
+        } elseif (!empty($imgRes['subida']) && !empty($res['imagen_anterior'])) {
+            $anterior = ltrim((string)$res['imagen_anterior'], '/');
+            if (strpos($anterior, 'uploads/categorias/') === 0) {
+                $rutaAnteriorFisica = dirname(__DIR__) . '/' . $anterior;
+                if (is_file($rutaAnteriorFisica)) {
+                    @unlink($rutaAnteriorFisica);
+                }
+            }
+        }
+
+        unset($res['imagen_anterior']);
+        echo json_encode($res, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
     if ($opcion === 'categoria_cambiar_estado') {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);

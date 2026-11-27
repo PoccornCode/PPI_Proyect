@@ -181,6 +181,172 @@ class CategoriaDAO
         ];
     }
 
+    public function obtenerCategoriaPorId(int $idCategoria): ?array
+    {
+        if (!$this->conexion || $this->conexion->connect_errno || $idCategoria <= 0) {
+            return null;
+        }
+
+        $stmt = $this->conexion->prepare(
+            "SELECT id_categoria, nombre, descripcion, imagen, estado
+             FROM sb_categoria
+             WHERE id_categoria = ?
+             LIMIT 1"
+        );
+        if (!$stmt) {
+            return null;
+        }
+
+        $stmt->bind_param('i', $idCategoria);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $row = $res ? $res->fetch_assoc() : null;
+        $stmt->close();
+
+        if (!$row) {
+            return null;
+        }
+
+        return [
+            'id_categoria' => (int)$row['id_categoria'],
+            'nombre'       => (string)$row['nombre'],
+            'descripcion'  => (string)($row['descripcion'] ?? ''),
+            'imagen'       => !empty($row['imagen']) ? (string)$row['imagen'] : 'assets/img/cat-coleccionables.jpg',
+            'estado'       => (int)($row['estado'] ?? 1),
+        ];
+    }
+
+    private function verificarBloqueoDesactivacion(int $idCategoria, string $nombre): ?array
+    {
+        $stmtCheck = $this->conexion->prepare(
+            "SELECT
+                SUM(CASE WHEN LOWER(s.estado) = 'activa' THEN 1 ELSE 0 END) AS activas,
+                SUM(CASE WHEN LOWER(s.estado) = 'pendiente' THEN 1 ELSE 0 END) AS pendientes
+             FROM sb_subasta s
+             INNER JOIN sb_producto p ON p.id_producto = s.id_producto
+             WHERE p.id_categoria = ?
+               AND LOWER(s.estado) IN ('activa', 'pendiente')"
+        );
+        if (!$stmtCheck) {
+            return [
+                'estado'  => false,
+                'mensaje' => 'No se pudieron verificar las subastas asociadas a la categoría.',
+            ];
+        }
+
+        $stmtCheck->bind_param('i', $idCategoria);
+        $stmtCheck->execute();
+        $resCheck = $stmtCheck->get_result();
+        $conteo = $resCheck ? $resCheck->fetch_assoc() : null;
+        $stmtCheck->close();
+
+        $activas = (int)($conteo['activas'] ?? 0);
+        $pendientes = (int)($conteo['pendientes'] ?? 0);
+
+        if (($activas + $pendientes) > 0) {
+            $partes = [];
+            if ($activas > 0) {
+                $partes[] = $activas === 1 ? '1 subasta activa' : ($activas . ' subastas activas');
+            }
+            if ($pendientes > 0) {
+                $partes[] = $pendientes === 1 ? '1 subasta pendiente' : ($pendientes . ' subastas pendientes');
+            }
+
+            return [
+                'estado'              => false,
+                'bloqueado'           => true,
+                'subastas_activas'    => $activas,
+                'subastas_pendientes' => $pendientes,
+                'mensaje'             => 'No puedes desactivar "' . $nombre . '" porque tiene ' . implode(' y ', $partes) . '.',
+            ];
+        }
+
+        return null;
+    }
+
+    public function actualizarCategoria(int $idCategoria, string $nombre, string $descripcion, ?string $nuevaImagen, int $estado): array
+    {
+        if (!$this->conexion || $this->conexion->connect_errno) {
+            return [
+                'estado'  => false,
+                'mensaje' => 'No hay conexión disponible con la base de datos.',
+            ];
+        }
+
+        if ($idCategoria <= 0) {
+            return [
+                'estado'  => false,
+                'mensaje' => 'ID de categoría no válido.',
+            ];
+        }
+
+        $actual = $this->obtenerCategoriaPorId($idCategoria);
+        if (!$actual) {
+            return [
+                'estado'  => false,
+                'mensaje' => 'No se encontró la categoría solicitada.',
+            ];
+        }
+
+        $validacion = $this->validarDatosCategoria($nombre, $descripcion, $idCategoria);
+        if (empty($validacion['estado'])) {
+            return $validacion;
+        }
+
+        $nombreLimpio = $validacion['nombre'];
+        $descLimpia = $validacion['descripcion'];
+        $estadoFinal = $estado === 1 ? 1 : 0;
+
+        if ($estadoFinal === 0 && (int)$actual['estado'] === 1) {
+            $bloqueo = $this->verificarBloqueoDesactivacion($idCategoria, $nombreLimpio);
+            if ($bloqueo !== null) {
+                return $bloqueo;
+            }
+        }
+
+        $imagenAnterior = (string)$actual['imagen'];
+        $imagenFinal = ($nuevaImagen !== null && trim($nuevaImagen) !== '')
+            ? trim($nuevaImagen)
+            : $imagenAnterior;
+
+        $descParam = $descLimpia !== '' ? $descLimpia : null;
+        $stmt = $this->conexion->prepare(
+            "UPDATE sb_categoria
+             SET nombre = ?, descripcion = ?, imagen = ?, estado = ?
+             WHERE id_categoria = ?"
+        );
+        if (!$stmt) {
+            return [
+                'estado'  => false,
+                'mensaje' => 'No se pudo preparar la actualización de la categoría.',
+            ];
+        }
+
+        $stmt->bind_param('sssii', $nombreLimpio, $descParam, $imagenFinal, $estadoFinal, $idCategoria);
+        $ok = $stmt->execute();
+        $stmt->close();
+
+        if (!$ok) {
+            return [
+                'estado'  => false,
+                'mensaje' => 'Ocurrió un error al actualizar la categoría.',
+            ];
+        }
+
+        return [
+            'estado'          => true,
+            'mensaje'         => 'Categoría "' . $nombreLimpio . '" actualizada correctamente.',
+            'imagen_anterior' => $imagenAnterior,
+            'categoria'       => [
+                'id_categoria' => $idCategoria,
+                'nombre'       => $nombreLimpio,
+                'descripcion'  => $descLimpia,
+                'imagen'       => $imagenFinal,
+                'estado'       => $estadoFinal,
+            ],
+        ];
+    }
+
     public function cambiarEstadoCategoria(int $idCategoria, ?int $nuevoEstado = null): array
     {
         if (!$this->conexion || $this->conexion->connect_errno) {
@@ -226,47 +392,9 @@ class CategoriaDAO
         $nombre = (string)$cat['nombre'];
 
         if ($estadoFinal === 0) {
-            $stmtCheck = $this->conexion->prepare(
-                "SELECT
-                    SUM(CASE WHEN LOWER(s.estado) = 'activa' THEN 1 ELSE 0 END) AS activas,
-                    SUM(CASE WHEN LOWER(s.estado) = 'pendiente' THEN 1 ELSE 0 END) AS pendientes
-                 FROM sb_subasta s
-                 INNER JOIN sb_producto p ON p.id_producto = s.id_producto
-                 WHERE p.id_categoria = ?
-                   AND LOWER(s.estado) IN ('activa', 'pendiente')"
-            );
-            if (!$stmtCheck) {
-                return [
-                    'estado'  => false,
-                    'mensaje' => 'No se pudieron verificar las subastas asociadas a la categoría.',
-                ];
-            }
-
-            $stmtCheck->bind_param('i', $idCategoria);
-            $stmtCheck->execute();
-            $resCheck = $stmtCheck->get_result();
-            $conteo = $resCheck ? $resCheck->fetch_assoc() : null;
-            $stmtCheck->close();
-
-            $activas = (int)($conteo['activas'] ?? 0);
-            $pendientes = (int)($conteo['pendientes'] ?? 0);
-
-            if (($activas + $pendientes) > 0) {
-                $partes = [];
-                if ($activas > 0) {
-                    $partes[] = $activas === 1 ? '1 subasta activa' : ($activas . ' subastas activas');
-                }
-                if ($pendientes > 0) {
-                    $partes[] = $pendientes === 1 ? '1 subasta pendiente' : ($pendientes . ' subastas pendientes');
-                }
-
-                return [
-                    'estado'              => false,
-                    'bloqueado'           => true,
-                    'subastas_activas'    => $activas,
-                    'subastas_pendientes' => $pendientes,
-                    'mensaje'             => 'No puedes desactivar "' . $nombre . '" porque tiene ' . implode(' y ', $partes) . '.',
-                ];
+            $bloqueo = $this->verificarBloqueoDesactivacion($idCategoria, $nombre);
+            if ($bloqueo !== null) {
+                return $bloqueo;
             }
         }
 

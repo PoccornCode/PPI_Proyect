@@ -996,6 +996,7 @@ $resumen_categorias = [
     <script src="<?= $base_url ?>assets/js/admin-subasta-estado.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-subasta-estado.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-categorias.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-categorias.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-categoria-agregar.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-categoria-agregar.js') ?>"></script>
+    <script src="<?= $base_url ?>assets/js/admin-categoria-editar.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-categoria-editar.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-dashboard.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-dashboard.js') ?>"></script>
     <script src="<?= $base_url ?>assets/js/admin-dashboard-referencia.js?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/js/admin-dashboard-referencia.js') ?>"></script>
 </body>
