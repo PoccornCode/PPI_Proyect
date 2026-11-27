@@ -281,7 +281,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     mostrarModal("danger", "Error", resultado.mensaje || "No se pudo completar el registro.");
                 }
             } catch (error) {
-                mostrarModal("danger", "Error", error.message || "Error al procesar la solicitud con el servidor.");
+                const esErrorRed = !navigator.onLine
+                    || error instanceof TypeError
+                    || /failed to fetch|networkerror|load failed/i.test(error?.message || "");
+                const tituloError = esErrorRed ? "Sin conexión" : "Error";
+                const mensajeError = esErrorRed
+                    ? "No se pudo conectar con el servidor. Verifica tu conexión a internet e intenta de nuevo."
+                    : "Ocurrió un problema al procesar tu solicitud. Intenta de nuevo en unos momentos.";
+                mostrarModal("danger", tituloError, mensajeError);
             } finally {
                 if (!redirigiendo) {
                     if (overlayRegistro) {

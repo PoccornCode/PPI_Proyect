@@ -304,7 +304,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 abrirAlertaSobreModal("error", "No se pudo cambiar", resultado.mensaje || "Inténtalo de nuevo.", foco);
             }
         } catch (error) {
-            abrirAlertaSobreModal("error", "Error de conexión", error.message || "No se pudo comunicar con el servidor.");
+            const esErrorRed = !navigator.onLine
+                || error instanceof TypeError
+                || /failed to fetch|networkerror|load failed/i.test(error?.message || "");
+            const tituloError = esErrorRed ? "Sin conexión" : "Error de conexión";
+            const mensajeError = esErrorRed
+                ? "No se pudo conectar con el servidor. Verifica tu conexión a internet e intenta de nuevo."
+                : "Ocurrió un problema al procesar tu solicitud. Intenta de nuevo en unos momentos.";
+            abrirAlertaSobreModal("error", tituloError, mensajeError);
         } finally {
             btnGuardar.disabled = false;
             btnGuardar.textContent = "Guardar contraseña";
@@ -446,7 +453,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 mostrarToast("error", "No se pudo guardar", resultado.mensaje || "Inténtalo de nuevo.");
             }
         } catch (error) {
-            mostrarToast("error", "Error de conexión", error.message || "No se pudo comunicar con el servidor.");
+            const esErrorRed = !navigator.onLine
+                || error instanceof TypeError
+                || /failed to fetch|networkerror|load failed/i.test(error?.message || "");
+            const tituloError = esErrorRed ? "Sin conexión" : "Error de conexión";
+            const mensajeError = esErrorRed
+                ? "No se pudo conectar con el servidor. Verifica tu conexión a internet e intenta de nuevo."
+                : "Ocurrió un problema al guardar los cambios. Intenta de nuevo en unos momentos.";
+            mostrarToast("error", tituloError, mensajeError);
         } finally {
             btnGuardar.disabled = false;
             btnGuardar.textContent = "Guardar cambios";
