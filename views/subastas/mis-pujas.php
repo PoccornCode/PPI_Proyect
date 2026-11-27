@@ -160,7 +160,12 @@ $mostrar = $filtro === '' ? $pujas : array_filter($pujas, function ($p) use ($fi
                                     <?php endif; ?>
                                 </div>
 
-                                <div class="mis-pujas-accion">
+                                <div class="mis-pujas-accion d-flex flex-wrap gap-2">
+                                    <?php if ($p['resultado'] === 'ganada'): ?>
+                                        <a href="<?= BASE_URL ?>views/chat.php?subasta=<?= (int)$p['id'] ?>" class="btn btn-primary btn-sm fw-bold px-3">
+                                            <i class="fas fa-comment-dots me-1"></i> Ir al chat
+                                        </a>
+                                    <?php endif; ?>
                                     <a href="<?= BASE_URL ?>views/subasta.php?id=<?= (int)$p['id'] ?>" class="btn btn-contorno-ppi btn-sm fw-bold px-3" data-btn-accion>
                                         <?= $p['resultado'] === 'superada' ? 'Volver a pujar' : 'Ver subasta' ?>
                                     </a>

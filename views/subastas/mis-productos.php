@@ -229,17 +229,15 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                                                     <i class="fas fa-redo"></i> <?= $estadoNorm === 'rechazada' ? 'Reenviar' : 'Resubastar' ?>
                                                 </button>
 
-                                            <?php else: // Finalizada: solo ver detalles ?>
-                                                <button type="button" class="btn btn-modificar-producto btn-sm flex-grow-1 btn-ver-detalle" data-detalle="<?= $detalleJson ?>">
-                                                    <i class="fas fa-eye"></i> Ver detalles
-                                                </button>
+                                            <?php else: // Finalizada: chat con el ganador ?>
+                                                <a href="<?= BASE_URL ?>views/chat.php?subasta=<?= $idSubasta ?>" class="btn btn-subastar-producto btn-sm flex-grow-1">
+                                                    <i class="fas fa-comment-dots"></i> Mensaje al ganador
+                                                </a>
                                             <?php endif; ?>
 
-                                            <?php if ($estadoNorm !== 'finalizada'): // Ojito en todos menos finalizada (ya lo tiene a lo ancho) ?>
-                                                <button type="button" class="btn btn-modificar-producto btn-sm btn-accion-icon btn-ver-detalle" data-detalle="<?= $detalleJson ?>" title="Ver detalles" aria-label="Ver detalles">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                            <?php endif; ?>
+                                            <button type="button" class="btn btn-modificar-producto btn-sm btn-accion-icon btn-ver-detalle" data-detalle="<?= $detalleJson ?>" title="Ver detalles" aria-label="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
 
                                             <?php if (!in_array($estadoNorm, ['activa', 'finalizada'], true)): // Modificar y eliminar: bloqueados solo en activa y finalizada ?>
                                                 <a href="<?= BASE_URL ?>views/subastas/registro-producto.php?id=<?= (int)$item['id_producto'] ?>" class="btn btn-modificar-producto btn-sm btn-accion-icon" title="Modificar" aria-label="Modificar">

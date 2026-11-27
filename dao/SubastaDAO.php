@@ -4,8 +4,7 @@ require_once __DIR__ . '/../helpers/Mailer.php';
 
 class SubastaDAO
 {
-    // Ruta temporal del chat; ajustar si el módulo de chat cambia de ubicación o parámetro
-    private const RUTA_CHAT_SUBASTA = 'views/chat.php?id_subasta=';
+    private const RUTA_CHAT_SUBASTA = 'views/chat.php?subasta=';
 
     private $conexion;
 
