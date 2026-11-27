@@ -130,7 +130,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     mostrarToast("error", "No se pudo enviar", resultado.mensaje || "Ocurrió un error al enviar tu mensaje.");
                 }
             } catch (error) {
-                mostrarToast("error", "Error de conexión", error.message || "No se pudo comunicar con el servidor.");
+                const esErrorRed = !navigator.onLine
+                    || error instanceof TypeError
+                    || /failed to fetch|networkerror|load failed/i.test(error?.message || "");
+                const tituloError = esErrorRed ? "Sin conexión" : "Error de conexión";
+                const mensajeError = esErrorRed
+                    ? "No se pudo conectar con el servidor. Verifica tu conexión a internet e intenta de nuevo."
+                    : "Ocurrió un problema al enviar tu mensaje. Intenta de nuevo en unos momentos.";
+                mostrarToast("error", tituloError, mensajeError);
             } finally {
                 if (!redirigiendo) {
                     if (overlayContacto) {

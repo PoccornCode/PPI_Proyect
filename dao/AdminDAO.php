@@ -70,7 +70,7 @@ class AdminDAO
             $contactos = (int)($row['contactos_pendientes'] ?? 0);
             $resumen['subastas_pendientes'] = $subastas;
             $resumen['contactos_pendientes'] = $contactos;
-            $resumen['total'] = $subastas + $contactos;
+            $resumen['total'] = $subastas; // Solo subastas mientras contactos esté oculto
         }
 
         return $resumen;
@@ -674,7 +674,12 @@ class AdminDAO
                           COUNT(DISTINCT CASE WHEN LOWER(s.estado) = 'cancelada' THEN s.id_subasta END) AS subastas_canceladas,
                           COUNT(DISTINCT CASE WHEN LOWER(s.estado) = 'rechazada' THEN s.id_subasta END) AS subastas_rechazadas
                    FROM sb_producto p
-                   LEFT JOIN sb_subasta s ON s.id_producto = p.id_producto
+                   LEFT JOIN (
+                       SELECT id_producto, MAX(id_subasta) AS max_id
+                       FROM sb_subasta
+                       GROUP BY id_producto
+                   ) ult ON ult.id_producto = p.id_producto
+                   LEFT JOIN sb_subasta s ON s.id_subasta = ult.max_id
                    WHERE p.id_usuario = ?";
         $stmtSub = $this->conexion->prepare($sqlSub);
         if ($stmtSub) {

@@ -131,8 +131,9 @@ if ($opcion === "actualizarDatos") {
     $apellido = trim($_POST['apellido'] ?? '');
     $telefono = trim($_POST['telefono'] ?? '');
     $ubicacion = trim($_POST['ubicacion'] ?? '');
+    $username = trim($_POST['username'] ?? '');
  
-    if ($nombre === '' || $apellido === '' || $telefono === '' || $ubicacion === '') {
+    if ($nombre === '' || $apellido === '' || $telefono === '' || $ubicacion === '' || $username === '') {
         echo json_encode(["estado" => false, "mensaje" => "Por favor completa todos los campos."]);
         exit;
     }
@@ -168,13 +169,25 @@ if ($opcion === "actualizarDatos") {
         exit;
     }
  
+    if (!preg_match('/^[A-Za-z0-9._-]{3,50}$/', $username)) {
+        echo json_encode(["estado" => false, "campo" => "username", "mensaje" => "El usuario debe tener de 3 a 50 caracteres: letras, números, punto, guion y guion bajo."]);
+        exit;
+    }
+
     $dao = new PerfilDAO();
-    $resultado = $dao->actualizarDatos($id_usuario, $nombre, $apellido, $ubicacion, $telefono);
+
+    if ($dao->existeUsernameEnOtro($username, $id_usuario)) {
+        echo json_encode(["estado" => false, "campo" => "username", "mensaje" => "Este nombre de usuario ya está en uso."]);
+        exit;
+    }
+
+    $resultado = $dao->actualizarDatos($id_usuario, $nombre, $apellido, $ubicacion, $telefono, $username);
  
     if (!empty($resultado['estado'])) {
         // para que el nombre del menu se actualice
         $_SESSION['nombre'] = $nombre;
         $_SESSION['apellido'] = $apellido;
+        $_SESSION['username'] = $username;
     }
  
     echo json_encode($resultado);

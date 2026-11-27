@@ -43,7 +43,12 @@ class PerfilDAO
                        COUNT(DISTINCT CASE WHEN LOWER(s.estado) = 'activa' AND s.fecha_final > NOW() THEN s.id_subasta END) AS activas,
                        COUNT(DISTINCT CASE WHEN LOWER(s.estado) = 'pendiente' THEN s.id_subasta END) AS pendientes
                 FROM sb_producto p
-                LEFT JOIN sb_subasta s ON s.id_producto = p.id_producto
+                LEFT JOIN (
+                    SELECT id_producto, MAX(id_subasta) AS max_id
+                    FROM sb_subasta
+                    GROUP BY id_producto
+                ) ult ON ult.id_producto = p.id_producto
+                LEFT JOIN sb_subasta s ON s.id_subasta = ult.max_id
                 WHERE p.id_usuario = ?";
         $stmt = $this->conexion->prepare($sql);
         $stmt->bind_param("i", $id_usuario);
@@ -69,7 +74,12 @@ class PerfilDAO
                        COALESCE(MAX(pu.monto), s.precio_inicial) AS precio_actual,
                        TIMESTAMPDIFF(SECOND, NOW(), s.fecha_final) AS segundos_restantes
                 FROM sb_producto p
-                INNER JOIN sb_subasta s ON s.id_producto = p.id_producto
+                INNER JOIN (
+                    SELECT id_producto, MAX(id_subasta) AS max_id
+                    FROM sb_subasta
+                    GROUP BY id_producto
+                ) ult ON ult.id_producto = p.id_producto
+                INNER JOIN sb_subasta s ON s.id_subasta = ult.max_id
                 LEFT JOIN sb_imagen_producto img ON img.id_producto = p.id_producto AND img.principal = 1
                 LEFT JOIN sb_puja pu ON pu.id_subasta = s.id_subasta
                 WHERE p.id_usuario = ? AND LOWER(s.estado) = 'activa' AND s.fecha_final > NOW()
@@ -97,10 +107,15 @@ class PerfilDAO
     public function obtenerResumenModeracion()
     {
         $sql = "SELECT
-                    COALESCE(SUM(LOWER(estado) = 'pendiente'), 0) AS pendientes,
-                    COALESCE(SUM(LOWER(estado) = 'activa' AND fecha_final > NOW()), 0) AS activas,
-                    COALESCE(SUM(LOWER(estado) IN ('finalizada', 'sin_ofertas')), 0) AS cerradas
-                FROM sb_subasta";
+                    COALESCE(SUM(LOWER(s.estado) = 'pendiente'), 0) AS pendientes,
+                    COALESCE(SUM(LOWER(s.estado) = 'activa' AND s.fecha_final > NOW()), 0) AS activas,
+                    COALESCE(SUM(LOWER(s.estado) IN ('finalizada', 'sin_ofertas')), 0) AS cerradas
+                FROM sb_subasta s
+                INNER JOIN (
+                    SELECT MAX(id_subasta) AS max_id
+                    FROM sb_subasta
+                    GROUP BY id_producto
+                ) ult ON s.id_subasta = ult.max_id";
         $res = $this->conexion->query($sql);
         $fila = $res ? $res->fetch_assoc() : [];
 
@@ -131,14 +146,24 @@ class PerfilDAO
         ];
     }
 
-    // actualiza nombre, apellido, ubicacion y telefono del usuario
-    public function actualizarDatos($id_usuario, $nombre, $apellido, $ubicacion, $telefono)
+    public function existeUsernameEnOtro($username, $id_usuario)
+    {
+        $stmt = $this->conexion->prepare("SELECT id_usuario FROM sb_usuario WHERE username = ? AND id_usuario <> ? LIMIT 1");
+        $stmt->bind_param("si", $username, $id_usuario);
+        $stmt->execute();
+        $existe = $stmt->get_result()->num_rows > 0;
+        $stmt->close();
+        return $existe;
+    }
+
+    // actualizar modificaciones 
+    public function actualizarDatos($id_usuario, $nombre, $apellido, $ubicacion, $telefono, $username)
     {
         $this->conexion->begin_transaction();
         try {
-            $sql = "UPDATE sb_usuario SET nombre = ?, apellido = ?, ubicacion = ? WHERE id_usuario = ?";
+            $sql = "UPDATE sb_usuario SET nombre = ?, apellido = ?, ubicacion = ?, username = ? WHERE id_usuario = ?";
             $stmt = $this->conexion->prepare($sql);
-            $stmt->bind_param("sssi", $nombre, $apellido, $ubicacion, $id_usuario);
+            $stmt->bind_param("ssssi", $nombre, $apellido, $ubicacion, $username, $id_usuario);
             $stmt->execute();
             $stmt->close();
  
@@ -164,6 +189,9 @@ class PerfilDAO
             return ["estado" => true, "mensaje" => "Tus datos se actualizaron correctamente."];
         } catch (Throwable $e) {
             $this->conexion->rollback();
+            if ((int)$e->getCode() === 1062 || (int)$this->conexion->errno === 1062) {
+                return ["estado" => false, "campo" => "username", "mensaje" => "Este nombre de usuario ya está en uso."];
+            }
             error_log("[PerfilDAO] Error al actualizar datos: " . $e->getMessage());
             return ["estado" => false, "mensaje" => "No se pudieron guardar los cambios. Inténtalo de nuevo."];
         }

@@ -52,17 +52,36 @@
     function renderTabla(usuarios) {
         if (!Array.isArray(usuarios) || usuarios.length === 0) {
             const hayFiltros = estado.q !== '' || estado.idRol > 0 || estado.estadoFiltro !== 'todos';
-            const mensaje = hayFiltros
-                ? 'No se encontraron usuarios que coincidan con la búsqueda o el filtro.'
-                : 'No se encontraron usuarios registrados.';
+            const subtitulo = hayFiltros
+                ? 'Prueba con otro término de búsqueda o cambia los filtros seleccionados.'
+                : 'No hay usuarios registrados en este momento.';
+            const btnLimpiar = hayFiltros
+                ? `<button type="button" class="mod-btn-sm mod-btn-cancel" id="admUsersClearFiltersBtn"><i class="fa-solid fa-rotate-left"></i> Limpiar filtros</button>`
+                : '';
             tbodyEl.innerHTML = `
                 <tr>
-                    <td colspan="5" class="adm-table-empty">
-                        <i class="fa-solid fa-users-slash" aria-hidden="true"></i>
-                        <span>${escHtml(mensaje)}</span>
+                    <td colspan="5" class="text-center py-4">
+                        <div class="adm-cat-empty-icon mx-auto"><i class="fa-solid fa-users-slash" aria-hidden="true"></i></div>
+                        <h3 class="h6 text-white fw-bold mb-1">No se encontraron usuarios</h3>
+                        <p class="small ${hayFiltros ? 'mb-3' : 'mb-0'}" style="color:#9aa392;">${escHtml(subtitulo)}</p>
+                        ${btnLimpiar}
                     </td>
                 </tr>
             `;
+            const clearBtn = document.getElementById('admUsersClearFiltersBtn');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    if (searchInput) searchInput.value = '';
+                    if (roleFilter) roleFilter.value = '0';
+                    if (statusFilter) statusFilter.value = 'todos';
+                    estado.q = '';
+                    estado.idRol = 0;
+                    estado.estadoFiltro = 'todos';
+                    estado.pagina = 1;
+                    window.AdminUsuarios?.recargar();
+                    searchInput?.focus();
+                });
+            }
             return;
         }
 

@@ -65,7 +65,7 @@ $urlSubasta = 'views/subasta.php?id=';
 
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
-    <link href="assets/css/main.css?v=45" rel="stylesheet">
+    <link href="assets/css/main.css?v=50" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi">
@@ -102,35 +102,7 @@ $urlSubasta = 'views/subasta.php?id=';
             </div>
         </section>
 
-        <section class="py-4" aria-label="Buscador de subastas">
-            <div class="container-fluid px-4 px-lg-5">
-                <form action="views/catalogo.php" method="GET" class="row g-3" role="search">
-                    <div class="col-lg">
-                        <input type="search" class="form-control py-3" id="q" name="q" placeholder="Busca un producto, marca o palabra clave" aria-label="Buscar subasta">
-                    </div>
-                    <div class="col-sm-6 col-lg-3">
-                        <select class="form-select py-3" id="categoria" name="categoria" aria-label="Categoría">
-                            <option value="">Todas las categorías</option>
-                            <?php foreach ($categoriasSelect as $cat) { ?>
-                                <option value="<?= e($cat['nombre']) ?>"><?= e($cat['nombre']) ?></option>
-                            <?php } ?>
-                        </select>
-                    </div>
-                    <div class="col-sm-6 col-lg-2">
-                        <select class="form-select py-3" id="estado" name="estado" aria-label="Estado">
-                            <option value="activas">Activas</option>
-                            <option value="hoy">Terminan hoy</option>
-                            <option value="proximas">Próximas</option>
-                        </select>
-                    </div>
-                    <div class="col-12 col-lg-auto">
-                        <button type="submit" class="w-100 btn btn-primary py-3 px-5 fw-bold">Buscar</button>
-                    </div>
-                </form>
-            </div>
-        </section>
-
-        <section class="py-4" aria-labelledby="titulo-destacada">
+        <section class="pt-2 pb-4" aria-labelledby="titulo-destacada">
             <div class="container-fluid px-4 px-lg-5">
                 <div class="row g-4">
 
@@ -261,6 +233,7 @@ $urlSubasta = 'views/subasta.php?id=';
     <?php include "views/Footer/footer.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/toast-ppi.js"></script>
     <script src="assets/js/temporizador-subastas.js?v=<?= filemtime(__DIR__ . '/assets/js/temporizador-subastas.js') ?>" defer></script>
 </body>
 

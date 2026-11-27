@@ -68,10 +68,20 @@ function inicializarDropzone() {
     inputImagenes.addEventListener("change", function (event) {
         const permitidos = ["image/jpeg", "image/png", "image/webp"];
         const elegidos = Array.from(event.target.files);
-        const nuevos = elegidos.filter(f => permitidos.includes(f.type));
+        const maxBytes = 5 * 1024 * 1024;
+        const conFormato = elegidos.filter(f => permitidos.includes(f.type));
+        let nuevos = conFormato.filter(f => f.size <= maxBytes);
 
-        if (nuevos.length < elegidos.length) {
+        if (conFormato.length < elegidos.length) {
             mostrarModal("warning", "Formato no válido", "Solo se permiten imágenes JPG, PNG o WEBP.");
+        } else if (nuevos.length < conFormato.length) {
+            mostrarModal("warning", "Imagen muy pesada", "Cada imagen debe pesar menos de 5 MB.");
+        }
+
+        const espacio = 5 - totalImagenesVisibles();
+        if (nuevos.length > espacio) {
+            nuevos = nuevos.slice(0, Math.max(espacio, 0));
+            mostrarModal("warning", "Límite de fotografías", "El producto puede tener máximo 5 fotografías.");
         }
 
         imagenesNuevas.push(...nuevos);
@@ -116,10 +126,6 @@ function renderNuevas() {
 
         btnQuitar.addEventListener("click", (e) => {
             e.stopPropagation();
-            if (totalImagenesVisibles() <= 1) {
-                mostrarModal("warning", "Acción no permitida", "El producto debe tener al menos una fotografía.");
-                return;
-            }
             imagenesNuevas.splice(index, 1);
             renderNuevas();
         });
@@ -226,10 +232,6 @@ function cargarImagenesActuales(imagenes) {
 
         btnQuitar.addEventListener("click", (e) => {
             e.stopPropagation();
-            if (totalImagenesVisibles() <= 1) {
-                mostrarModal("warning", "Acción no permitida", "El producto debe tener al menos una fotografía.");
-                return;
-            }
             idsEliminar.push(imagen.id_imagen_producto);
             div.remove();
 
@@ -288,6 +290,12 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!validarFormulario()) {
             return;
         }
+
+        if (totalImagenesVisibles() === 0) {
+            mostrarModal("warning", "Fotografías requeridas", "Debes agregar al menos una fotografía del producto.");
+            return;
+        }
+
         enviando = true;
         btnGuardar.disabled = true;
         inputImagenes.disabled = true;

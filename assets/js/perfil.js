@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
                     });
                 } catch (_) {
-                    // Silencioso para no interrumpir al usuario si hay un corte momentáneo
+                    // Silencioso para no interrumpir al user
                 } finally {
                     consultando = false;
                 }
@@ -304,7 +304,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 abrirAlertaSobreModal("error", "No se pudo cambiar", resultado.mensaje || "Inténtalo de nuevo.", foco);
             }
         } catch (error) {
-            abrirAlertaSobreModal("error", "Error de conexión", error.message || "No se pudo comunicar con el servidor.");
+            const esErrorRed = !navigator.onLine
+                || error instanceof TypeError
+                || /failed to fetch|networkerror|load failed/i.test(error?.message || "");
+            const tituloError = esErrorRed ? "Sin conexión" : "Error de conexión";
+            const mensajeError = esErrorRed
+                ? "No se pudo conectar con el servidor. Verifica tu conexión a internet e intenta de nuevo."
+                : "Ocurrió un problema al procesar tu solicitud. Intenta de nuevo en unos momentos.";
+            abrirAlertaSobreModal("error", tituloError, mensajeError);
         } finally {
             btnGuardar.disabled = false;
             btnGuardar.textContent = "Guardar contraseña";
@@ -315,6 +322,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // editar datos personales
 const REGEX_TELEFONO = /^\d{4}-\d{4}$/;
 const REGEX_NOMBRE = /^\p{L}+(?:[\s'-]\p{L}+)*$/u;
+const REGEX_USERNAME = /^[A-Za-z0-9._-]{3,50}$/;
 
 document.addEventListener("DOMContentLoaded", () => {
     const modalEl = document.getElementById("modalEditarPerfil");
@@ -326,13 +334,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const apellido = document.getElementById("edit_apellido");
     const telefono = document.getElementById("edit_telefono");
     const ubicacion = document.getElementById("edit_ubicacion");
-    const campos = [nombre, apellido, telefono, ubicacion];
+    const username = document.getElementById("edit_username");
+    const campos = [nombre, apellido, telefono, ubicacion, username];
 
     const feedbackPorCampo = {
         edit_nombre: document.getElementById("err_edit_nombre"),
         edit_apellido: document.getElementById("err_edit_apellido"),
         edit_telefono: document.getElementById("err_edit_telefono"),
-        edit_ubicacion: document.getElementById("err_edit_ubicacion")
+        edit_ubicacion: document.getElementById("err_edit_ubicacion"),
+        edit_username: document.getElementById("err_edit_username")
     };
 
     function marcar(campo, ok, mensajeError = "") {
@@ -363,6 +373,12 @@ document.addEventListener("DOMContentLoaded", () => {
         if (campo === telefono) {
             if (valor === "") return marcar(campo, false, "Ingresa tu teléfono.");
             if (!REGEX_TELEFONO.test(valor)) return marcar(campo, false, "Usa el formato 7000-0000.");
+            return marcar(campo, true);
+        }
+
+        if (campo === username) {
+            if (valor === "") return marcar(campo, false, "Ingresa tu nombre de usuario.");
+            if (!REGEX_USERNAME.test(valor)) return marcar(campo, false, "Usa 3 a 50 caracteres: letras, números, punto, guion y guion bajo.");
             return marcar(campo, true);
         }
 
@@ -428,7 +444,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 // se recarga para que el nombre del perfil y del menu se vean actualizados
                 setTimeout(() => window.location.reload(), 1200);
             } else {
-                const mapaCampos = { nombre, apellido, telefono, ubicacion };
+                const mapaCampos = { nombre, apellido, telefono, ubicacion, username };
                 const campoSrv = mapaCampos[resultado.campo];
                 if (campoSrv) {
                     marcar(campoSrv, false, resultado.mensaje || "");
@@ -437,7 +453,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 mostrarToast("error", "No se pudo guardar", resultado.mensaje || "Inténtalo de nuevo.");
             }
         } catch (error) {
-            mostrarToast("error", "Error de conexión", error.message || "No se pudo comunicar con el servidor.");
+            const esErrorRed = !navigator.onLine
+                || error instanceof TypeError
+                || /failed to fetch|networkerror|load failed/i.test(error?.message || "");
+            const tituloError = esErrorRed ? "Sin conexión" : "Error de conexión";
+            const mensajeError = esErrorRed
+                ? "No se pudo conectar con el servidor. Verifica tu conexión a internet e intenta de nuevo."
+                : "Ocurrió un problema al guardar los cambios. Intenta de nuevo en unos momentos.";
+            mostrarToast("error", tituloError, mensajeError);
         } finally {
             btnGuardar.disabled = false;
             btnGuardar.textContent = "Guardar cambios";

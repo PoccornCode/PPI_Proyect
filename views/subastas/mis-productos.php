@@ -6,6 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__ . '/../../config/env.php';
 require_once __DIR__ . '/../../config/conexion.php';
 require_once __DIR__ . '/../../dao/ProductoDAO.php';
+require_once __DIR__ . '/../../dao/ModeradorDAO.php';
 
 if (!isset($_SESSION['id_usuario'])) {
     $_SESSION['redirect_after_login'] = BASE_URL . 'views/subastas/mis-productos.php';
@@ -22,7 +23,26 @@ $id_usuario = (int)$_SESSION['id_usuario'];
 $titulo = "Mis Productos";
 $pagina = "mis-productos";
 
+// Guarda la página de origen en el sitio para el botón Regresar (evita bucles con el formulario)
+$referer = trim((string)($_SERVER['HTTP_REFERER'] ?? ''));
+if ($referer !== '') {
+    $hostActual = strtolower((string)($_SERVER['HTTP_HOST'] ?? ''));
+    $hostReferer = strtolower((string)(parse_url($referer, PHP_URL_HOST) ?? ''));
+    $pathReferer = (string)(parse_url($referer, PHP_URL_PATH) ?? '');
+    $esMismoSitio = ($hostReferer === '' || $hostReferer === $hostActual);
+    $esRutaInterna = str_contains($pathReferer, 'mis-productos.php')
+        || str_contains($pathReferer, 'registro-producto.php')
+        || str_contains($pathReferer, 'login.php');
+    if ($esMismoSitio && !$esRutaInterna) {
+        $_SESSION['mis_productos_volver'] = $referer;
+    }
+}
+$urlRegresar = $_SESSION['mis_productos_volver'] ?? (BASE_URL . 'index.php');
+
+(new ModeradorDAO($conexion))->inactivarSubastasVencidas();
+
 $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -44,7 +64,7 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
     <link href="<?= BASE_URL ?>assets/css/style.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/main.css?v=14" rel="stylesheet">
     <link href="<?= BASE_URL ?>assets/css/forms.css?v=14" rel="stylesheet">
-    <link href="<?= BASE_URL ?>assets/css/productos.css?v=5" rel="stylesheet">
+    <link href="<?= BASE_URL ?>assets/css/productos.css?v=11" rel="stylesheet">
 </head>
 
 <body class="bg-dark-ppi d-flex flex-column min-vh-100">
@@ -59,12 +79,17 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                     <h2 class="text-main-ppi fw-bold mb-1">Mis Productos</h2>
                     <p class="text-second-ppi small mb-0">Gestiona tus productos registrados y publícalos en subasta.</p>
                 </div>
-                <a href="<?= BASE_URL ?>views/subastas/registro-producto.php" class="btn btn-outline-publish btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2">
+                <a href="<?= BASE_URL ?>views/subastas/registro-producto.php?origen=mis-productos" class="btn btn-outline-publish btn-sm px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2">
                     <i class="fas fa-plus"></i> Registrar Nuevo Producto
                 </a>
             </div>
 
             <?php if (empty($productos)): ?>
+                <div class="mb-3">
+                    <a href="<?= htmlspecialchars($urlRegresar, ENT_QUOTES, 'UTF-8') ?>" class="text-second-ppi text-decoration-none small d-inline-flex align-items-center gap-2">
+                        <i class="fas fa-arrow-left"></i> Regresar
+                    </a>
+                </div>
                 <div class="empty-state-box">
                     <div class="mb-3">
                         <i class="fas fa-box-open fs-1 text-second-ppi opacity-50"></i>
@@ -73,11 +98,27 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                     <p class="text-second-ppi small mb-4 mx-auto" style="max-width: 480px;">
                         Comienza publicando los detalles de tu producto (fotografías, descripción y condición). Luego podrás programar su subasta y enviarla a revisión.
                     </p>
-                    <a href="<?= BASE_URL ?>views/subastas/registro-producto.php" class="btn btn-primary px-4 py-2 fw-semibold">
+                    <a href="<?= BASE_URL ?>views/subastas/registro-producto.php?origen=mis-productos" class="btn btn-primary px-4 py-2 fw-semibold">
                         <i class="fas fa-plus me-1"></i> Publicar mi primer producto
                     </a>
                 </div>
             <?php else: ?>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="<?= htmlspecialchars($urlRegresar, ENT_QUOTES, 'UTF-8') ?>" class="text-second-ppi text-decoration-none small d-inline-flex align-items-center gap-2">
+                        <i class="fas fa-arrow-left"></i> Regresar
+                    </a>
+                    <select id="filtroEstado" class="form-select select-gavel w-auto" aria-label="Filtrar por estado de la subasta">
+                        <option value="todos" selected>Todos los productos</option>
+                        <option value="sin_subasta">Sin subasta</option>
+                        <option value="pendiente">En revisión</option>
+                        <option value="activa">En subasta</option>
+                        <option value="rechazada">Rechazada</option>
+                        <option value="finalizada">Finalizada</option>
+                        <option value="sin_ofertas">Sin ofertas</option>
+                        <option value="cancelada">Cancelada</option>
+                    </select>
+                </div>
+
                 <div class="row g-4">
                     <?php foreach ($productos as $item): ?>
                         <?php
@@ -85,9 +126,30 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                             ? BASE_URL . 'uploads/productos/' . htmlspecialchars($item['imagen_principal'])
                             : BASE_URL . 'assets/img/hero-img.jpg';
 
+                        // Normaliza el estado de la subasta para decidir qué badge y botones mostrar en la tarjeta
                         $estadoSubasta = $item['estado_subasta'] ?? null;
+                        $estadoNorm = $estadoSubasta !== null ? strtolower(trim((string)$estadoSubasta)) : '';
+                        $idSubasta = (int)($item['id_subasta'] ?? 0);
+                        $motivoRechazo = (string)($item['motivo_rechazo'] ?? '');
+                        if ($estadoNorm === 'rechazada' && $motivoRechazo === '') {
+                            $motivoRechazo = 'El moderador no indicó un motivo.';
+                        }
+
+                        // Empaqueta los datos del producto y su subasta en JSON seguro para abrir el modal "Ver detalles"
+                        $detalleJson = htmlspecialchars(json_encode([
+                            'nombre' => (string)($item['nombre'] ?? ''),
+                            'descripcion' => (string)($item['descripcion'] ?? ''),
+                            'condicion' => (string)($item['condicion'] ?? ''),
+                            'categoria' => (string)($item['categoria'] ?? 'Sin categoría'),
+                            'imagen' => $imgRuta,
+                            'estado_subasta' => $estadoNorm,
+                            'precio_inicial' => $item['precio_inicial'] ?? null,
+                            'fecha_inicial' => $item['fecha_inicial'] ?? null,
+                            'fecha_final' => $item['fecha_final'] ?? null,
+                            'motivo_rechazo' => $motivoRechazo,
+                        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8');
                         ?>
-                        <div class="col-md-6 col-lg-4 col-xl-3">
+                        <div class="col-md-6 col-lg-4 col-xl-3 item-producto" data-estado="<?= $estadoNorm === '' ? 'sin_subasta' : htmlspecialchars($estadoNorm) ?>">
                             <div class="producto-card">
                                 <div class="producto-img-wrapper">
                                     <img src="<?= $imgRuta ?>" alt="<?= htmlspecialchars($item['nombre']) ?>" onerror="this.onerror=null; this.src='<?= BASE_URL ?>assets/img/hero-img.jpg';">
@@ -104,25 +166,25 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                                             <?= htmlspecialchars($item['condicion']) ?>
                                         </span>
 
-                                        <?php if (empty($estadoSubasta)): ?>
+                                        <?php if ($estadoNorm === ''): ?>
                                             <span class="status-badge status-none">
                                                 <span class="status-dot"></span> Sin subasta
                                             </span>
-                                        <?php elseif (strtolower($estadoSubasta) === 'pendiente' || strtolower($estadoSubasta) === 'en revision'): ?>
+                                        <?php elseif ($estadoNorm === 'pendiente' || $estadoNorm === 'en revision'): ?>
                                             <span class="status-badge status-revision">
                                                 <span class="status-dot"></span> En revisión
                                             </span>
-                                        <?php elseif (strtolower($estadoSubasta) === 'activa' || strtolower($estadoSubasta) === 'abierta'): ?>
+                                        <?php elseif ($estadoNorm === 'activa' || $estadoNorm === 'abierta'): ?>
                                             <span class="status-badge status-activa">
                                                 <span class="status-dot"></span> En subasta
                                             </span>
-                                        <?php elseif (strtolower($estadoSubasta) === 'sin_ofertas'): ?>
+                                        <?php elseif ($estadoNorm === 'sin_ofertas'): ?>
                                             <span class="status-badge status-finalizada">
                                                 <span class="status-dot"></span> Sin ofertas
                                             </span>
                                         <?php else: ?>
                                             <span class="status-badge status-finalizada">
-                                                <span class="status-dot"></span> <?= htmlspecialchars(ucfirst($estadoSubasta)) ?>
+                                                <span class="status-dot"></span> <?= htmlspecialchars(ucfirst($estadoNorm)) ?>
                                             </span>
                                         <?php endif; ?>
                                     </div>
@@ -131,37 +193,91 @@ $productos = obtenerProductosPorUsuario($conexion, $id_usuario);
                                         <?= htmlspecialchars($item['nombre']) ?>
                                     </h5>
 
-                                    <p class="text-second-ppi small mb-3 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                    <p class="text-second-ppi small mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                                         <?= htmlspecialchars($item['descripcion']) ?>
                                     </p>
 
-                                    <div class="d-flex gap-2 mt-2">
-                                        <a href="<?= BASE_URL ?>views/subastas/registro-producto.php?id=<?= (int)$item['id_producto'] ?>" class="btn btn-modificar-producto btn-sm flex-grow-1">
-                                            <i class="fas fa-edit"></i> Modificar
-                                        </a>
+                                <?php // Acciones según el estado actual de la subasta ?>
+                                        <div class="d-flex gap-2 mt-auto pt-2">
+                                            <?php if ($estadoNorm === ''): // Sin subasta: subastar, ver, modificar, eliminar ?>
+                                                <button type="button" class="btn btn-subastar-producto btn-sm flex-grow-1 btn-abrir-subasta"
+                                                    data-id-producto="<?= (int)$item['id_producto'] ?>"
+                                                    data-nombre="<?= htmlspecialchars($item['nombre']) ?>"
+                                                    data-estado-anterior="" data-motivo-rechazo="">
+                                                    <i class="fas fa-gavel"></i> Subastar
+                                                </button>
 
-                                        <form action="<?= BASE_URL ?>controllers/ControllerProducto.php?id=<?= (int)$item['id_producto'] ?>" method="POST" class="flex-grow-1 form-eliminar">
-                                            <input type="hidden" name="opcion" value="eliminar">
-                                            <button type="submit" class="btn btn-eliminar-producto btn-sm w-100">
-                                                <i class="fas fa-trash"></i> Eliminar
+                                            <?php elseif ($estadoNorm === 'pendiente'): // En revisión: cancelar, ver, modificar, eliminar ?>
+                                                <button type="button" class="btn btn-eliminar-producto btn-sm flex-grow-1 btn-cancelar-solicitud"
+                                                    data-id-subasta="<?= $idSubasta ?>"
+                                                    data-url="<?= BASE_URL ?>controllers/ControllerProducto.php"
+                                                    data-nombre="<?= htmlspecialchars($item['nombre']) ?>">
+                                                    <i class="fas fa-times"></i> Cancelar solicitud
+                                                </button>
+
+                                            <?php elseif ($estadoNorm === 'activa'): // En subasta: ver subasta y ver detalles ?>
+                                                <a href="<?= BASE_URL ?>views/subasta.php?id=<?= $idSubasta ?>" class="btn btn-subastar-producto btn-sm flex-grow-1">
+                                                    <i class="fas fa-gavel"></i> Ver subasta
+                                                </a>
+
+                                            <?php elseif (in_array($estadoNorm, ['rechazada', 'cancelada', 'sin_ofertas'], true)): // Reenviar/resubastar, ver, modificar, eliminar ?>
+                                                <button type="button" class="btn btn-subastar-producto btn-sm flex-grow-1 btn-abrir-subasta"
+                                                    data-id-producto="<?= (int)$item['id_producto'] ?>"
+                                                    data-nombre="<?= htmlspecialchars($item['nombre']) ?>"
+                                                    data-estado-anterior="<?= htmlspecialchars($estadoNorm) ?>"
+                                                    data-motivo-rechazo="<?= htmlspecialchars($motivoRechazo) ?>">
+                                                    <i class="fas fa-redo"></i> <?= $estadoNorm === 'rechazada' ? 'Reenviar' : 'Resubastar' ?>
+                                                </button>
+
+                                            <?php else: // Finalizada: chat con el ganador ?>
+                                                <a href="<?= BASE_URL ?>views/chat.php?subasta=<?= $idSubasta ?>" class="btn btn-subastar-producto btn-sm flex-grow-1">
+                                                    <i class="fas fa-comment-dots"></i> Mensaje al ganador
+                                                </a>
+                                            <?php endif; ?>
+
+                                            <button type="button" class="btn btn-modificar-producto btn-sm btn-accion-icon btn-ver-detalle" data-detalle="<?= $detalleJson ?>" title="Ver detalles" aria-label="Ver detalles">
+                                                <i class="fas fa-eye"></i>
                                             </button>
-                                        </form>
+
+                                            <?php if (!in_array($estadoNorm, ['activa', 'finalizada'], true)): // Modificar y eliminar: bloqueados solo en activa y finalizada ?>
+                                                <a href="<?= BASE_URL ?>views/subastas/registro-producto.php?id=<?= (int)$item['id_producto'] ?>" class="btn btn-modificar-producto btn-sm btn-accion-icon" title="Modificar" aria-label="Modificar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <form action="<?= BASE_URL ?>controllers/ControllerProducto.php?id=<?= (int)$item['id_producto'] ?>" method="POST" class="form-eliminar" data-nombre="<?= htmlspecialchars($item['nombre']) ?>">
+                                                    <input type="hidden" name="opcion" value="eliminar">
+                                                    <button type="submit" class="btn btn-eliminar-producto btn-sm btn-accion-icon" title="Eliminar" aria-label="Eliminar">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            <?php endif; ?>
+                                        </div>
+
                                     </div>
-                                </div>
                             </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
+
+                <p id="sinResultadosFiltro" class="text-second-ppi text-center py-5 mb-0 d-none">
+                    No tienes productos con este estado.
+                </p>
             <?php endif; ?>
 
         </div>
     </main>
 
+    <?php include __DIR__ . "/partials/modal-detalle-producto.php"; ?>
+    <?php include __DIR__ . "/partials/modal-publicar-subasta.php"; ?>
+    <?php include __DIR__ . "/partials/modal-eliminar-producto.php"; ?>
+    <?php include __DIR__ . "/partials/modal-cancelar-solicitud.php"; ?>
     <?php include __DIR__ . "/../Footer/footer.php"; ?>
 
+    <script>
+        window.BASE_URL_APP = <?= json_encode(BASE_URL) ?>;
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>assets/js/toast-ppi.js?v=2"></script>
-    <script src="<?= BASE_URL ?>assets/js/mis-productos.js?v=1"></script>
+    <script src="<?= BASE_URL ?>assets/js/mis-productos.js?v=14"></script>
 
     <?php if (isset($_SESSION['flash_toast'])): ?>
         <?php

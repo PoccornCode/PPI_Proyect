@@ -40,9 +40,6 @@ $totalSubastas = count($subastasLista);
                 <option value="cancelada">Cancelada</option>
             </select>
         </div>
-        <button type="button" class="adm-btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevaSubasta">
-            <i class="fa-solid fa-plus"></i> Nueva subasta
-        </button>
     </div>
 
     <div class="adm-table-card">
@@ -117,13 +114,14 @@ $totalSubastas = count($subastasLista);
                         </tr>
                     <?php endforeach; ?>
                     <tr id="admAuctionsEmptyRow" class="<?= $totalSubastas === 0 ? '' : 'd-none' ?>">
-                        <td colspan="6" class="text-center py-4" style="color: #9aa392;">
-                            <i class="fa-solid <?= $totalSubastas === 0 ? 'fa-box-open' : 'fa-magnifying-glass' ?> mb-2 d-block" id="admAuctionsEmptyIcon" style="font-size: 1.25rem; opacity: 0.7;"></i>
-                            <span id="admAuctionsEmptyText">
-                                <?= $totalSubastas === 0 ? 'No hay subastas registradas en este momento.' : 'No se encontraron subastas que coincidan con tu búsqueda.' ?>
-                            </span>
-                            <button type="button" class="btn btn-link btn-sm p-0 ms-2 <?= $totalSubastas === 0 ? 'd-none' : '' ?>" id="admAuctionsClearFiltersBtn" style="color: var(--adm-accent); text-decoration: none;">
-                                Limpiar filtros
+                        <td colspan="6" class="text-center py-4">
+                            <div class="adm-cat-empty-icon mx-auto"><i class="fa-solid fa-gavel" id="admAuctionsEmptyIcon" aria-hidden="true"></i></div>
+                            <h3 class="h6 text-white fw-bold mb-1">No se encontraron subastas</h3>
+                            <p class="small mb-3" style="color:#9aa392;" id="admAuctionsEmptyText">
+                                <?= $totalSubastas === 0 ? 'No hay subastas registradas en este momento.' : 'Prueba con otro término de búsqueda o cambia los filtros seleccionados.' ?>
+                            </p>
+                            <button type="button" class="mod-btn-sm mod-btn-cancel <?= $totalSubastas === 0 ? 'd-none' : '' ?>" id="admAuctionsClearFiltersBtn">
+                                <i class="fa-solid fa-rotate-left"></i> Limpiar filtros
                             </button>
                         </td>
                     </tr>
