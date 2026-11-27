@@ -54,12 +54,12 @@
         emptyRow.classList.remove('d-none');
 
         if (total === 0 && !hayFiltros) {
-            if (emptyRowIcon) emptyRowIcon.className = 'fa-solid fa-clipboard-check mb-2 d-block';
+            if (emptyRowIcon) emptyRowIcon.className = 'fa-solid fa-clipboard-check';
             if (emptyRowText) emptyRowText.textContent = 'No hay subastas pendientes por validar en este momento.';
             if (clearBtn) clearBtn.classList.add('d-none');
         } else {
-            if (emptyRowIcon) emptyRowIcon.className = 'fa-solid fa-magnifying-glass mb-2 d-block';
-            if (emptyRowText) emptyRowText.textContent = 'No se encontraron subastas que coincidan con tu búsqueda.';
+            if (emptyRowIcon) emptyRowIcon.className = 'fa-solid fa-gavel';
+            if (emptyRowText) emptyRowText.textContent = 'Prueba con otro término de búsqueda o cambia los filtros seleccionados.';
             if (clearBtn) clearBtn.classList.remove('d-none');
         }
     }

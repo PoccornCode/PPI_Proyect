@@ -70,7 +70,7 @@ class AdminDAO
             $contactos = (int)($row['contactos_pendientes'] ?? 0);
             $resumen['subastas_pendientes'] = $subastas;
             $resumen['contactos_pendientes'] = $contactos;
-            $resumen['total'] = $subastas + $contactos;
+            $resumen['total'] = $subastas; // Solo subastas mientras contactos esté oculto
         }
 
         return $resumen;
